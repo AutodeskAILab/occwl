@@ -1,4 +1,5 @@
 from OCC.Display.SimpleGui import init_display
+from OCC.Core.AIS import AIS_Shape, AIS_Shaded, AIS_TexturedShape, AIS_WireFrame, AIS_Shape_SelectionMode
 from datetime import datetime
 import time
 
@@ -12,14 +13,20 @@ class Viewer:
         self.add_submenu("camera", self.fit)
         self.add_submenu("camera", self.perspective)
         self.add_submenu("camera", self.orthographic)
-        self.add_submenu("camera", self.save_image)
+        self.add_menu("rendering")
+        self.add_submenu("rendering", self.wireframe)
+        self.add_submenu("rendering", self.shaded)
+        self.add_submenu("rendering", None)
+        self.add_submenu("rendering", self.save_image)
 
-    
     def display(self, shape, update=False, color=None):
         if color:
             self._display.DisplayColoredShape(shape, update=False, color=color)
         else:
             self._display.DisplayShape(shape, update=False)
+
+    def on_select(self, callback):
+        self._display.register_select_callback(callback)
 
     def show(self):
         self._start_display()
@@ -48,6 +55,26 @@ class Viewer:
         self._display.SetOrthographicProjection()
         self._display.FitAll()
     
+    def wireframe(self):
+        self._display.View.SetComputedMode(False)
+        self._display.Context.SetDisplayMode(AIS_WireFrame, True)
+
+    def shaded(self):
+        self._display.View.SetComputedMode(False)
+        self._display.Context.SetDisplayMode(AIS_Shaded, True)
+
+    def selection_mode(self, entity):
+        if entity == "vertex":
+            self._display.SetSelectionModeVertex()
+        elif entity == "edge":
+            self._display.SetSelectionModeEdge()
+        elif entity == "face":
+            self._display.SetSelectionModeFace()
+        elif entity == "solid":
+            self._display.SetSelectionModeShape()
+        else:
+            raise NotImplementedError("Invalid entity type. Expected one of ('vertex', 'edge', 'face', 'solid')")
+
     def add_sphere(self):
         pass
 

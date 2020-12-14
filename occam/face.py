@@ -8,6 +8,7 @@ from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
 from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
 from OCC.Core.GeomAbs import GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, GeomAbs_Sphere, GeomAbs_Torus, GeomAbs_BezierSurface, GeomAbs_BSplineSurface
 
+
 class Face:
     def __init__(self, topods_face):
         self._face = topods_face
@@ -20,7 +21,22 @@ class Face:
     def surface(self):
         return BRep_Tool_Surface(self._face)
     
+    def specific_surface(self):
+        srf = BRepAdaptor_Surface(self._face)
+        surf_type = self.surface_type()
+        if surf_type == "plane":
+            return srf.Plane()
+        if surf_type == "cylinder":
+            return srf.Cylinder()
+        if surf_type == "torus":
+            return srf.Torus()
+        if surf_type == "bezier":
+            return srf.Bezier()
+    
     def reversed(self):
+        """
+        Returns if the orientation of the face is reversed i.e. TopAbs_REVERSED
+        """
         return self._face.Orientation() == TopAbs_REVERSED
 
     def point(self, u, v):
@@ -92,3 +108,12 @@ class Face:
     
     def neighboring_faces(self):
         pass
+
+    def vertices(self):
+        pass
+
+    def edges(self):
+        pass
+
+    def topods_face(self):
+        return self._face
