@@ -11,14 +11,17 @@ from OCC.Extend import TopologyUtils
 class Solid:
     def __init__(self, shape):
         assert isinstance(shape, TopoDS_Solid)
-        self.shape = shape
-        self.top_exp = TopologyUtils.TopologyExplorer(self.shape, True)
+        self._solid = shape
+        self.top_exp = TopologyUtils.TopologyExplorer(self._solid, True)
         self._face_attr = {}
 
     @staticmethod
     def box(width, height, depth):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
         return Solid(BRepPrimAPI_MakeBox(width, height, depth).Shape())
+
+    def topods_solid(self):
+        return self._solid
 
     def get_face_color(self, face):
         return self._face_attr.get("color").get(face)
