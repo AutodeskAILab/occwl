@@ -2,6 +2,9 @@ from OCC.Display.SimpleGui import init_display
 from OCC.Core.AIS import AIS_Shape, AIS_Shaded, AIS_TexturedShape, AIS_WireFrame, AIS_Shape_SelectionMode
 from datetime import datetime
 import time
+from occam.solid import Solid
+from occam.face import Face
+from occam.edge import Edge
 
 
 class Viewer:
@@ -16,10 +19,15 @@ class Viewer:
         self.add_menu("rendering")
         self.add_submenu("rendering", self.wireframe)
         self.add_submenu("rendering", self.shaded)
-        self.add_submenu("rendering", None)
         self.add_submenu("rendering", self.save_image)
 
     def display(self, shape, update=False, color=None):
+        if isinstance(shape, Solid):
+            shape = shape.topods_solid()
+        if isinstance(shape, Face):
+            shape = shape.topods_face()
+        if isinstance(shape, Edge):
+            shape = shape.topods_edge()
         if color:
             self._display.DisplayColoredShape(shape, update=False, color=color)
         else:
