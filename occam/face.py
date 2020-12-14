@@ -5,7 +5,8 @@ from OCC.Core.BRepTopAdaptor import BRepTopAdaptor_FClass2d
 from OCC.Core.BRep import BRep_Tool_Surface
 from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
-
+from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
+from OCC.Core.GeomAbs import GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, GeomAbs_Sphere, GeomAbs_Torus, GeomAbs_BezierSurface, GeomAbs_BSplineSurface
 
 class Face:
     def __init__(self, topods_face):
@@ -72,7 +73,22 @@ class Face:
         return uv.Coord()
 
     def surface_type(self):
-        pass
+        surf_type = BRepAdaptor_Surface(self._face).GetType()
+        if surf_type == GeomAbs_Plane:
+            return "plane"
+        if surf_type == GeomAbs_Cylinder:
+            return "cylinder"
+        if surf_type == GeomAbs_Cone:
+            return "cone"
+        if surf_type == GeomAbs_Sphere:
+            return "sphere"
+        if surf_type == GeomAbs_Torus:
+            return "torus"
+        if surf_type == GeomAbs_BezierSurface:
+            return "bezier"
+        if surf_type == GeomAbs_BSplineSurface:
+            return "bspline"
+        return "unknown"
     
     def neighboring_faces(self):
         pass
