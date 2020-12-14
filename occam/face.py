@@ -14,6 +14,9 @@ class Face:
         self._face = topods_face
         self._trimmed = BRepTopAdaptor_FClass2d(self._face, 1e-9)
     
+    def hash(self):
+        return self.topods_face().Hash()
+
     def inside(self, u, v):
         result = self._trimmed.Perform(gp_Pnt2d(u, v))
         return result == TopAbs_IN
@@ -32,6 +35,9 @@ class Face:
             return srf.Torus()
         if surf_type == "bezier":
             return srf.Bezier()
+        if surf_type == "bspline":
+            return srf.BSpline()
+        raise ValueError("Unknown surface type: ", surf_type)
     
     def reversed(self):
         """
@@ -104,6 +110,14 @@ class Face:
             return "bezier"
         if surf_type == GeomAbs_BSplineSurface:
             return "bspline"
+        if surf_type == GeomAbs_SurfaceOfRevolution:
+            return "revolution"
+        if surf_type == GeomAbs_SurfaceOfExtrusion:
+            return "extrusion"
+        if surf_type == GeomAbs_OffsetSurface:
+            return "offset"
+        if surf_type == GeomAbs_OtherSurface:
+            return "other"
         return "unknown"
     
     def neighboring_faces(self):
