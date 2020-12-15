@@ -10,8 +10,6 @@ from OCC.Core.GeomAbs import GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, Geom
 from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
 
-_HASH_UPPERBOUND = int(1e20)
-
 
 class Face:
     def __init__(self, topods_face):
