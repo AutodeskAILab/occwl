@@ -7,15 +7,20 @@ from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
 from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
 from OCC.Core.GeomAbs import GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, GeomAbs_Sphere, GeomAbs_Torus, GeomAbs_BezierSurface, GeomAbs_BSplineSurface
+from OCC.Extend import TopologyUtils
+from OCC.Core.TopoDS import TopoDS_Face
+
+_HASH_UPPERBOUND = int(1e20)
 
 
 class Face:
     def __init__(self, topods_face):
+        assert isinstance(topods_face, TopoDS_Face)
         self._face = topods_face
         self._trimmed = BRepTopAdaptor_FClass2d(self._face, 1e-9)
     
     def hash(self):
-        return self.topods_face().Hash()
+        return hash(self.topods_face())
 
     def inside(self, u, v):
         result = self._trimmed.Perform(gp_Pnt2d(u, v))
@@ -34,11 +39,11 @@ class Face:
         if surf_type == "torus":
             return srf.Torus()
         if surf_type == "bezier":
-            return srf.Bezier()
+            return srf.BezierSurface()
         if surf_type == "bspline":
-            return srf.BSpline()
+            return srf.BSplineSurface()
         raise ValueError("Unknown surface type: ", surf_type)
-    
+
     def reversed(self):
         """
         Returns if the orientation of the face is reversed i.e. TopAbs_REVERSED
@@ -119,15 +124,6 @@ class Face:
         if surf_type == GeomAbs_OtherSurface:
             return "other"
         return "unknown"
-    
-    def neighboring_faces(self):
-        pass
-
-    def vertices(self):
-        pass
-
-    def edges(self):
-        pass
 
     def topods_face(self):
         return self._face

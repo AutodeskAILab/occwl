@@ -1,22 +1,23 @@
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d
 from OCC.Core.BRep import BRep_Tool_Curve
-from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
-from OCC.Core.BRepTopAdaptor import BRepTopAdaptor_FClass2d
 from OCC.Core.GeomLProp import GeomLProp_SLProps
-from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.GeomAbs import GeomAbs_Line, GeomAbs_Circle, GeomAbs_Ellipse, GeomAbs_Hyperbola, GeomAbs_Parabola, GeomAbs_BezierCurve, GeomAbs_BSplineCurve, GeomAbs_OffsetCurve, GeomAbs_OtherCurve
+from OCC.Extend import TopologyUtils
+from OCC.Core.TopAbs import TopAbs_FACE
+from OCC.Core.TopoDS import TopoDS_Edge
 
 
 class Edge:
     def __init__(self, topods_edge):
+        assert isinstance(topods_edge, TopoDS_Edge)
         self._edge = topods_edge
     
     def topods_edge(self):
         return self._edge
 
     def hash(self):
-        return self.topods_edge().HashCode()
+        return hash(self.topods_edge())
     
     def point(self, u):
         pt = self.curve().Value(u)
@@ -65,13 +66,10 @@ class Edge:
 
 
     def u_bounds(self):
-        _, umin, umax = BRep_Tool_Curve(self._edge)
+        _, umin, umax = BRep_Tool_Curve(self.topods_edge())
         return umin, umax
     
     def twin_edge(self):
-        pass
-
-    def face(self):
         pass
 
     def convex(self):
