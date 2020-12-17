@@ -30,7 +30,7 @@ def uvgrid(face, num_u=10, num_v=10):
     return uvgrid
 
 
-def ugrid(edge: Edge, num_u: int =10):
+def ugrid(edge, num_u: int =10):
     """ 
     Creates a 1D UV-grid of samples from the given edge
     :param face: A B-rep edge of type occam.Edge
@@ -47,4 +47,3 @@ def ugrid(edge: Edge, num_u: int =10):
         ugrid[i, :3] = xyz
         ugrid[i, 3:6] = tgt
     return ugrid
-
