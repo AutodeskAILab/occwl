@@ -29,9 +29,9 @@ class Solid:
         return Solid(BRepPrimAPI_MakeBox(width, height, depth).Shape())
 
     @staticmethod
-    def sphere(radius):
+    def sphere(radius, center=(0, 0, 0)):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
-        return Solid(BRepPrimAPI_MakeSphere(radius).Shape())
+        return Solid(BRepPrimAPI_MakeSphere(gp_Pnt(*center), radius).Shape())
     
     @staticmethod
     def spherical_wedge(radius, center=(0, 0, 0), longitudinal_angle=2*math.pi):
