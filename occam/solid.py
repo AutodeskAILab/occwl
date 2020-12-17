@@ -67,6 +67,10 @@ class Solid:
     def faces_from_edge(self, edge):
         assert isinstance(edge, Edge)
         return map(Face, self._top_exp.faces_from_edge(edge.topods_edge()))
+    
+    def vertices_from_edge(self, edge):
+        assert isinstance(edge, Edge)
+        return map(Vertex, self._top_exp.vertices_from_edge(edge.topods_edge()))
 
     def num_faces(self):
         return self._top_exp.number_of_faces()
