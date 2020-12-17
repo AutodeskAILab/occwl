@@ -14,6 +14,7 @@ from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1
 import math
 from occam.edge import Edge
 from occam.face import Face
+from occam.vertex import Vertex
 
 
 class Solid:
@@ -51,7 +52,7 @@ class Solid:
         return self._solid
 
     def vertices(self) -> Iterator[TopoDS_Vertex]:
-        return self._top_exp.vertices()
+        return map(Vertex, self._top_exp.vertices())
 
     def edges(self) -> Iterator[TopoDS_Edge]:
         return map(Edge, self._top_exp.edges())
