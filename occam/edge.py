@@ -4,8 +4,9 @@ from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.GeomAbs import GeomAbs_Line, GeomAbs_Circle, GeomAbs_Ellipse, GeomAbs_Hyperbola, GeomAbs_Parabola, GeomAbs_BezierCurve, GeomAbs_BSplineCurve, GeomAbs_OffsetCurve, GeomAbs_OtherCurve
 from OCC.Extend import TopologyUtils
-from OCC.Core.TopAbs import TopAbs_FACE
 from OCC.Core.TopoDS import TopoDS_Edge
+from OCC.Core.GCPnts import GCPnts_AbscissaPoint
+from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 
 
 class Edge:
@@ -36,8 +37,9 @@ class Edge:
         self.curve().D1(u, pt, der)
         return (der.X(), der.Y(), der.Z())
 
-    def length(self):
-        pass
+    def length(self, tolerance=1e-9):
+        umin, umax = self.u_bounds()
+        return GCPnts_AbscissaPoint().Length(BRepAdaptor_Curve(self.topods_edge()), umin, umax, tolerance)
 
     def curve(self):
         return BRep_Tool_Curve(self._edge)[0]
@@ -60,8 +62,6 @@ class Edge:
             return self.curve().BSplineCurve()
         if curv_type == GeomAbs_OffsetCurve:
             return self.curve().OffsetCurve()
-        if curv_type == GeomAbs_OtherCurve:
-            return self.curve().OtherCurve()
         raise ValueError("Unknown curve type: ", curv_type)
 
 
