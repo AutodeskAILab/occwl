@@ -2,11 +2,11 @@ import numpy as np
 from occam.face import Face
 from occam.edge import Edge
 
-def uvgrid_reverse_u(grid):
+def _uvgrid_reverse_u(grid):
     reversed_grid = grid[::-1, :, :]
     return reversed_grid
 
-def ugrid_reverse_u(grid):
+def _ugrid_reverse_u(grid):
     return grid[::-1, :]
 
 def uvgrid(face, num_u=10, num_v=10):
@@ -35,7 +35,7 @@ def uvgrid(face, num_u=10, num_v=10):
             uvgrid[i, j, 6] = mask
 
     if face.reversed():
-        uvgrid = uvgrid_reverse_u(uvgrid)
+        uvgrid = _uvgrid_reverse_u(uvgrid)
 
     return uvgrid
 
@@ -64,6 +64,6 @@ def ugrid(edge, num_u: int =10):
         ugrid[i, 3:6] = tgt
 
     if edge.reversed():
-        ugrid = ugrid_reverse_u(ugrid)
+        ugrid = _ugrid_reverse_u(ugrid)
 
     return ugrid

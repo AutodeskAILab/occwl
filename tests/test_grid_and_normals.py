@@ -4,7 +4,7 @@ import numpy as np
 
 # OCC
 from occam.solid import Solid
-from occam.uvgrid import uvgrid, ugrid, uvgrid_reverse_u
+from occam.uvgrid import uvgrid, ugrid, _uvgrid_reverse_u
 
 # Test
 from test_base import TestBase
@@ -16,7 +16,7 @@ class GridTester(TestBase):
         self.run_test_on_all_files_in_folder(data_folder)
 
     def reverse_u_test(self, grid):
-        reversed_grid = uvgrid_reverse_u(grid)
+        reversed_grid = _uvgrid_reverse_u(grid)
         for i in range(grid.shape[0]):
             self.assertTrue((reversed_grid[i] == grid[grid.shape[0]-1-i]).all())
 
