@@ -1,5 +1,7 @@
 import numpy as np
 
+from geometry.interval import Interval
+
 class Box:
     """A 2d or 3d box for points defined as numpy arrays"""
     def __init__(
@@ -9,7 +11,7 @@ class Box:
         self.intervals = []
         if pt is not None:
             for value in pt:
-                self.intervals.append(Interval(value, value)
+                self.intervals.append(Interval(value, value))
 
     def encompass_box(self, box):
         if len(self.intervals) == 0:
@@ -21,9 +23,13 @@ class Box:
                 self.intervals[i].encompass_interval(interval)
 
     def encompass_point(self, point):
-        assert len(self.intervals) == point.size
-        for i, value in enumerate(point): 
-            self.intervals[i].encompass_value(value)
+        if len(self.intervals) == 0:
+            for i, value in enumerate(point): 
+                self.intervals.append(Interval(value, value))
+        else:
+            assert len(self.intervals) == point.size
+            for i, value in enumerate(point): 
+                self.intervals[i].encompass_value(value)
 
     def x_length(self):
         assert len(self.intervals) >= 1
@@ -33,9 +39,9 @@ class Box:
         assert len(self.intervals) >= 2
         return self.intervals[1].length()
         
-    def y_length(self):
+    def z_length(self):
         assert len(self.intervals) >= 2
-        return self.intervals[1].length()
+        return self.intervals[2].length()
 
     def max_box_length(self):
         max_length = 0.0
