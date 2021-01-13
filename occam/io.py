@@ -5,8 +5,9 @@ from OCC.Extend import TopologyUtils
 
 
 def load_step(step_filename):
+    step_filename_str = str(step_filename)
     reader = STEPControl_Reader()
-    reader.ReadFile(step_filename)
+    reader.ReadFile(step_filename_str)
     reader.TransferRoots()
     shape = reader.OneShape()
     exp = TopologyUtils.TopologyExplorer(shape, True)
