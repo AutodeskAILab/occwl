@@ -3,6 +3,7 @@ from OCC.Core.BRep import BRep_Tool_Curve
 from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.GeomAbs import GeomAbs_Line, GeomAbs_Circle, GeomAbs_Ellipse, GeomAbs_Hyperbola, GeomAbs_Parabola, GeomAbs_BezierCurve, GeomAbs_BSplineCurve, GeomAbs_OffsetCurve, GeomAbs_OtherCurve
+from OCC.Core.TopAbs import TopAbs_REVERSED
 from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Edge
 from OCC.Core.GCPnts import GCPnts_AbscissaPoint
@@ -29,7 +30,10 @@ class Edge:
         der = gp_Vec()
         self.curve().D1(u, pt, der)
         der.Normalize()
-        return (der.X(), der.Y(), der.Z())
+        tangent = (der.X(), der.Y(), der.Z())
+        if self.reversed():
+            tangent = (-tangent[0], -tangent[1], -tangent[2])
+        return tangent
     
     def first_derivative(self, u):
         pt = gp_Pnt()
@@ -77,6 +81,9 @@ class Edge:
     
     def closed(self):
         return self.topods_edge().Closed()
+
+    def reversed(self):
+        return self.topods_edge().Orientation() == TopAbs_REVERSED
     
     def curve_type(self):
         curv_type = BRepAdaptor_Curve(self._edge).GetType()
