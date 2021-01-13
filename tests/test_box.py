@@ -4,6 +4,7 @@ import numpy as np
 
 # OCC
 from geometry.box import Box
+from geometry.interval import Interval
 
 # Test
 from test_base import TestBase
@@ -53,3 +54,8 @@ class BoxTester(TestBase):
         box.offset(1)
         self.assertTrue(np.array_equal(box.min_point(), np.array([-1, -1, -1])))
         self.assertTrue(np.array_equal(box.max_point(), np.array([3,4,5])))
+
+    def test_interpolate(self):
+        interval = Interval(1,2)
+        self.assertEqual(interval.interpolate(0.25), 1.25)
+        self.assertEqual(interval.interpolate(0.75), 1.75)

@@ -26,6 +26,15 @@ class Interval:
     def middle(self):
         return (self.a+self.b)/2.0
 
+    def interpolate(self, t):
+        """Return a position inside the interval 
+           which interpolates between a and b.  i.e.
+           If t==0 then return a
+           If t==1 then return b
+           If 0<t<1 then return a value inside the interval
+        """
+        return (1.0-t)*self.a + t*self.b
+
     def offset(self, dist):
         self.a -= dist
         self.b += dist
