@@ -32,6 +32,8 @@ class BoxTester(TestBase):
         another_box2d.encompass_box(box2d)
         self.assertTrue(np.array_equal(box2d.min_point(), np.array([-1, 1])))
         self.assertTrue(np.array_equal(box2d.max_point(), np.array([5, 5])))
+        self.assertTrue(box2d.contains_point(np.array([0,1])))
+        self.assertTrue(another_box2d.contains_box(box2d))
 
     def test_center(self):
         pt1 = np.array([1,2,3])

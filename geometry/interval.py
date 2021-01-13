@@ -2,8 +2,12 @@ import sys
 
 class Interval:
     def __init__(self, a=sys.float_info.max, b=-sys.float_info.max):
-        self.a = a
-        self.b = b
+        if a==sys.float_info.max  or a < b:
+            self.a = a
+            self.b = b
+        else:
+            self.a = b
+            self.b = a
 
     def encompass_interval(self, interval):
         if self.a > interval.a:
@@ -16,6 +20,18 @@ class Interval:
             self.a = value
         if self.b < value:
             self.b = value
+
+    def contains_value(self, value):
+        assert self.a != sys.float_info.max, "Invalid interval"
+        return self.a <= value and value <= self.b
+
+    def contains_interval(self, interval):
+        assert self.a != sys.float_info.max, "Invalid interval"
+        assert interval.a != sys.float_info.max, "Invalid interval"
+        assert self.a <= self.b
+        assert interval.a <= interval.b
+        return self.a <= interval.a and interval.b <= self.b
+
 
     def length(self):
         l = self.b-self.a

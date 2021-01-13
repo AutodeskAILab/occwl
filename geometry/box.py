@@ -31,6 +31,20 @@ class Box:
             for i, value in enumerate(point): 
                 self.intervals[i].encompass_value(value)
 
+    def contains_point(self, point):
+        assert len(self.intervals) == point.size
+        for i, value in enumerate(point): 
+            if not self.intervals[i].contains_value(value):
+                return False
+        return True
+
+    def contains_box(self, box):
+        assert len(self.intervals) == len(box.intervals)
+        for i, interval in enumerate(self.intervals): 
+            if not interval.contains_interval(box.intervals[i]):
+                return False
+        return True
+
     def x_length(self):
         assert len(self.intervals) >= 1
         return self.intervals[0].length()
