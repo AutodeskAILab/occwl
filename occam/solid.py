@@ -34,22 +34,22 @@ class Solid:
         return Solid(BRepPrimAPI_MakeBox(width, height, depth).Shape())
 
     @staticmethod
-    def sphere(radius, center=(0, 0, 0)):
+    def make_sphere(radius, center=(0, 0, 0)):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
         return Solid(BRepPrimAPI_MakeSphere(gp_Pnt(*center), radius).Shape())
     
     @staticmethod
-    def spherical_wedge(radius, center=(0, 0, 0), longitudinal_angle=2*math.pi):
+    def make_spherical_wedge(radius, center=(0, 0, 0), longitudinal_angle=2*math.pi):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
         return Solid(BRepPrimAPI_MakeSphere(gp_Pnt(*center), radius, longitudinal_angle).Shape())
     
     @staticmethod
-    def cone(radius_bottom, radius_top, height, apex_angle=2*math.pi, base_point=(0, 0, 0), up_dir=(0, 0, 1)):
+    def make_cone(radius_bottom, radius_top, height, apex_angle=2*math.pi, base_point=(0, 0, 0), up_dir=(0, 0, 1)):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCone
         return Solid(BRepPrimAPI_MakeCone(gp_Ax2(gp_Pnt(*base_point), gp_Dir(*up_dir)), radius_bottom, radius_top, height, apex_angle).Shape())
     
     @staticmethod
-    def cylinder(radius, height, angle=2*math.pi, base_point=(0, 0, 0), up_dir=(0, 0, 1)):
+    def make_cylinder(radius, height, angle=2*math.pi, base_point=(0, 0, 0), up_dir=(0, 0, 1)):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCylinder
         return Solid(BRepPrimAPI_MakeCylinder(gp_Ax2(gp_Pnt(*base_point), gp_Dir(*up_dir)), radius, height, angle).Shape())
 
