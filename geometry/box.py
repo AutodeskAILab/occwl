@@ -61,7 +61,8 @@ class Box:
         max_length = 0.0
         for interval in self.intervals:
             length = interval.length()
-            max_length = length
+            if length > max_length:
+                max_length = length
         return max_length
 
     def min_point(self):

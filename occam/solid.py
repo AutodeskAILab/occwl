@@ -5,6 +5,8 @@ from OCC.Core.TopoDS import (topods, TopoDS_Wire, TopoDS_Vertex, TopoDS_Edge,
                              TopoDS_Compound, TopoDS_CompSolid, topods_Edge,
                              topods_Vertex, TopoDS_Iterator)
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
+from OCC.Core.Bnd import Bnd_Box
+from OCC.Core.BRepBndLib import brepbndlib_Add
 from OCC.Extend import TopologyUtils
 from OCC.Core.BRepGProp import (brepgprop_LinearProperties,
                                 brepgprop_SurfaceProperties,
@@ -16,6 +18,9 @@ from occam.edge import Edge
 from occam.face import Face
 from occam.vertex import Vertex
 
+import geometry.geom_utils as geom_utils
+from geometry.box import Box
+
 
 class Solid:
     def __init__(self, shape):
@@ -24,7 +29,7 @@ class Solid:
         self._top_exp = TopologyUtils.TopologyExplorer(self._solid, True)
 
     @staticmethod
-    def box(width, height, depth):
+    def make_box(width, height, depth):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
         return Solid(BRepPrimAPI_MakeBox(width, height, depth).Shape())
 
@@ -96,3 +101,14 @@ class Solid:
         props = GProp_GProps()
         brepgprop_VolumeProperties(self.topods_solid(), props, tolerance)
         return props.MomentOfInertia(gp_Ax1(gp_Pnt(*point), gp_Dir(*direction)))
+
+    def box(self):
+        b = Bnd_Box()
+        brepbndlib_Add(self._solid, b)
+        max_corner = b.CornerMax()
+        min_corner = b.CornerMin()
+
+        bb = Box(geom_utils.gp_Pnt_to_numpy(min_corner))
+        bb.encompass_point(geom_utils.gp_Pnt_to_numpy(max_corner))
+        return bb
+        
