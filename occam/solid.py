@@ -95,7 +95,7 @@ class Solid:
         props = GProp_GProps()
         brepgprop_VolumeProperties(self.topods_solid(), props, tolerance)
         com = props.CentreOfMass()
-        return (com.X(), com.Y(), com.Z())
+        return geom_utils.gp_to_numpy(com)
 
     def moment_of_inertia(self, point, direction, tolerance=1e-9):
         props = GProp_GProps()
@@ -108,7 +108,7 @@ class Solid:
         max_corner = b.CornerMax()
         min_corner = b.CornerMin()
 
-        bb = Box(geom_utils.gp_Pnt_to_numpy(min_corner))
-        bb.encompass_point(geom_utils.gp_Pnt_to_numpy(max_corner))
+        bb = Box(geom_utils.gp_to_numpy(min_corner))
+        bb.encompass_point(geom_utils.gp_to_numpy(max_corner))
         return bb
         

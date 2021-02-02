@@ -4,5 +4,5 @@ def tuple_to_numpy(tup):
     l = list(tup)
     return np.array(l)
 
-def gp_Pnt_to_numpy(pnt):
-    return np.array([pnt.X(), pnt.Y(), pnt.Z()])
+def gp_to_numpy(gp):
+    return np.array([gp.X(), gp.Y(), gp.Z()])

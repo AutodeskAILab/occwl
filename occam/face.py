@@ -1,3 +1,5 @@
+import numpy as np
+
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d
 from OCC.Core.BRepTools import breptools_UVBounds
 from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
@@ -10,6 +12,8 @@ from OCC.Core.GeomAbs import GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, Geom
 from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
 
+import geometry.geom_utils as geom_utils
+from geometry.box import Box
 
 class Face:
     def __init__(self, topods_face):
@@ -50,23 +54,23 @@ class Face:
 
     def point(self, u, v):
         pt = self.surface().Value(u, v)
-        return (pt.X(), pt.Y(), pt.Z())
+        return geom_utils.gp_to_numpy(pt)
 
     def tangent(self, u, v):
         dU, dV = gp_Dir(), gp_Dir()
         res = GeomLProp_SLProps(self.surface(), u, v, 1, 1e-9)
         if res.IsTangentUDefined() and res.IsTangentVDefined():
             res.TangentU(dU), res.TangentV(dV)
-            return (dU.X(), dU.Y(), dU.Z()), (dV.X(), dV.Y(), dV.Z())
+            return (geom_utils.gp_to_numpy(dU)), (geom_utils.gp_to_numpy(dV))
         return None, None
 
     def normal(self, u, v):
         res = GeomLProp_SLProps(self.surface(), u, v, 1, 1e-9)
         if not res.IsNormalDefined():
             return (0, 0, 0)
-        normal = (res.Normal().X(), res.Normal().Y(), res.Normal().Z())
+        normal = geom_utils.gp_to_numpy(res.Normal())
         if self.reversed():
-            normal = (-normal[0], -normal[1], -normal[2])
+            normal = -normal
         return normal
 
     def gaussian_curvature(self, u, v):
@@ -91,7 +95,10 @@ class Face:
         pass
 
     def uv_bounds(self):
-        return breptools_UVBounds(self._face)
+        umin, umax, vmin, vmax = breptools_UVBounds(self._face)
+        bounds = Box(np.array([umin, vmin]))
+        bounds.encompass_point(np.array([umax, vmax]))
+        return bounds
     
     def point_to_parameter(self, pt):
         uv = ShapeAnalysis_Surface(self.surface()).ValueOfUV(gp_Pnt(pt[0], pt[1], pt[2]), 1e-9)
