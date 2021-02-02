@@ -30,9 +30,10 @@ def uvgrid(face, num_u=10, num_v=10, uvs=False):
             v = uv_box.intervals[1].interpolate(float(j)/(num_v - 1))
             uv_values[i,j, 0] = u
             uv_values[i,j, 1] = v
-            xyz = face.point(u, v)
-            nor = face.normal(u, v)
-            mask = int(face.inside(u, v))
+            uv = np.array([u, v])
+            xyz = face.point(uv)
+            nor = face.normal(uv)
+            mask = int(face.inside(uv))
             uvgrid[i, j, :3] = xyz
             uvgrid[i, j, 3:6] = nor
             uvgrid[i, j, 6] = mask

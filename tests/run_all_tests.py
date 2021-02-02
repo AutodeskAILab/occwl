@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from test_grid_and_normals import GridTester
 from test_box import BoxTester
 from test_edge import EdgeTester
+from test_face import FaceTester
 
 if __name__ == '__main__':
     unittest.main()
