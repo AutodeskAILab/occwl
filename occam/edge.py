@@ -1,3 +1,5 @@
+import numpy as np
+
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d
 from OCC.Core.BRep import BRep_Tool_Curve
 from OCC.Core.GeomLProp import GeomLProp_SLProps
@@ -9,6 +11,8 @@ from OCC.Core.TopoDS import TopoDS_Edge
 from OCC.Core.GCPnts import GCPnts_AbscissaPoint
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 
+import geometry.geom_utils as geom_utils
+from geometry.interval import Interval
 
 class Edge:
     def __init__(self, topods_edge):
@@ -22,56 +26,89 @@ class Edge:
         return hash(self.topods_edge())
     
     def point(self, u):
-        pt = self.curve().Value(u)
-        return (pt.X(), pt.Y(), pt.Z())
+        if self.has_curve():
+            pt = self.curve().Value(u)
+            return geom_utils.gp_to_numpy(pt)
+        # If the edge has no curve then return a point
+        # at the origin.
+        # It would ne nice to return the location of the 
+        # vertex
+        return np.array([0,0,0])
 
     def tangent(self, u):
-        pt = gp_Pnt()
-        der = gp_Vec()
-        self.curve().D1(u, pt, der)
-        der.Normalize()
-        tangent = (der.X(), der.Y(), der.Z())
-        if self.reversed():
-            tangent = (-tangent[0], -tangent[1], -tangent[2])
-        return tangent
+        if self.has_curve():
+            pt = gp_Pnt()
+            der = gp_Vec()
+            self.curve().D1(u, pt, der)
+            der.Normalize()
+            tangent = geom_utils.gp_to_numpy(der)
+            if self.reversed():
+                tangent = -tangent
+            return tangent
+        # If the edge has no curve then return 
+        # a zero vector
+        return np.array([0,0,0])
     
     def first_derivative(self, u):
-        pt = gp_Pnt()
-        der = gp_Vec()
-        self.curve().D1(u, pt, der)
-        return (der.X(), der.Y(), der.Z())
+        if self.has_curve():
+            pt = gp_Pnt()
+            der = gp_Vec()
+            self.curve().D1(u, pt, der)
+            return geom_utils.gp_to_numpy(der)
+        # If the edge has no curve then return 
+        # a zero vector
+        return np.array([0,0,0])
 
     def length(self, tolerance=1e-9):
-        umin, umax = self.u_bounds()
-        return GCPnts_AbscissaPoint().Length(BRepAdaptor_Curve(self.topods_edge()), umin, umax, tolerance)
+        if not self.has_curve():
+            return 0.0
+        bounds = self.u_bounds()
+        return GCPnts_AbscissaPoint().Length(
+            BRepAdaptor_Curve(self.topods_edge()), 
+            bounds.a, 
+            bounds.b, 
+            tolerance
+        )
 
     def curve(self):
         return BRep_Tool_Curve(self._edge)[0]
 
     def specific_curve(self):
-        curv_type = BRepAdaptor_Curve(self._edge).GetType()
+        brep_adaptor_curve = BRepAdaptor_Curve(self._edge)
+        curv_type = brep_adaptor_curve.GetType()
         if curv_type == GeomAbs_Line:
-            return self.curve().Line()
+            return brep_adaptor_curve.Line()
         if curv_type == GeomAbs_Circle:
-            return self.curve().Circle()
+            return brep_adaptor_curve.Circle()
         if curv_type == GeomAbs_Ellipse:
-            return self.curve().Ellipse()
+            return brep_adaptor_curve.Ellipse()
         if curv_type == GeomAbs_Hyperbola:
-            return self.curve().Hyperbola()
+            return brep_adaptor_curve.Hyperbola()
         if curv_type == GeomAbs_Parabola:
-            return self.curve().Parabola()
+            return brep_adaptor_curve.Parabola()
         if curv_type == GeomAbs_BezierCurve:
-            return self.curve().BezierCurve()
+            return brep_adaptor_curve.BezierCurve()
         if curv_type == GeomAbs_BSplineCurve:
-            return self.curve().BSplineCurve()
+            return brep_adaptor_curve.BSplineCurve()
         if curv_type == GeomAbs_OffsetCurve:
-            return self.curve().OffsetCurve()
+            return brep_adaptor_curve.OffsetCurve()
         raise ValueError("Unknown curve type: ", curv_type)
+
+    def has_curve(self):
+        """
+        Does this edge have a valid curve?
+        Some edges don't.  For example the edge at the pole of a sphere.
+        """
+        curve = BRepAdaptor_Curve(self.topods_edge())
+        return curve.Is3DCurve() 
 
 
     def u_bounds(self):
+        if not self.has_curve():
+            # Return an empty interval
+            return Interval()
         _, umin, umax = BRep_Tool_Curve(self.topods_edge())
-        return umin, umax
+        return Interval(umin, umax)
     
     def twin_edge(self):
         pass

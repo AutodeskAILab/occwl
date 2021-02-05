@@ -1,3 +1,5 @@
+import numpy as np
+
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d
 from OCC.Core.BRepTools import breptools_UVBounds
 from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
@@ -10,6 +12,8 @@ from OCC.Core.GeomAbs import GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, Geom
 from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
 
+import geometry.geom_utils as geom_utils
+from geometry.box import Box
 
 class Face:
     def __init__(self, topods_face):
@@ -20,8 +24,8 @@ class Face:
     def hash(self):
         return hash(self.topods_face())
 
-    def inside(self, u, v):
-        result = self._trimmed.Perform(gp_Pnt2d(u, v))
+    def inside(self, uv):
+        result = self._trimmed.Perform(gp_Pnt2d(uv[0], uv[1]))
         return result == TopAbs_IN
 
     def surface(self):
@@ -48,41 +52,41 @@ class Face:
         """
         return self._face.Orientation() == TopAbs_REVERSED
 
-    def point(self, u, v):
-        pt = self.surface().Value(u, v)
-        return (pt.X(), pt.Y(), pt.Z())
+    def point(self, uv):
+        pt = self.surface().Value(uv[0], uv[1])
+        return geom_utils.gp_to_numpy(pt)
 
-    def tangent(self, u, v):
+    def tangent(self, uv):
         dU, dV = gp_Dir(), gp_Dir()
-        res = GeomLProp_SLProps(self.surface(), u, v, 1, 1e-9)
+        res = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 1, 1e-9)
         if res.IsTangentUDefined() and res.IsTangentVDefined():
             res.TangentU(dU), res.TangentV(dV)
-            return (dU.X(), dU.Y(), dU.Z()), (dV.X(), dV.Y(), dV.Z())
+            return (geom_utils.gp_to_numpy(dU)), (geom_utils.gp_to_numpy(dV))
         return None, None
 
-    def normal(self, u, v):
-        res = GeomLProp_SLProps(self.surface(), u, v, 1, 1e-9)
+    def normal(self,uv):
+        res = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 1, 1e-9)
         if not res.IsNormalDefined():
             return (0, 0, 0)
-        normal = (res.Normal().X(), res.Normal().Y(), res.Normal().Z())
+        normal = geom_utils.gp_to_numpy(res.Normal())
         if self.reversed():
-            normal = (-normal[0], -normal[1], -normal[2])
+            normal = -normal
         return normal
 
-    def gaussian_curvature(self, u, v):
-        return GeomLProp_SLProps(self.surface(), u, v, 2, 1e-9).GaussianCurvature()
+    def gaussian_curvature(self, uv):
+        return GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).GaussianCurvature()
 
-    def min_curvature(self, u, v):
-        min_curv = GeomLProp_SLProps(self.surface(), u, v, 2, 1e-9).MinCurvature()
+    def min_curvature(self, uv):
+        min_curv = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MinCurvature()
         if self.reversed():
             min_curv *= -1
         return min_curv
 
-    def mean_curvature(self, u, v):
-        return GeomLProp_SLProps(self.surface(), u, v, 2, 1e-9).MeanCurvature()
+    def mean_curvature(self, uv):
+        return GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MeanCurvature()
 
-    def max_curvature(self, u, v):
-        max_curv = GeomLProp_SLProps(self.surface(), u, v, 2, 1e-9).MaxCurvature()
+    def max_curvature(self, uv):
+        max_curv = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MaxCurvature()
         if self.reversed():
             max_curv *= -1
         return max_curv
@@ -91,7 +95,10 @@ class Face:
         pass
 
     def uv_bounds(self):
-        return breptools_UVBounds(self._face)
+        umin, umax, vmin, vmax = breptools_UVBounds(self._face)
+        bounds = Box(np.array([umin, vmin]))
+        bounds.encompass_point(np.array([umax, vmax]))
+        return bounds
     
     def point_to_parameter(self, pt):
         uv = ShapeAnalysis_Surface(self.surface()).ValueOfUV(gp_Pnt(pt[0], pt[1], pt[2]), 1e-9)

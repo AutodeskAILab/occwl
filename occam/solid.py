@@ -5,6 +5,8 @@ from OCC.Core.TopoDS import (topods, TopoDS_Wire, TopoDS_Vertex, TopoDS_Edge,
                              TopoDS_Compound, TopoDS_CompSolid, topods_Edge,
                              topods_Vertex, TopoDS_Iterator)
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
+from OCC.Core.Bnd import Bnd_Box
+from OCC.Core.BRepBndLib import brepbndlib_Add
 from OCC.Extend import TopologyUtils
 from OCC.Core.BRepGProp import (brepgprop_LinearProperties,
                                 brepgprop_SurfaceProperties,
@@ -16,6 +18,9 @@ from occam.edge import Edge
 from occam.face import Face
 from occam.vertex import Vertex
 
+import geometry.geom_utils as geom_utils
+from geometry.box import Box
+
 
 class Solid:
     def __init__(self, shape):
@@ -24,27 +29,27 @@ class Solid:
         self._top_exp = TopologyUtils.TopologyExplorer(self._solid, True)
 
     @staticmethod
-    def box(width, height, depth):
+    def make_box(width, height, depth):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
         return Solid(BRepPrimAPI_MakeBox(width, height, depth).Shape())
 
     @staticmethod
-    def sphere(radius, center=(0, 0, 0)):
+    def make_sphere(radius, center=(0, 0, 0)):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
         return Solid(BRepPrimAPI_MakeSphere(gp_Pnt(*center), radius).Shape())
     
     @staticmethod
-    def spherical_wedge(radius, center=(0, 0, 0), longitudinal_angle=2*math.pi):
+    def make_spherical_wedge(radius, center=(0, 0, 0), longitudinal_angle=2*math.pi):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
         return Solid(BRepPrimAPI_MakeSphere(gp_Pnt(*center), radius, longitudinal_angle).Shape())
     
     @staticmethod
-    def cone(radius_bottom, radius_top, height, apex_angle=2*math.pi, base_point=(0, 0, 0), up_dir=(0, 0, 1)):
+    def make_cone(radius_bottom, radius_top, height, apex_angle=2*math.pi, base_point=(0, 0, 0), up_dir=(0, 0, 1)):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCone
         return Solid(BRepPrimAPI_MakeCone(gp_Ax2(gp_Pnt(*base_point), gp_Dir(*up_dir)), radius_bottom, radius_top, height, apex_angle).Shape())
     
     @staticmethod
-    def cylinder(radius, height, angle=2*math.pi, base_point=(0, 0, 0), up_dir=(0, 0, 1)):
+    def make_cylinder(radius, height, angle=2*math.pi, base_point=(0, 0, 0), up_dir=(0, 0, 1)):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCylinder
         return Solid(BRepPrimAPI_MakeCylinder(gp_Ax2(gp_Pnt(*base_point), gp_Dir(*up_dir)), radius, height, angle).Shape())
 
@@ -90,9 +95,20 @@ class Solid:
         props = GProp_GProps()
         brepgprop_VolumeProperties(self.topods_solid(), props, tolerance)
         com = props.CentreOfMass()
-        return (com.X(), com.Y(), com.Z())
+        return geom_utils.gp_to_numpy(com)
 
     def moment_of_inertia(self, point, direction, tolerance=1e-9):
         props = GProp_GProps()
         brepgprop_VolumeProperties(self.topods_solid(), props, tolerance)
         return props.MomentOfInertia(gp_Ax1(gp_Pnt(*point), gp_Dir(*direction)))
+
+    def box(self):
+        b = Bnd_Box()
+        brepbndlib_Add(self._solid, b)
+        max_corner = b.CornerMax()
+        min_corner = b.CornerMin()
+
+        bb = Box(geom_utils.gp_to_numpy(min_corner))
+        bb.encompass_point(geom_utils.gp_to_numpy(max_corner))
+        return bb
+        
