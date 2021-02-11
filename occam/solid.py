@@ -11,6 +11,7 @@ from OCC.Extend import TopologyUtils
 from OCC.Core.BRepGProp import (brepgprop_LinearProperties,
                                 brepgprop_SurfaceProperties,
                                 brepgprop_VolumeProperties)
+from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
 from OCC.Core.GProp import GProp_GProps
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1
 import math
@@ -112,3 +113,54 @@ class Solid:
         bb.encompass_point(geom_utils.gp_to_numpy(max_corner))
         return bb
         
+    def triangulate_all_faces(
+        self, 
+        triangle_face_tol = 0.01,     # Tolerance between triangle and surface
+        tol_relative_to_face = True,  # The tolerance value is relative to the face size
+        angle_tol_rads = 0.1          # Angle between normals/tangents at triangle vertices
+        ):
+        """
+        Triangulate all the faces.   You can then get the triangles 
+        from each face separately using face.get_triangles().
+        If you wanted triangles for the entire solid then call
+        solid.get_triangles() below.
+        For more details see 
+        https://old.opencascade.com/doc/occt-7.1.0/overview/html/occt_user_guides__modeling_algos.html#occt_modalg_11
+        
+        Returns True is successful
+        """
+        mesh = BRepMesh_IncrementalMesh(
+            self._solid, 
+            triangle_face_tol, 
+            tol_relative_to_face, 
+            angle_tol_rads, 
+            True
+        )
+        mesh.Perform()
+        return mesh.IsDone()
+	
+
+
+    def get_triangles(
+        self,
+        triangle_face_tol = 0.01,     # Tolerance between triangle and surface
+        tol_relative_to_face = True,  # The tolerance value is relative to the face size
+        angle_tol_rads = 0.1          # Angle between normals/tangents at triangle vertices
+        ):
+        ok  = self.triangulate_all_faces(triangle_face_tol, tol_relative_to_face, angle_tol_rads)
+        verts = []
+        tris = []
+        if not ok:
+            # Failed to triangulate
+            return verts, tris
+        faces = self.faces()
+        last_vert_index = 0
+        for face in faces:
+            fverts, ftris = face.get_triangles()
+            verts.extend(fverts)
+            for tri in ftris:
+                new_indices = [index+last_vert_index for index in tri]
+                tris.append(new_indices)
+            last_vert_index = len(verts)
+        return verts, tris
+

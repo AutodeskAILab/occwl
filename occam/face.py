@@ -4,6 +4,7 @@ from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d
 from OCC.Core.BRepTools import breptools_UVBounds
 from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
 from OCC.Core.BRepTopAdaptor import BRepTopAdaptor_FClass2d
+from OCC.Core.BRep import BRep_Tool
 from OCC.Core.BRep import BRep_Tool_Surface
 from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
@@ -11,6 +12,7 @@ from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
 from OCC.Core.GeomAbs import GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, GeomAbs_Sphere, GeomAbs_Torus, GeomAbs_BezierSurface, GeomAbs_BSplineSurface
 from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
+from OCC.Core.TopLoc import TopLoc_Location
 
 import geometry.geom_utils as geom_utils
 from geometry.box import Box
@@ -132,3 +134,36 @@ class Face:
 
     def topods_face(self):
         return self._face
+
+
+    def get_triangles(self):
+        """
+        First you must call solid.triangulate_all_faces()
+        Then call this method to get the triangles for the
+        face.
+        """
+        location = TopLoc_Location()
+        bt = BRep_Tool()
+        facing = (bt.Triangulation(self._face, location))
+        if facing == None:
+            return None
+
+        tab = facing.Nodes()
+        tri = facing.Triangles()
+        verts = []
+        for i in range(1, facing.NbNodes()+1):
+            verts.append(np.array(list(tab.Value(i).Coord())))
+
+        tris = []
+        reversed = self.reversed()
+        for i in range(1, facing.NbTriangles()+1):
+            # OCC triangle normals point in the surface normal
+            # direction
+            if reversed:
+                index1, index3, index2 = tri.Value(i).Get()
+            else:
+                index1, index2, index3 = tri.Value(i).Get()
+
+            tris.append([index1 - 1, index2 - 1, index3 - 1])
+    
+        return verts, tris

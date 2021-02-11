@@ -10,6 +10,7 @@ from test_grid_and_normals import GridTester
 from test_box import BoxTester
 from test_edge import EdgeTester
 from test_face import FaceTester
+from test_get_triangles import TriangleTester
 
 if __name__ == '__main__':
     unittest.main()
