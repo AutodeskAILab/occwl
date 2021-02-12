@@ -130,3 +130,6 @@ dmypy.json
 
 # VS-Code settings dir
 .vscode/
+
+# Folder for results
+results/*

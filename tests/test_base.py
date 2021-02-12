@@ -25,8 +25,10 @@ class TestBase(unittest.TestCase):
             print(f"Running tests for {file.stem}{file.suffix}")
             solids = load_step(file)
             for solid in solids: 
-                self.run_test(solid)
+                self.run_test_with_pathname(file, solid)
 
+    def run_test_with_pathname(self, file, solid):
+        self.run_test(solid)
 
     def unitize_vector(self, vec):
         eps = 1e-7
