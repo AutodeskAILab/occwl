@@ -101,7 +101,10 @@ class Solid:
     def moment_of_inertia(self, point, direction, tolerance=1e-9):
         props = GProp_GProps()
         brepgprop_VolumeProperties(self.topods_solid(), props, tolerance)
-        axis = gp_Ax1(geom_utils.numpy_to_gp(point), geom_utils.numpy_to_gp_dir(direction))
+        axis = gp_Ax1(
+            geom_utils.numpy_to_gp(point), 
+            geom_utils.numpy_to_gp_dir(direction)
+        )
         return props.MomentOfInertia(axis)
 
     def box(self):
