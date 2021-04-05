@@ -12,7 +12,8 @@ from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
 from OCC.Core.GeomAbs import GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, \
                              GeomAbs_Sphere, GeomAbs_Torus, GeomAbs_BezierSurface, \
                              GeomAbs_BSplineSurface, GeomAbs_SurfaceOfRevolution, \
-                             GeomAbs_SurfaceOfExtrusion
+                             GeomAbs_SurfaceOfExtrusion, GeomAbs_OffsetSurface, \
+                             GeomAbs_OtherSurface
 from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Core.TopLoc import TopLoc_Location
