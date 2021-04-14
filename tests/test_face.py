@@ -44,6 +44,9 @@ class FaceTester(TestBase):
         curv_mean = face.mean_curvature(uv)
         self.assertTrue(isinstance(curv_mean, float))
 
+        area = face.area()
+        self.assertTrue(isinstance(area, float))
+
     def run_test(self, solid):
         faces = solid.faces()
         for face in faces:
