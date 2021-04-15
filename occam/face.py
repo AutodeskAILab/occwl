@@ -103,6 +103,10 @@ class Face:
         geometry_properties = GProp_GProps()
         brepgprop_SurfaceProperties(self._face, geometry_properties)
         return geometry_properties.Mass()
+    
+    def pcurve(self, edge):
+        crv, u_min, u_max = BRep_Tool().CurveOnSurface(edge.topods_edge(), self.topods_face())
+        return crv, u_min, u_max
 
     def uv_bounds(self):
         umin, umax, vmin, vmax = breptools_UVBounds(self._face)
@@ -112,7 +116,7 @@ class Face:
     
     def point_to_parameter(self, pt):
         uv = ShapeAnalysis_Surface(self.surface()).ValueOfUV(gp_Pnt(pt[0], pt[1], pt[2]), 1e-9)
-        return uv.Coord()
+        return np.array(uv.Coord())
 
     def surface_type(self):
         surf_type = BRepAdaptor_Surface(self._face).GetType()
@@ -143,6 +147,9 @@ class Face:
     def topods_face(self):
         return self._face
 
+    def closed(self):
+        sa = ShapeAnalysis_Surface(self.surface())
+        return sa.IsUClosed(), sa.IsVClosed()
 
     def get_triangles(self):
         """
