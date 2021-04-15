@@ -16,9 +16,9 @@ from OCC.Core.GProp import GProp_GProps
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1
 
 import math
-from occam.edge import Edge
-from occam.face import Face
-from occam.vertex import Vertex
+from occwl.edge import Edge
+from occwl.face import Face
+from occwl.vertex import Vertex
 
 import geometry.geom_utils as geom_utils
 from geometry.box import Box

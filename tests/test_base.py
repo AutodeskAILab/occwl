@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 
 # OCC
-from occam.io import load_step
+from occwl.io import load_step
 
 class TestBase(unittest.TestCase):
 

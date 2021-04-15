@@ -1,6 +1,6 @@
 import numpy as np
-from occam.face import Face
-from occam.edge import Edge
+from occwl.face import Face
+from occwl.edge import Edge
 
 def _uvgrid_reverse_u(grid):
     reversed_grid = grid[::-1, :, :]

@@ -1,5 +1,5 @@
 from OCC.Core.STEPControl import STEPControl_Reader
-from occam.solid import Solid
+from occwl.solid import Solid
 from OCC.Extend.DataExchange import export_shape_to_svg
 from OCC.Extend import TopologyUtils
 

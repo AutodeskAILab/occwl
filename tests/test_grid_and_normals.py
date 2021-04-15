@@ -3,8 +3,8 @@ from pathlib import Path
 import numpy as np
 
 # OCC
-from occam.solid import Solid
-from occam.uvgrid import uvgrid, ugrid, _uvgrid_reverse_u
+from occwl.solid import Solid
+from occwl.uvgrid import uvgrid, ugrid, _uvgrid_reverse_u
 
 # Test
 from test_base import TestBase
