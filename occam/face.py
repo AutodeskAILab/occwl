@@ -4,9 +4,11 @@ from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d
 from OCC.Core.BRepTools import breptools_UVBounds
 from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
 from OCC.Core.BRepTopAdaptor import BRepTopAdaptor_FClass2d
+from OCC.Core.BRepGProp import brepgprop_SurfaceProperties
 from OCC.Core.BRep import BRep_Tool
 from OCC.Core.BRep import BRep_Tool_Surface
 from OCC.Core.GeomLProp import GeomLProp_SLProps
+from OCC.Core.GProp import GProp_GProps
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
 from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
 from OCC.Core.GeomAbs import GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, \
@@ -98,7 +100,9 @@ class Face:
         return max_curv
 
     def area(self):
-        pass
+        geometry_properties = GProp_GProps()
+        brepgprop_SurfaceProperties(self._face, geometry_properties)
+        return geometry_properties.Mass()
 
     def uv_bounds(self):
         umin, umax, vmin, vmax = breptools_UVBounds(self._face)
