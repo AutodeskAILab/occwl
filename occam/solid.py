@@ -14,6 +14,7 @@ from OCC.Core.BRepGProp import (brepgprop_LinearProperties,
 from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
 from OCC.Core.GProp import GProp_GProps
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1
+
 import math
 from occam.edge import Edge
 from occam.face import Face
@@ -168,3 +169,9 @@ class Solid:
             last_vert_index = len(verts)
         return verts, tris
 
+    def edge_continuity(self, edge):
+        faces = list(self.faces_from_edge(edge))
+        # Handle seam edges which only have one face around them
+        if len(faces) == 1:
+           faces.append(faces[-1])
+        return edge.continuity(faces[0], faces[1])
