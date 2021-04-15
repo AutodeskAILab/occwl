@@ -14,9 +14,11 @@ nodes, edges, connectivity = face_adjacency(box)
 # Get the center points for each face's center
 face_centers = []
 for i, face in enumerate(nodes):
-    umin, umax, vmin, vmax = face.uv_bounds()
-    center_u, center_v = (0.5 * (umax - umin), vmin + 0.5 * (vmax - vmin))
-    center = face.point(center_u, center_v)
+    parbox = face.uv_bounds()
+    umin, vmin = parbox.min_point()
+    umax, vmax = parbox.max_point()
+    center_uv = (0.5 * (umax - umin), vmin + 0.5 * (vmax - vmin))
+    center = face.point(center_uv)
     face_centers.append(center)
 
 # Make a sphere for each face's center
