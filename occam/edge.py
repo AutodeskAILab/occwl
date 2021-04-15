@@ -1,7 +1,7 @@
 import numpy as np
 
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d
-from OCC.Core.BRep import BRep_Tool_Curve
+from OCC.Core.BRep import BRep_Tool_Curve, BRep_Tool_Continuity
 from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.GeomAbs import GeomAbs_Line, GeomAbs_Circle, GeomAbs_Ellipse, GeomAbs_Hyperbola, GeomAbs_Parabola, GeomAbs_BezierCurve, GeomAbs_BSplineCurve, GeomAbs_OffsetCurve, GeomAbs_OtherCurve
@@ -10,6 +10,7 @@ from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Edge
 from OCC.Core.GCPnts import GCPnts_AbscissaPoint
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
+from OCC.Core.ShapeAnalysis import ShapeAnalysis_Edge
 
 import geometry.geom_utils as geom_utils
 from geometry.interval import Interval
@@ -114,10 +115,26 @@ class Edge:
         pass
 
     def convex(self):
+        """
+        Returns the convex flag associated with the edge
+        NOTE: this does not check for edge convexity
+        """
         return self.topods_edge().Convex()
     
     def closed(self):
         return self.topods_edge().Closed()
+
+    def seam(self, face):
+        return ShapeAnalysis_Edge().IsSeam(self.topods_edge(), face.topods_face())
+
+    def periodic(self):
+        return BRepAdaptor_Curve(self.topods_edge()).IsPeriodic()
+
+    def rational(self):
+        return BRepAdaptor_Curve(self.topods_edge()).IsRational()
+
+    def continuity(self, face1, face2):
+        return BRep_Tool_Continuity(self.topods_edge(), face1.topods_face(), face2.topods_face())
 
     def reversed(self):
         return self.topods_edge().Orientation() == TopAbs_REVERSED
