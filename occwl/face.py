@@ -20,8 +20,8 @@ from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Core.TopLoc import TopLoc_Location
 
-import geometry.geom_utils as geom_utils
-from geometry.box import Box
+import occwl.geometry.geom_utils as geom_utils
+from occwl.geometry.box import Box
 
 class Face:
     def __init__(self, topods_face):

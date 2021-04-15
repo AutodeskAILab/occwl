@@ -3,8 +3,8 @@ from pathlib import Path
 import numpy as np
 
 # OCC
-from geometry.box import Box
-from geometry.interval import Interval
+from occwl.geometry.box import Box
+from occwl.geometry.interval import Interval
 
 # Test
 from test_base import TestBase

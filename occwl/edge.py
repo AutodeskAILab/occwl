@@ -12,8 +12,8 @@ from OCC.Core.GCPnts import GCPnts_AbscissaPoint
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Edge
 
-import geometry.geom_utils as geom_utils
-from geometry.interval import Interval
+import occwl.geometry.geom_utils as geom_utils
+from occwl.geometry.interval import Interval
 
 class Edge:
     def __init__(self, topods_edge):

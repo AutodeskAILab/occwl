@@ -3,7 +3,7 @@
 import numpy as np
 
 # Geometry
-from geometry.interval import Interval
+from occwl.geometry.interval import Interval
 
 # Test
 from test_base import TestBase

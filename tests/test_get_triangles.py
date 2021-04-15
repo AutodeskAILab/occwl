@@ -3,7 +3,7 @@
 import numpy as np
 from pathlib import Path
 
-from geometry.tri_utils import write_obj 
+from occwl.geometry.tri_utils import write_obj 
 
 # Test
 from test_base import TestBase

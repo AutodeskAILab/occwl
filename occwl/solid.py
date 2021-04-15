@@ -20,8 +20,8 @@ from occwl.edge import Edge
 from occwl.face import Face
 from occwl.vertex import Vertex
 
-import geometry.geom_utils as geom_utils
-from geometry.box import Box
+import occwl.geometry.geom_utils as geom_utils
+from occwl.geometry.box import Box
 
 
 class Solid:

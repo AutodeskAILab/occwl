@@ -1,6 +1,6 @@
 import numpy as np
 
-from geometry.interval import Interval
+from occwl.geometry.interval import Interval
 
 class Box:
     """A 2d or 3d box for points defined as numpy arrays"""
