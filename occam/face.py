@@ -151,6 +151,10 @@ class Face:
         sa = ShapeAnalysis_Surface(self.surface())
         return sa.IsUClosed(), sa.IsVClosed()
 
+    def periodic(self):
+        adaptor = BRepAdaptor_Surface(self._face)
+        return adaptor.IsUPeriodic(), adaptor.IsVPeriodic()
+
     def get_triangles(self):
         """
         First you must call solid.triangulate_all_faces()
