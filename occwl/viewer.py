@@ -2,9 +2,9 @@ from OCC.Display.SimpleGui import init_display
 from OCC.Core.AIS import AIS_Shape, AIS_Shaded, AIS_TexturedShape, AIS_WireFrame, AIS_Shape_SelectionMode
 from datetime import datetime
 import time
-from occam.solid import Solid
-from occam.face import Face
-from occam.edge import Edge
+from occwl.solid import Solid
+from occwl.face import Face
+from occwl.edge import Edge
 
 
 class Viewer:

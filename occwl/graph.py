@@ -1,16 +1,16 @@
-from occam.solid import Solid
-from occam.face import Face
-from occam.edge import Edge
-#from occam.vertex import Vertex
+from occwl.solid import Solid
+from occwl.face import Face
+from occwl.edge import Edge
+#from occwl.vertex import Vertex
 import itertools
 
 
 def face_adjacency(solid, self_loops=False):
     """ 
     Creates a face adjacency graph from the given solid
-    :param solid: A B-rep solid model of type occam.Solid
+    :param solid: A B-rep solid model of type occwl.Solid
     :param self_loops: Whether to add self loops in the graph (default: False)
-    :return: list of faces (occam.Face), dict of edges (occam.Edge), and a list of face index pairs for each edge in the graph.
+    :return: list of faces (occwl.Face), dict of edges (occwl.Edge), and a list of face index pairs for each edge in the graph.
              The indices in the connectivity index into the face list and can be used as keys in the edge dict. 
     """
     assert isinstance(solid, Solid)
@@ -40,9 +40,9 @@ def face_adjacency(solid, self_loops=False):
 def vertex_adjacency(solid, self_loops=False):
     """ 
     Creates a vertex adjacency graph from the given solid
-    :param solid: A B-rep solid model of type occam.Solid
+    :param solid: A B-rep solid model of type occwl.Solid
     :param self_loops: Whether to add self loops in the graph (default: False)
-    :return: list of vertices (occam.Vertex), dict of edges (occam.Edge), and a list of vertex index pairs for each edge in the graph.
+    :return: list of vertices (occwl.Vertex), dict of edges (occwl.Edge), and a list of vertex index pairs for each edge in the graph.
              The indices in the connectivity index into the vertex list and can be used as keys in the edge dict. 
     """
     assert isinstance(solid, Solid)

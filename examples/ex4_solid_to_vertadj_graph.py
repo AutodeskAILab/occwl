@@ -3,9 +3,9 @@ import sys
 import numpy as np
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from occam.solid import Solid
-from occam.viewer import Viewer
-from occam.graph import face_adjacency, vertex_adjacency
+from occwl.solid import Solid
+from occwl.viewer import Viewer
+from occwl.graph import face_adjacency, vertex_adjacency
 import math
 
 box = Solid.make_box(10, 10, 10)

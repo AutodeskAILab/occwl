@@ -12,7 +12,7 @@ def _ugrid_reverse_u(grid):
 def uvgrid(face, num_u=10, num_v=10, uvs=False):
     """ 
     Creates a 2D UV-grid of samples from the given face
-    :param face: A B-rep face of type occam.Face
+    :param face: A B-rep face of type occwl.Face
     :param num_u: Number of samples along u-direction (default: 10)
     :param num_v: Number of samples along v-direction (default: 10)
     :param uvs: Return the surface UVs at which the points and normals
@@ -50,7 +50,7 @@ def uvgrid(face, num_u=10, num_v=10, uvs=False):
 def ugrid(edge, num_u: int =10, us=False):
     """ 
     Creates a 1D UV-grid of samples from the given edge
-    :param face: A B-rep edge of type occam.Edge
+    :param face: A B-rep edge of type occwl.Edge
     :param num_u: Number of samples along the curve (default: 10)
     :param us: Return the u values at which the points were evaluated
     """
