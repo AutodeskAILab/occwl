@@ -112,7 +112,7 @@ class Edge:
         return Interval(umin, umax)
     
     def twin_edge(self):
-        pass
+        raise NotImplementedError
 
     def convex(self):
         """
