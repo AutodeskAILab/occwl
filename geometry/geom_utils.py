@@ -8,7 +8,7 @@ def tuple_to_numpy(tup):
 def gp_to_numpy(gp):
     if isinstance(gp, gp_Pnt2d):
         return np.array([gp.X(), gp.Y()])
-    elif isinstance(gp, (gp_Pnt, gp_Dir)):
+    elif isinstance(gp, (gp_Pnt, gp_Dir, gp_Vec)):
         return np.array([gp.X(), gp.Y(), gp.Z()])
     raise NotImplementedError
 
