@@ -67,7 +67,7 @@ class Solid:
         """
         return self._solid
 
-    def vertices(self) -> Iterator[occwl.vertex.Vertex]:
+    def vertices(self):
         """
         Get an iterator to go over all vertices in the solid
 
@@ -76,7 +76,7 @@ class Solid:
         """
         return map(Vertex, self._top_exp.vertices())
 
-    def edges(self) -> Iterator[occwl.edge.Edge]:
+    def edges(self):
         """
         Get an iterator to go over all edges in the solid
 
@@ -85,7 +85,7 @@ class Solid:
         """
         return map(Edge, self._top_exp.edges())
 
-    def faces(self) -> Iterator[occwl.face.Face]:
+    def faces(self):
         """
         Get an iterator to go over all faces in the solid
 
