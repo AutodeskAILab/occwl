@@ -4,6 +4,11 @@ import numpy as np
 
 # Geometry
 from occwl.geometry.interval import Interval
+from OCC.Core.gp import gp_XOY, gp_Pnt
+from OCC.Core.GC import GC_MakeSegment
+from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
+from OCC.Core.Geom import Geom_Circle
+from occwl.edge import Edge
 
 # Test
 from test_base import TestBase
@@ -38,18 +43,37 @@ class EdgeTester(TestBase):
             d1 = edge.first_derivative(t)
             self.assertTrue(isinstance(d1, np.ndarray))
 
-        concave = edge.convex()
-        self.assertTrue(isinstance(concave, bool))
-        closed = edge.closed()
-        self.assertTrue(isinstance(closed, bool))
-        periodic = edge.periodic()
-        self.assertTrue(isinstance(periodic, bool))
+        self._test_closed_periodic()
         rational = edge.rational()
         self.assertTrue(isinstance(rational, bool))
         reversed = edge.reversed()
         self.assertTrue(isinstance(reversed, bool))
-        curve_type = edge.curve_type()
+        self._test_curve_type()
+
+    def _test_closed_periodic(self):
+        # Circle
+        circle = BRepBuilderAPI_MakeEdge(Geom_Circle(gp_XOY(), 1)).Edge()
+        circle = Edge(circle)
+        is_closed = circle.closed()
+        is_periodic = circle.periodic()
+        self.assertTrue(isinstance(is_closed, bool))
+        self.assertTrue(isinstance(is_periodic, bool))
+        self.assertTrue(is_closed)
+        self.assertTrue(is_periodic)
+        # Line segment
+        line = BRepBuilderAPI_MakeEdge(GC_MakeSegment(gp_Pnt(0, 0, 0), gp_Pnt(1, 1, 1)).Value()).Edge()
+        line = Edge(line)
+        is_closed = line.closed()
+        is_periodic = line.periodic()
+        self.assertTrue(not is_closed)
+        self.assertTrue(not is_periodic)
+
+    def _test_curve_type(self):
+        circle = BRepBuilderAPI_MakeEdge(Geom_Circle(gp_XOY(), 1)).Edge()
+        circle = Edge(circle)
+        curve_type = circle.curve_type()
         self.assertTrue(isinstance(curve_type, str))
+        self.assertTrue(curve_type == "circle")
 
     def run_test(self, solid):
         edges = solid.edges()

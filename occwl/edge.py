@@ -183,27 +183,11 @@ class Edge:
         _, umin, umax = BRep_Tool_Curve(self.topods_edge())
         return Interval(umin, umax)
     
-    def twin_edge(self):
-        raise NotImplementedError
-
-    def convex(self):
-        """
-        Returns the convex flag associated with the edge
-        NOTE: this does not check for edge convexity
-
-        Returns:
-            bool: the Convex flag set in the edge
-        """
-        return self.topods_edge().Convex()
+    def reversed_edge(self):
+        return Edge(self.topods_edge().Reversed())
     
     def closed(self):
-        """
-        Whether the curve is closed
-
-        Returns:
-            bool: If closed
-        """
-        return self.topods_edge().Closed()
+        return self.curve().IsClosed()
 
     def seam(self, face):
         """

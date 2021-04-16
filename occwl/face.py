@@ -285,27 +285,45 @@ class Face:
         """
         return self._face
 
-    def closed(self):
+    def closed_u(self):
         """
-        Whether the surface is closed along the U- and V-directions
+        Whether the surface is closed along the U-direction
 
         Returns:
             bool: Is closed along U
+        """
+        sa = ShapeAnalysis_Surface(self.surface())
+        return sa.IsUClosed()
+    
+    def closed_v(self):
+        """
+        Whether the surface is closed along the V-direction
+
+        Returns:
             bool: Is closed along V
         """
         sa = ShapeAnalysis_Surface(self.surface())
-        return sa.IsUClosed(), sa.IsVClosed()
+        return sa.IsVClosed()
 
-    def periodic(self):
+    def periodic_u(self):
         """
-        Whether the surface is periodic along the U- and V-directions
+        Whether the surface is periodic along the U-direction
 
         Returns:
             bool: Is periodic along U
+        """
+        adaptor = BRepAdaptor_Surface(self._face)
+        return adaptor.IsUPeriodic()
+    
+    def periodic_v(self):
+        """
+        Whether the surface is periodic along the V-direction
+
+        Returns:
             bool: Is periodic along V
         """
         adaptor = BRepAdaptor_Surface(self._face)
-        return adaptor.IsUPeriodic(), adaptor.IsVPeriodic()
+        return adaptor.IsVPeriodic()
 
     def get_triangles(self):
         """
