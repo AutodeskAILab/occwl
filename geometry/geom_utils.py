@@ -1,12 +1,16 @@
 import numpy as np
-from OCC.Core.gp import gp_Pnt, gp_Vec, gp_Dir
+from OCC.Core.gp import gp_Pnt, gp_Pnt2d, gp_Vec, gp_Dir
 
 def tuple_to_numpy(tup):
     l = list(tup)
     return np.array(l)
 
 def gp_to_numpy(gp):
-    return np.array([gp.X(), gp.Y(), gp.Z()])
+    if isinstance(gp, gp_Pnt2d):
+        return np.array([gp.X(), gp.Y()])
+    elif isinstance(gp, (gp_Pnt, gp_Dir, gp_Vec)):
+        return np.array([gp.X(), gp.Y(), gp.Z()])
+    raise NotImplementedError
 
 def numpy_to_gp(np_point):
     assert np_point.size == 3

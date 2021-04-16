@@ -32,6 +32,14 @@ class FaceTester(TestBase):
         reversed = face.reversed()
         self.assertTrue(isinstance(reversed, bool))
 
+        closed_u, closed_v = face.closed_u(), face.closed_v()
+        self.assertTrue(isinstance(closed_u, bool))
+        self.assertTrue(isinstance(closed_v, bool))
+
+        periodic_u, periodic_v = face.periodic_u(), face.periodic_v()
+        self.assertTrue(isinstance(periodic_u, bool))
+        self.assertTrue(isinstance(periodic_v, bool))
+
         curv_g = face.gaussian_curvature(uv)
         self.assertTrue(isinstance(curv_g, float))
 
