@@ -147,13 +147,21 @@ class Face:
     def topods_face(self):
         return self._face
 
-    def closed(self):
+    def closed_u(self):
         sa = ShapeAnalysis_Surface(self.surface())
-        return sa.IsUClosed(), sa.IsVClosed()
+        return sa.IsUClosed()
+    
+    def closed_v(self):
+        sa = ShapeAnalysis_Surface(self.surface())
+        return sa.IsVClosed()
 
-    def periodic(self):
+    def periodic_u(self):
         adaptor = BRepAdaptor_Surface(self._face)
-        return adaptor.IsUPeriodic(), adaptor.IsVPeriodic()
+        return adaptor.IsUPeriodic()
+    
+    def periodic_v(self):
+        adaptor = BRepAdaptor_Surface(self._face)
+        return adaptor.IsVPeriodic()
 
     def get_triangles(self):
         """
