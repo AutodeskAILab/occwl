@@ -1,11 +1,11 @@
-# OCCam
+# OCC Wrapper Library
 
-OCCam is a simple, lightweight Pythonic wrapper around pythonocc that makes it easy to work with B-reps.
+OCCWL is a simple, lightweight Pythonic wrapper around pythonocc (python bindings for OpenCascade).
 
 ## Installation
 
-- Clone OCCam into a local directory: `git clone https://git.autodesk.com/jayarap/occam.git`
-- CD into the cloned repository: `cd /path/to/occam`
+- Clone OCCWL into a local directory
+- CD into the cloned repository: `cd /path/to/occwl`
 - Run `pip install .`
 
 
@@ -18,8 +18,8 @@ Dependencies:
 ## Hello world
 
 ```python
-from occam.solid import Solid
-from occam.viewer import Viewer
+from occwl.solid import Solid
+from occwl.viewer import Viewer
 
 box = Solid.make_box(10, 10, 10)
 v = Viewer()
@@ -35,4 +35,7 @@ should display a box:
 More examples are available in the `examples` folder.
 
 
-Feel free to contact me for usage information or feature requests.
+## Maintainers
+
+- Pradeep Kumar Jayaraman (pradeep.kumar.jayaraman@autodesk.com)
+- Joseph Lambourne (joseph.lambourne@autodesk.com)
