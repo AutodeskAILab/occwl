@@ -5,6 +5,14 @@ from OCC.Extend import TopologyUtils
 
 
 def load_step(step_filename):
+    """Load solids from a STEP file
+
+    Args:
+        step_filename (str): Path to STEP file
+
+    Returns:
+        List of occwl.Solid: a list of solid models from the file
+    """
     step_filename_str = str(step_filename)
     reader = STEPControl_Reader()
     reader.ReadFile(step_filename_str)
@@ -24,7 +32,23 @@ def save_svg(shape,
              direction=(1, 1, 1),
              color="black",
              line_width=0.1):
-    
+    """Saves the shape outline as an SVG file
+
+    Args:
+        shape (Any occwl topology type): Any topological entity
+        filename (str): Path to output SVG
+        export_hidden_edges (bool, optional): Whether to render hidden edges as dotted lines in the SVG. Defaults to True.
+        location (tuple, optional): Location. Defaults to (0, 0, 0).
+        direction (tuple, optional): Direction. Defaults to (1, 1, 1).
+        color (str, optional): Color of the paths in SVG. Defaults to "black".
+        line_width (float, optional): Width of each path. Defaults to 0.1.
+    """
+    if isinstance(shape, Solid):
+        shape = shape.topods_solid()
+    if isinstance(shape, Face):
+        shape = shape.topods_face()
+    if isinstance(shape, Edge):
+        shape = shape.topods_edge()
     svg_string = export_shape_to_svg(shape, filename=filename, export_hidden_edges=export_hidden_edges,
                                      location=gp_Pnt(*location), direction=gp_Dir(*direction),
                                      color=color, line_width=line_width,
@@ -32,6 +56,14 @@ def save_svg(shape,
 
 
 def save_stl(shape, filename, binary=True):
+    """Saves a tesselated entity as a STL file
+    NOTE: Call Solid.triangulate_all_faces() first
+
+    Args:
+        shape ([type]): [description]
+        filename ([type]): [description]
+        binary (bool, optional): [description]. Defaults to True.
+    """
     from OCC.Extend.DataExchange import write_stl_file
     write_stl_file(shape,
                    filename,
