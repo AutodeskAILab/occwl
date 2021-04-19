@@ -23,34 +23,40 @@ class GridTester(TestBase):
     def face_test(self, face):
         num_u=10
         num_v=10
-        g = uvgrid(face, num_u, num_v)
-        self.reverse_u_test(g)
-        for i in range(1, num_u):
-            for j in range(1, num_v):
-                pt00 = np.array(g[i-1, j-1, 0:3])
-                pt10 = np.array(g[i, j-1, 0:3])
-                pt01 = np.array(g[i-1, j, 0:3])
-                du = pt10-pt00
-                dv = pt01-pt00
-                approx_normal = np.cross(du, dv)
-                normal = np.array(g[i, j, 3:6])
-                angle = self.angle_between_vectors(approx_normal, normal)
+        pts = uvgrid(face, num_u, num_v, method="point")
+        nor = uvgrid(face, num_u, num_v, method="normal")
+        if pts is not None and nor is not None:
+            g = np.concatenate((pts, nor), axis=2)
+            self.reverse_u_test(g)
+            for i in range(1, num_u):
+                for j in range(1, num_v):
+                    pt00 = np.array(g[i-1, j-1, 0:3])
+                    pt10 = np.array(g[i, j-1, 0:3])
+                    pt01 = np.array(g[i-1, j, 0:3])
+                    du = pt10-pt00
+                    dv = pt01-pt00
+                    approx_normal = np.cross(du, dv)
+                    normal = np.array(g[i, j, 3:6])
+                    angle = self.angle_between_vectors(approx_normal, normal)
 
-                angle_tol = np.pi / 4.0  # Big tol of 45 degrees
-                self.assertLess(angle, angle_tol)
+                    angle_tol = np.pi / 4.0  # Big tol of 45 degrees
+                    self.assertLess(angle, angle_tol)
 
 
     def edge_test(self, edge):
         num_u=10
-        g = ugrid(edge, num_u)
-        for i in range(1, num_u):
-            pt0 = np.array(g[i-1, 0:3])
-            pt1 = np.array(g[i, 0:3])
-            du = pt1-pt0
-            tangent = np.array(g[i, 3:6])
-            angle = self.angle_between_vectors(du, tangent)
-            angle_tol = np.pi / 4.0  # Big tol of 45 degrees
-            self.assertLess(angle, angle_tol)
+        pts = ugrid(edge, num_u, method="point")
+        tgt = ugrid(edge, num_u, method="tangent")
+        if pts is not None and tgt is not None:
+            g = np.concatenate((pts, tgt), axis=1)
+            for i in range(1, num_u):
+                pt0 = np.array(g[i-1, 0:3])
+                pt1 = np.array(g[i, 0:3])
+                du = pt1-pt0
+                tangent = np.array(g[i, 3:6])
+                angle = self.angle_between_vectors(du, tangent)
+                angle_tol = np.pi / 4.0  # Big tol of 45 degrees
+                self.assertLess(angle, angle_tol)
 
 
     def run_test(self, solid):
