@@ -4,6 +4,8 @@ from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d
 from OCC.Core.BRep import BRep_Tool_Curve, BRep_Tool_Continuity
 from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
+from OCC.Core.BRepGProp import brepgprop_LinearProperties
+from OCC.Core.GProp import GProp_GProps
 from OCC.Core.GeomAbs import GeomAbs_Line, GeomAbs_Circle, GeomAbs_Ellipse, GeomAbs_Hyperbola, GeomAbs_Parabola, GeomAbs_BezierCurve, GeomAbs_BSplineCurve, GeomAbs_OffsetCurve, GeomAbs_OtherCurve
 from OCC.Core.TopAbs import TopAbs_REVERSED
 from OCC.Extend import TopologyUtils
@@ -103,25 +105,18 @@ class Edge:
         # a zero vector
         return np.array([0,0,0])
 
-    def length(self, tolerance=1e-9):
+    def length(self):
         """
         Compute the length of the edge curve
-
-        Args:
-            tolerance (float, optional): Tolerance to compute abscissa points. Defaults to 1e-9.
 
         Returns:
             float: Length of the edge curve
         """
         if not self.has_curve():
             return 0.0
-        bounds = self.u_bounds()
-        return GCPnts_AbscissaPoint().Length(
-            BRepAdaptor_Curve(self.topods_edge()), 
-            bounds.a, 
-            bounds.b, 
-            tolerance
-        )
+        geometry_properties = GProp_GProps()
+        brepgprop_LinearProperties(self.topods_edge(), geometry_properties)
+        return geometry_properties.Mass()
 
     def curve(self):
         """
