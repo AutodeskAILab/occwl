@@ -6,16 +6,20 @@ import itertools
 
 
 def face_adjacency(solid, self_loops=False):
-    """ 
+    """
     Creates a face adjacency graph from the given solid
-    :param solid: A B-rep solid model of type occwl.Solid
-    :param self_loops: Whether to add self loops in the graph (default: False)
-    :return: list of faces (occwl.Face), dict of edges (occwl.Edge), and a list of face index pairs for each edge in the graph.
-             The indices in the connectivity index into the face list and can be used as keys in the edge dict. 
+
+    Args:
+        solid (occwl.solid.Solid): Solid model
+        self_loops (bool, optional): Whether to add self loops in the graph. Defaults to False.
+        
+    Returns:
+        List[occwl.face.Face]: list of faces
+        Dict[(int, int), occwl.edge.Edge]: mapping from face pairs to edge that lies in-between them
+        List[(int, int)]: Indices into the face list; can be used as keys in the edge dict.
     """
     assert isinstance(solid, Solid)
     face2ind = {}
-    edge2ind = {}
     nodes = []
     edges = {}
     connectivity = []
@@ -40,14 +44,18 @@ def face_adjacency(solid, self_loops=False):
 def vertex_adjacency(solid, self_loops=False):
     """ 
     Creates a vertex adjacency graph from the given solid
-    :param solid: A B-rep solid model of type occwl.Solid
-    :param self_loops: Whether to add self loops in the graph (default: False)
-    :return: list of vertices (occwl.Vertex), dict of edges (occwl.Edge), and a list of vertex index pairs for each edge in the graph.
-             The indices in the connectivity index into the vertex list and can be used as keys in the edge dict. 
+
+    Args:
+        solid (occwl.solid.Solid): Solid model
+        self_loops (bool, optional): Whether to add self loops in the graph. Defaults to False.
+    
+    Returns:
+        List[occwl.vertex.Vertex]: list of vertices
+        Dict[(int, int), occwl.edge.Edge]: mapping from vertex pairs to edge that lies in-between them
+        List[(int, int)]: Indices into the vertex list; can be used as keys in the edge dict.
     """
     assert isinstance(solid, Solid)
     vert2ind = {}
-    edge2ind = {}
     nodes = []
     edges = {}
     connectivity = []
@@ -67,4 +75,3 @@ def vertex_adjacency(solid, self_loops=False):
             edges[(ind1, ind2)] = ei
     connectivity = list(set(connectivity))
     return nodes, edges, connectivity
-

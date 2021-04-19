@@ -1,7 +1,11 @@
 from OCC.Core.STEPControl import STEPControl_Reader
 from occwl.solid import Solid
+from occwl.face import Face
+from occwl.edge import Edge
+from occwl.geometry import geom_utils
 from OCC.Extend.DataExchange import export_shape_to_svg
 from OCC.Extend import TopologyUtils
+from OCC.Core.gp import gp_Pnt, gp_Dir
 
 
 def load_step(step_filename):
@@ -45,10 +49,12 @@ def save_svg(shape,
     """
     if isinstance(shape, Solid):
         shape = shape.topods_solid()
-    if isinstance(shape, Face):
+    elif isinstance(shape, Face):
         shape = shape.topods_face()
-    if isinstance(shape, Edge):
+    elif isinstance(shape, Edge):
         shape = shape.topods_edge()
+    else:
+        raise NotImplementedError
     svg_string = export_shape_to_svg(shape, filename=filename, export_hidden_edges=export_hidden_edges,
                                      location=gp_Pnt(*location), direction=gp_Dir(*direction),
                                      color=color, line_width=line_width,
