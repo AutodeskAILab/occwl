@@ -337,8 +337,8 @@ class Face:
         face.
 
         Returns:
-            List[np.ndarray]: Vertices
-            List[List]: Faces
+            2D np.ndarray: Vertices
+            2D np.ndarray: Faces
         """
         location = TopLoc_Location()
         bt = BRep_Tool()
@@ -364,4 +364,4 @@ class Face:
 
             tris.append([index1 - 1, index2 - 1, index3 - 1])
     
-        return verts, tris
+        return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int)
