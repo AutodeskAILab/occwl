@@ -94,6 +94,15 @@ class Solid:
         """
         return map(Face, self._top_exp.faces())
     
+    def wires(self) -> Iterator[TopoDS_Wire]:
+        """
+        Get an iterator to go over all wires in the solid
+
+        Returns:
+            Iterator[occwl.wire.Wire]: Wire iterator
+        """
+        return map(Face, self._top_exp.wires())
+
     def edges_from_face(self, face):
         """
         Get an iterator to go over the edges in a face
@@ -133,6 +142,15 @@ class Solid:
         """
         return self._top_exp.number_of_faces()
     
+    def num_of_wires(self):
+        """
+        Number of wires in the solid
+
+        Returns:
+            int: Number of wires
+        """
+        return self._top_exp.number_of_wires()
+
     def num_edges(self):
         """
         Number of edges in the solid
