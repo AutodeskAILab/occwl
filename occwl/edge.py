@@ -179,9 +179,22 @@ class Edge:
         return Interval(umin, umax)
     
     def reversed_edge(self):
+        """
+        Return a copy of this edge with the orientation reversed.
+        
+        Returns:
+            occwl.edge.Edge: An edge with the opposite orientation to this edge.
+        """
         return Edge(self.topods_edge().Reversed())
     
     def closed(self):
+        """
+        Returns whether the 3D curve of this edge is closed.
+        i.e. the start and edge points are coincident.
+        
+        Returns:
+            bool: If closed
+        """
         return self.curve().IsClosed()
 
     def seam(self, face):
