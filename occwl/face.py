@@ -176,7 +176,10 @@ class Face:
         Returns:
             float: Mean curvature
         """
-        return GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MeanCurvature()
+        mean_curv = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MeanCurvature()
+        if self.reversed():
+            mean_curv *= -1
+        return mean_curv
 
     def max_curvature(self, uv):
         """
