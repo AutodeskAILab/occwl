@@ -21,6 +21,7 @@ from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Core.TopLoc import TopLoc_Location
 
 import occwl.geometry.geom_utils as geom_utils
+import occwl.geometry.interval as Interval
 from occwl.geometry.box import Box
 
 class Face:
