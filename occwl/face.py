@@ -33,14 +33,14 @@ class Face:
         self._face = topods_face
         self._trimmed = BRepTopAdaptor_FClass2d(self._face, 1e-9)
     
-    def hash(self):
+    def __hash__(self):
         """
         Hash for the face
 
         Returns:
             int: Hash value
         """
-        return hash(self.topods_face())
+        return self.topods_face().__hash__()
 
     def inside(self, uv):
         """

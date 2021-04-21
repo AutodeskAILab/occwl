@@ -35,14 +35,14 @@ class Edge:
         """
         return self._edge
 
-    def hash(self):
+    def __hash__(self):
         """
         Hash for the edge
 
         Returns:
             int: Hash value
         """
-        return hash(self.topods_edge())
+        return self.topods_edge().__hash__()
     
     def point(self, u):
         """

@@ -18,14 +18,14 @@ class Vertex:
         assert isinstance(topods_vertex, TopoDS_Vertex)
         self._vertex = topods_vertex
     
-    def hash(self):
+    def __hash__(self):
         """
         Hash for the vertex
 
         Returns:
             int: Hash value
         """
-        return hash(self.topods_vertex())
+        return self.topods_vertex().__hash__()
 
     def point(self):
         """
