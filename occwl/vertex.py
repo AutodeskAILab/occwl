@@ -26,6 +26,12 @@ class Vertex:
             int: Hash value
         """
         return self.topods_vertex().__hash__()
+    
+    def __eq__(self, other):
+        """
+        Equality check for the vertex
+        """
+        return self.topods_vertex().__hash__() == other.topods_vertex().__hash__()
 
     def point(self):
         """

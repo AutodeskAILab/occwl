@@ -42,6 +42,12 @@ class Face:
             int: Hash value
         """
         return self.topods_face().__hash__()
+    
+    def __eq__(self, other):
+        """
+        Equality check for the face
+        """
+        return self.topods_face().__hash__() == other.topods_face().__hash__()
 
     def inside(self, uv):
         """

@@ -44,6 +44,12 @@ class Edge:
         """
         return self.topods_edge().__hash__()
     
+    def __eq__(self, other):
+        """
+        Equality check for the edge
+        """
+        return self.topods_edge().__hash__() == other.topods_edge().__hash__()
+    
     def point(self, u):
         """
         Evaluate the edge geometry at given parameter
