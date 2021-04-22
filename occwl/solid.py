@@ -1,3 +1,4 @@
+import numpy as np
 from typing import Any, Iterable, Iterator, List, Optional, Tuple
 
 from OCC.Core.TopoDS import (topods, TopoDS_Wire, TopoDS_Vertex, TopoDS_Edge,
@@ -281,15 +282,15 @@ class Solid:
             angle_tol_rads (float, optional): Angle tolerance in radians. Defaults to 0.1.
 
         Returns:
-            List[np.ndarray]: Vertices
-            List[List[int]]: Faces
+            2D np.ndarray (float): Vertices or None if triangulation failed
+            2D np.ndarray (int): Faces or None if triangulation failed
         """
         ok  = self.triangulate_all_faces(triangle_face_tol, tol_relative_to_face, angle_tol_rads)
-        verts = []
-        tris = []
         if not ok:
             # Failed to triangulate
-            return verts, tris
+            return None, None
+        verts = []
+        tris = []
         faces = self.faces()
         last_vert_index = 0
         for face in faces:
@@ -299,7 +300,7 @@ class Solid:
                 new_indices = [index+last_vert_index for index in tri]
                 tris.append(new_indices)
             last_vert_index = len(verts)
-        return verts, tris
+        return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int)
 
     def edge_continuity(self, edge):
         """
