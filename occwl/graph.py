@@ -24,14 +24,14 @@ def face_adjacency(solid, self_loops=False):
     edges = {}
     connectivity = []
     for i, face in enumerate(solid.faces()):
-        face2ind[face.hash()] = i
+        face2ind[face] = i
         nodes.append(face)
 
     for ei in solid.edges():
         connected_faces = list(solid.faces_from_edge(ei))
         for (fi, fj) in itertools.permutations(connected_faces):
-            ind1 = face2ind[fi.hash()]
-            ind2 = face2ind[fj.hash()]
+            ind1 = face2ind[fi]
+            ind2 = face2ind[fj]
             if not self_loops:
                 if ind1 == ind2:
                     continue
@@ -60,14 +60,14 @@ def vertex_adjacency(solid, self_loops=False):
     edges = {}
     connectivity = []
     for i, vert in enumerate(solid.vertices()):
-        vert2ind[vert.hash()] = i
+        vert2ind[vert] = i
         nodes.append(vert)
 
     for ei in solid.edges():
         connected_verts = list(solid.vertices_from_edge(ei))
         for (fi, fj) in itertools.permutations(connected_verts):
-            ind1 = vert2ind[fi.hash()]
-            ind2 = vert2ind[fj.hash()]
+            ind1 = vert2ind[fi]
+            ind2 = vert2ind[fj]
             if not self_loops:
                 if ind1 == ind2:
                     continue
