@@ -65,9 +65,9 @@ def vertex_adjacency(solid, self_loops=False):
 
     for ei in solid.edges():
         connected_verts = list(solid.vertices_from_edge(ei))
-        for (fi, fj) in itertools.permutations(connected_verts):
-            ind1 = vert2ind[fi]
-            ind2 = vert2ind[fj]
+        for (vi, vj) in itertools.permutations(connected_verts):
+            ind1 = vert2ind[vi]
+            ind2 = vert2ind[vj]
             if not self_loops:
                 if ind1 == ind2:
                     continue
