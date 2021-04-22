@@ -29,14 +29,19 @@ def face_adjacency(solid, self_loops=False):
 
     for ei in solid.edges():
         connected_faces = list(solid.faces_from_edge(ei))
-        for (fi, fj) in itertools.permutations(connected_faces):
-            ind1 = face2ind[fi]
-            ind2 = face2ind[fj]
-            if not self_loops:
-                if ind1 == ind2:
-                    continue
-            connectivity.append((min(ind1, ind2), max(ind1, ind2)))
-            edges[(ind1, ind2)] = ei
+        if len(connected_faces) < 2:
+            if ei.seam(connected_faces[0]) and self_loops:
+                connectivity.append((connected_faces[0], connected_faces[0]))
+                edges[(connected_faces[0], connected_faces[0])] = ei
+        else:
+            for (fi, fj) in itertools.permutations(connected_faces):
+                ind1 = face2ind[fi]
+                ind2 = face2ind[fj]
+                if not self_loops:
+                    if ind1 == ind2:
+                        continue
+                connectivity.append((min(ind1, ind2), max(ind1, ind2)))
+                edges[(ind1, ind2)] = ei
     connectivity = list(set(connectivity))
     return nodes, edges, connectivity
 
@@ -65,13 +70,18 @@ def vertex_adjacency(solid, self_loops=False):
 
     for ei in solid.edges():
         connected_verts = list(solid.vertices_from_edge(ei))
-        for (vi, vj) in itertools.permutations(connected_verts):
-            ind1 = vert2ind[vi]
-            ind2 = vert2ind[vj]
-            if not self_loops:
-                if ind1 == ind2:
-                    continue
-            connectivity.append((min(ind1, ind2), max(ind1, ind2)))
-            edges[(ind1, ind2)] = ei
+        if len(connected_verts) < 2:
+            # FIXME: Need to properly account for edges that are
+            # only connected to one vertex
+            pass
+        else:
+            for (vi, vj) in itertools.permutations(connected_verts):
+                ind1 = vert2ind[vi]
+                ind2 = vert2ind[vj]
+                if not self_loops:
+                    if ind1 == ind2:
+                        continue
+                connectivity.append((min(ind1, ind2), max(ind1, ind2)))
+                edges[(ind1, ind2)] = ei
     connectivity = list(set(connectivity))
     return nodes, edges, connectivity
