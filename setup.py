@@ -11,7 +11,7 @@ setuptools.setup(
     author_email="pradeep.kumar.jayaraman@autodesk.com",
     description="Lightweight Pythonic wrapper around pythonocc",
     url="git.autodesk.com/jayarap/occam",
-    packages=["occam"],
+    packages=["occwl"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
