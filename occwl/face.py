@@ -71,6 +71,15 @@ class Face:
         """
         return BRep_Tool_Surface(self._face)
     
+    def reversed_face(self):
+        """
+        Return a copy of this face with the orientation reversed.
+        
+        Returns:
+            occwl.face.Face: A face with the opposite orientation to this face.
+        """
+        return Face(self.topods_face().Reversed())
+
     def specific_surface(self):
         """
         Get the specific face surface geometry
