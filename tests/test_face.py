@@ -63,6 +63,10 @@ class FaceTester(TestBase):
         area = face.area()
         self.assertTrue(isinstance(area, float))
 
+        reversed_face = face.reversed_face()
+        self.assertTrue(type(face) == type(reversed_face))
+        self.assertTrue(face.reversed() != reversed_face.reversed())
+
     def run_test(self, solid):
         faces = solid.faces()
         for face in faces:
