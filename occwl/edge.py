@@ -1,7 +1,7 @@
 import numpy as np
 
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d
-from OCC.Core.BRep import BRep_Tool_Curve, BRep_Tool_Continuity
+from OCC.Core.BRep import BRep_Tool, BRep_Tool_Curve, BRep_Tool_Continuity
 from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.BRepGProp import brepgprop_LinearProperties
@@ -276,3 +276,14 @@ class Edge:
         if curv_type == GeomAbs_OtherCurve:
             return "other"
         return "unknown"
+
+
+    def tolerance(self):
+        """
+        Get tolerance of this edge.  The 3d curve of the edge should not
+        deviate from the surfaces of adjacent faces by more than this value
+
+        Returns:
+            float The edge tolerance
+        """
+        return BRep_Tool().Tolerance(self._edge)
