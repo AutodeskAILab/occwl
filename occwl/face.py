@@ -20,11 +20,13 @@ from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Core.TopLoc import TopLoc_Location
 
+from occwl.entity import Entity
+
 import occwl.geometry.geom_utils as geom_utils
 import occwl.geometry.interval as Interval
 from occwl.geometry.box import Box
 
-class Face:
+class Face(Entity):
     """
     A topological face in a solid model
     Represents a 3D surface bounded by a Wire
@@ -33,7 +35,16 @@ class Face:
         assert isinstance(topods_face, TopoDS_Face)
         self._face = topods_face
         self._trimmed = BRepTopAdaptor_FClass2d(self._face, 1e-9)
-    
+
+    def topods_entity(self):
+        """
+        Get the underlying OCC face as an entity
+
+        Returns:
+            OCC.Core.TopoDS.TopoDS_Face: Face
+        """
+        return self._face
+
     def __hash__(self):
         """
         Hash for the face
