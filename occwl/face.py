@@ -37,9 +37,9 @@ class Face(Shape):
         self._face = topods_face
         self._trimmed = BRepTopAdaptor_FClass2d(self._face, 1e-9)
 
-    def topods_entity(self):
+    def topods_shape(self):
         """
-        Get the underlying OCC face as an entity
+        Get the underlying OCC face as a shape
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Face: Face
