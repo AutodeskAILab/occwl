@@ -50,4 +50,7 @@ class TestBase(unittest.TestCase):
             # Case where one or both vectors had zero length
             return 0.0
         d = np.dot(unit_v1, unit_v2)
+        d = np.clip(d, -1.0, 1.0)
+        assert -1.0 <= d
+        assert d <= 1.0
         return np.arccos(d)
