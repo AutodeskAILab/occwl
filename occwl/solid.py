@@ -23,9 +23,9 @@ from occwl.vertex import Vertex
 
 import occwl.geometry.geom_utils as geom_utils
 from occwl.geometry.box import Box
+from occwl.shape import Shape
 
-
-class Solid:
+class Solid(Shape):
     """
     A solid model
     """
