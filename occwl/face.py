@@ -56,7 +56,16 @@ class Face(Entity):
     
     def __eq__(self, other):
         """
-        Equality check for the face
+        Equality check for the face.
+
+        NOTE: This function only checks if the face is the same.
+              It doesn't check the face orienation, so 
+
+              face1 == face2
+
+              does not necessarily mean 
+
+              face1.reversed() == face2.reversed()
         """
         return self.topods_face().__hash__() == other.topods_face().__hash__()
 

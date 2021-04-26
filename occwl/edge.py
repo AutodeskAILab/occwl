@@ -56,7 +56,16 @@ class Edge(Shape):
     
     def __eq__(self, other):
         """
-        Equality check for the edge
+        Equality check for the edge.
+
+        NOTE: This function only checks if the edge is the same.
+        It doesn't check the edge orienation, so 
+
+        edge1 == edge2
+
+        does not necessarily mean 
+
+        edge1.reversed() == edge2.reversed()
         """
         return self.topods_edge().__hash__() == other.topods_edge().__hash__()
     
