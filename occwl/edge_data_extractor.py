@@ -2,8 +2,16 @@
 Extract points, normals and potentially other information from an edge and its
 adjacent faces
 """
-
+# System
 from enum import Enum
+import numpy as np
+
+# OCC
+from OCC.Core.BRepAdaptor import BRepAdaptor_Curve2d, BRepAdaptor_Surface
+from OCC.Core.gp import gp_Pnt2d
+
+# occwl
+from occwl.geometry.interval import Interval
 
 class EdgeConvexity(Enum):
     CONCAVE = 1
@@ -21,8 +29,8 @@ class EdgeDataExtractor:
 
             EdgeDataExtractor.points
             EdgeDataExtractor.tangests
-            EdgeDataExtractor.normals1
-            EdgeDataExtractor.normals2
+            EdgeDataExtractor.left_normals
+            EdgeDataExtractor.right_normals
 
         If a problem was detected during the calculation then 
         EdgeDataExtractor.false and all arrays get set to 
@@ -36,21 +44,21 @@ class EdgeDataExtractor:
         self.num_samples = num_samples
         self.good = True
 
+        self.find_left_and_right_faces(edge, face1, face2)
+
         self.edge = edge
-        self.face1 = face1
-        self.surf1 = BRepAdaptor_Surface(face1.topods_face())
-        self.face2 = face2
-        self.surf2 = BRepAdaptor_Surface(face2.topods_face())
+        # self.left_surf = BRepAdaptor_Surface(self.left_face.topods_face())
+        # self.right_surf = BRepAdaptor_Surface(self.right_face.topods_face())
 
         self.curve3d = edge.curve()
-        self.pcurve1 = BRepAdaptor_Curve2d(edge.topods_edge(), self.surf1)
-        self.pcurve2 = BRepAdaptor_Curve2d(edge.topods_edge(), self.surf2)
+        self.left_pcurve = BRepAdaptor_Curve2d(edge.topods_edge(), self.left_face.topods_face())
+        self.right_pcurve = BRepAdaptor_Curve2d(edge.topods_edge(), self.right_face.topods_face())
 
         # Find the parameters to evaluate.   These will be
         # ordered based on the reverse flag of the edge
         self.u_params = self.find_arclength_parameters()
-        self.surf1_uvs = self.find_uvs(self.pcurve1)
-        self.surf2_uvs = self.find_uvs(self.pcurve2)
+        self.left_uvs = self.find_uvs(self.left_pcurve)
+        self.right_uvs = self.find_uvs(self.right_pcurve)
 
         # Find 3d points and tangents.
         # These will be ordered and oriented based on the 
@@ -62,45 +70,59 @@ class EdgeDataExtractor:
         # Test here on watertight models to make sure
         # that the uvs we found are parameterized in the
         # same way as the 3d curve
-        self.sanity_check_uvs(self.surf1_uvs, edge.tolerance())
-        self.sanity_check_uvs(self.surf2_uvs, edge.tolerance())
+        self.sanity_check_uvs(self.left_uvs, edge.tolerance())
+        self.sanity_check_uvs(self.right_uvs, edge.tolerance())
 
         # Generate the normals.  These will be ordered
         # based on the direction of the edge and the 
         # normals will be reversed based on the orientation
         # of the faces
-        self.normals1 = self.evaluate_surface_normals(self.face1)
-        self.normals2 = self.evaluate_surface_normals(self.face2)
+        self.left_normals = self.evaluate_surface_normals(self.left_uvs, self.left_face)
+        self.right_normals = self.evaluate_surface_normals(self.right_uvs, self.right_face)
 
+    def find_left_and_right_faces(self, edge, face1, face2):
+        """
+        We know two faces on either side of the edge, but we
+        don't know which is to the left and which to the right.
+        This function works it out
+        """
+        if face1.is_left_of(edge):
+            assert not face2.is_left_of(edge)
+            self.left_face = face1
+            self.right_face = face2
+        else:
+            assert face2.is_left_of(edge)
+            self.left_face = face2
+            self.right_face = face1
 
     def edge_convexity(self, angle_tol_rads):
         """
         Compute the convexity of the edge
         """
-        continuity = BRep_Tool_Continuity(
-            self.edge.topods_edge(), 
-            self.face1.topods_face(),
-            self.face2.topods_face()
-        )
+        continuity = self.edge.continuity(self.left_face, self.right_face)
         is_smooth = self.check_smooth(angle_tol_rads)
         if is_smooth:
             return EdgeConvexity.SMOOTH
 
-        cross_prod_of_normals = np.linalg.cross(self.normals1, self.normals2, axis=0)
-        dot_product_with_tangents = np.linalg.dot(cross_prod_of_normals, self.tangents, axis=0)
+        cross_prod_of_normals = np.cross(self.left_normals, self.right_normals, axis=1)
+        dot_product_with_tangents = np.multiply(cross_prod_of_normals, self.tangents).sum(1)
 
         if dot_product_with_tangents.sum() > 0.0:
             return EdgeConvexity.CONVEX
-        returnEdgeConvexity.CONCAVE
+        return EdgeConvexity.CONCAVE
 
+    def check_smooth(self, angle_tol_rads):
+        dot_prod = np.multiply(self.left_normals, self.right_normals).sum(1)
+        average_dot_product = dot_prod.mean()
+        return average_dot_product > np.cos(angle_tol_rads)
 
     def find_arclength_parameters(self):
         num_points_arclength = 100
-        interval = self.edge.u_bound()
+        interval = self.edge.u_bounds()
         points = []
         us = []
-        for i in range(num_samples):
-            u = interval.interpolate(i/(num_points_arclength-1)
+        for i in range(num_points_arclength):
+            u = interval.interpolate(i/(num_points_arclength-1))
             points.append(self.edge.point(u))
             us.append(u)
 
@@ -112,12 +134,15 @@ class EdgeDataExtractor:
             if prev_point is not None:
                 length = np.linalg.norm(point-prev_point)
                 lengths.append(length)
-                toltal_length += length
+                total_length += length
             prev_point = point
 
         arc_length_fraction = [ 0.0 ]
+        cumulative_length = 0.0
         for length in lengths:
-            arc_length_fraction.append(length/total_length)
+            cumulative_length += length
+            arc_length_fraction.append(cumulative_length/total_length)
+            
 
         arc_length_params = []
         arc_length_index = 0
@@ -125,8 +150,8 @@ class EdgeDataExtractor:
             desired_arc_length_fraction = i/(self.num_samples-1)
             while arc_length_fraction[arc_length_index] < desired_arc_length_fraction:
                 arc_length_index += 1
-                if arc_length_index == len(arc_length_fraction)-1
-                break
+                if arc_length_index >= len(arc_length_fraction)-1:
+                    break
 
             if arc_length_index == 0:
                 u_low = us[0]
@@ -137,20 +162,18 @@ class EdgeDataExtractor:
             u_high = us[arc_length_index]
             frac_high = arc_length_fraction[arc_length_index]
             d_frac = frac_high-frac_low
-            assert d_frac > 0.0
-            u_interval = Interval(low, high)
-            position_in_interval = (desired_arc_length_fraction-frac_low)/(d_frac)
-            u_param = u_interval.interpolate(position_in_interval)
+            if d_frac <= 0.0:
+                u_param = u_low
+            else:
+                u_interval = Interval(u_low, u_high)
+                position_in_interval = (desired_arc_length_fraction-frac_low)/(d_frac)
+                u_param = u_interval.interpolate(position_in_interval)
             arc_length_params.append(u_param)
 
         # Now we need to check the orientation of the edge and 
         # reverse the array is necessary
         if self.edge.reversed():
-            reversed_arc_length_params = []
-            for param in arc_length_params.reversed():
-                reversed_arc_length_params.append(param)
-            return reversed_arc_length_params
-
+            arc_length_params.reverse()
         return arc_length_params
 
 
@@ -179,10 +202,10 @@ class EdgeDataExtractor:
         return np.stack(tangents)
 
     def sanity_check_uvs(self, uvs, edge_tolerance):
-        for u, uv1, uv2 in zip(self.u_params, self.surf1_uvs, self.surf2_uvs):
+        for u, left_uv, right_uv in zip(self.u_params, self.left_uvs, self.right_uvs):
             point = self.edge.point(u)
-            point1 = self.face1.point(uv1)
-            point2 = self.face1.point(uv2)
+            point1 = self.left_face.point(left_uv)
+            point2 = self.right_face.point(right_uv)
             assert np.linalg.norm(point-point1) < edge_tolerance
             assert np.linalg.norm(point-point2) < edge_tolerance
 
@@ -191,4 +214,4 @@ class EdgeDataExtractor:
         for uv in uvs:
             normal = face.normal(uv)
             normals.append(normal)
-        return np.stack(normalsal)
+        return np.stack(normals)
