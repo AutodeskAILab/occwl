@@ -3,9 +3,9 @@ from OCC.Extend import TopologyUtils
 from occwl.edge import Edge
 from occwl.vertex import Vertex
 
-from occwl.entity import Entity
+from occwl.shape import Shape
 
-class Wire(Entity):
+class Wire(Shape):
     """
     A topological wire in a solid model
     Represents a closed loop of edges
@@ -15,9 +15,9 @@ class Wire(Entity):
         self._wire = topods_wire
         self._wire_exp = TopologyUtils.WireExplorer(self._wire)
         
-    def topods_entity(self):
+    def topods_shape(self):
         """
-        Get the underlying OCC wire as an entity
+        Get the underlying OCC wire as a shape
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Wire: Wire

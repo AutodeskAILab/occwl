@@ -16,9 +16,9 @@ from OCC.Core.ShapeAnalysis import ShapeAnalysis_Edge
 
 import occwl.geometry.geom_utils as geom_utils
 from occwl.geometry.interval import Interval
-from occwl.entity import Entity
+from occwl.shape import Shape
 
-class Edge(Entity):
+class Edge(Shape):
     """
     A topological edge in a solid model
     Represents a 3D curve bounded by vertices
@@ -27,9 +27,9 @@ class Edge(Entity):
         assert isinstance(topods_edge, TopoDS_Edge)
         self._edge = topods_edge
     
-    def topods_entity(self):
+    def topods_shape(self):
         """
-        Get the underlying OCC edge as an entity
+        Get the underlying OCC edge as a shape
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Edge: Edge

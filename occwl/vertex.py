@@ -2,9 +2,9 @@ from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d
 from OCC.Core.TopoDS import TopoDS_Vertex
 from OCC.Core.BRep import BRep_Tool
 
-from occwl.entity import Entity
+from occwl.shape import Shape
 
-class Vertex(Entity):
+class Vertex(Shape):
     """
     A topological vertex in a solid model
     Represents a 3D geometric point
@@ -19,9 +19,9 @@ class Vertex(Entity):
         assert isinstance(topods_vertex, TopoDS_Vertex)
         self._vertex = topods_vertex
 
-    def topods_entity(self):
+    def topods_shape(self):
         """
-        Get the underlying OCC vertex as an entity
+        Get the underlying OCC vertex as a shape
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Vertex: Vertex
