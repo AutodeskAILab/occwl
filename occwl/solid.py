@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 from typing import Any, Iterable, Iterator, List, Optional, Tuple
 
 from OCC.Core.TopoDS import (topods, TopoDS_Wire, TopoDS_Vertex, TopoDS_Edge,
@@ -317,3 +318,55 @@ class Solid(Shape):
         if len(faces) == 1:
            faces.append(faces[-1])
         return edge.continuity(faces[0], faces[1])
+
+
+    def find_closest_face_slow(self, datum):
+        """
+        Find the closest face to the given datum point.
+        The function is for testing only.  It will be slow 
+        as it loops over all faces in the solid.
+        A quick way to find the closest entity is to call
+        Solid.find_closest_point_data(), but then you
+        may get a face, edge or vertex back.
+        
+        Args:
+            datum (np.ndarray or tuple): 3D datum point
+
+        Returns:
+            Face: The closest face in the solid
+        """
+        return self._find_closest_shape_in_list(self.faces(), datum)
+
+    def find_closest_edge_slow(self, datum):
+        """
+        Find the closest edge to the given datum point.
+        The function is for testing only.  It will be slow 
+        as it loops over all edges in the solid.
+        A quick way to find the closest entity is to call
+        Solid.find_closest_point_data(), but then you
+        may get a face, edge or vertex back.
+        
+        Args:
+            datum (np.ndarray or tuple): 3D datum point
+
+        Returns:
+            Face: The closest face in the solid
+        """
+        return self._find_closest_shape_in_list(self.edges(), datum)
+
+    def _find_closest_shape_in_list(self, shapes, datum):
+        """
+        In this function we search all shapes in the list 
+        and return the closest one.   
+        Typically you would want to find the closest entity 
+        which may be a face, edge or vertex.  For this you can
+        use Solid.find_closest_point_data()
+        """
+        closest_dist_yet = sys.float_info.max
+        closest_shape = None
+        for s in shapes:
+            closest_point_data = s.find_closest_point_data(datum)
+            if closest_point_data.distance < closest_dist_yet:
+                closest_shape = s
+                closest_dist_yet = closest_point_data.distance
+        return closest_shape
