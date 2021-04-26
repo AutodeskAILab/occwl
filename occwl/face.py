@@ -20,26 +20,73 @@ from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Core.TopLoc import TopLoc_Location
 
-import geometry.geom_utils as geom_utils
-from geometry.box import Box
+import occwl.geometry.geom_utils as geom_utils
+import occwl.geometry.interval as Interval
+from occwl.geometry.box import Box
 
 class Face:
+    """
+    A topological face in a solid model
+    Represents a 3D surface bounded by a Wire
+    """
     def __init__(self, topods_face):
         assert isinstance(topods_face, TopoDS_Face)
         self._face = topods_face
         self._trimmed = BRepTopAdaptor_FClass2d(self._face, 1e-9)
     
-    def hash(self):
-        return hash(self.topods_face())
+    def __hash__(self):
+        """
+        Hash for the face
+
+        Returns:
+            int: Hash value
+        """
+        return self.topods_face().__hash__()
+    
+    def __eq__(self, other):
+        """
+        Equality check for the face
+        """
+        return self.topods_face().__hash__() == other.topods_face().__hash__()
 
     def inside(self, uv):
+        """
+        Check if the uv-coordinate in on the visible region of the face
+
+        Args:
+            uv (np.ndarray or tuple): Surface parameter
+        
+        Returns:
+            bool: Is inside
+        """
         result = self._trimmed.Perform(gp_Pnt2d(uv[0], uv[1]))
         return result == TopAbs_IN
 
     def surface(self):
+        """
+        Get the face surface geometry
+
+        Returns:
+            OCC.Geom.Handle_Geom_Surface: Interface to all surface geometry
+        """
         return BRep_Tool_Surface(self._face)
     
+    def reversed_face(self):
+        """
+        Return a copy of this face with the orientation reversed.
+        
+        Returns:
+            occwl.face.Face: A face with the opposite orientation to this face.
+        """
+        return Face(self.topods_face().Reversed())
+
     def specific_surface(self):
+        """
+        Get the specific face surface geometry
+
+        Returns:
+            OCC.Geom.Handle_Geom_*: Specific geometry type for the surface geometry
+        """
         srf = BRepAdaptor_Surface(self._face)
         surf_type = self.surface_type()
         if surf_type == "plane":
@@ -61,10 +108,28 @@ class Face:
         return self._face.Orientation() == TopAbs_REVERSED
 
     def point(self, uv):
+        """
+        Evaluate the edge geometry at given parameter
+
+        Args:
+            uv (np.ndarray or tuple): Surface parameter
+        
+        Returns:
+            np.ndarray: 3D Point
+        """
         pt = self.surface().Value(uv[0], uv[1])
         return geom_utils.gp_to_numpy(pt)
 
     def tangent(self, uv):
+        """
+        Compute the tangents of the surface geometry at given parameter
+
+        Args:
+            uv (np.ndarray or tuple): Surface parameter
+
+        Returns:
+            Pair of np.ndarray or None: 3D unit vectors
+        """
         dU, dV = gp_Dir(), gp_Dir()
         res = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 1, 1e-9)
         if res.IsTangentUDefined() and res.IsTangentVDefined():
@@ -73,6 +138,15 @@ class Face:
         return None, None
 
     def normal(self,uv):
+        """
+        Compute the normal of the surface geometry at given parameter
+
+        Args:
+            uv (np.ndarray or tuple): Surface parameter
+
+        Returns:
+            np.ndarray: 3D unit normal vector
+        """
         res = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 1, 1e-9)
         if not res.IsNormalDefined():
             return (0, 0, 0)
@@ -82,43 +156,120 @@ class Face:
         return normal
 
     def gaussian_curvature(self, uv):
+        """
+        Compute the gaussian curvature of the surface geometry at given parameter
+
+        Args:
+            uv (np.ndarray or tuple): Surface parameter
+
+        Returns:
+            float: Gaussian curvature
+        """
         return GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).GaussianCurvature()
 
     def min_curvature(self, uv):
+        """
+        Compute the minimum curvature of the surface geometry at given parameter
+
+        Args:
+            uv (np.ndarray or tuple): Surface parameter
+
+        Returns:
+            float: Min. curvature
+        """
         min_curv = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MinCurvature()
         if self.reversed():
             min_curv *= -1
         return min_curv
 
     def mean_curvature(self, uv):
-        return GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MeanCurvature()
+        """
+        Compute the mean curvature of the surface geometry at given parameter
+
+        Args:
+            uv (np.ndarray or tuple): Surface parameter
+
+        Returns:
+            float: Mean curvature
+        """
+        mean_curv = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MeanCurvature()
+        if self.reversed():
+            mean_curv *= -1
+        return mean_curv
 
     def max_curvature(self, uv):
+        """
+        Compute the maximum curvature of the surface geometry at given parameter
+
+        Args:
+            uv (np.ndarray or tuple): Surface parameter
+
+        Returns:
+            float: Max. curvature
+        """
         max_curv = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MaxCurvature()
         if self.reversed():
             max_curv *= -1
         return max_curv
 
     def area(self):
+        """
+        Compute the area of the face
+
+        Returns:
+            float: Area
+        """
         geometry_properties = GProp_GProps()
         brepgprop_SurfaceProperties(self._face, geometry_properties)
         return geometry_properties.Mass()
     
     def pcurve(self, edge):
-        crv, u_min, u_max = BRep_Tool().CurveOnSurface(edge.topods_edge(), self.topods_face())
-        return crv, u_min, u_max
+        """
+        Get the given edge's curve geometry as a 2D parametric curve
+        on this face
+
+        Args:
+            edge (occwl.edge.Edge): Edge
+
+        Returns:
+            Geom2d_Curve: 2D curve
+            Interval: domain of the parametric curve
+        """
+        crv, umin, umax = BRep_Tool().CurveOnSurface(edge.topods_edge(), self.topods_face())
+        return crv, Interval(umin, umax)
 
     def uv_bounds(self):
+        """
+        Get the UV-domain bounds of this face's surface geometry
+
+        Returns:
+            Box: UV-domain bounds
+        """
         umin, umax, vmin, vmax = breptools_UVBounds(self._face)
         bounds = Box(np.array([umin, vmin]))
         bounds.encompass_point(np.array([umax, vmax]))
         return bounds
     
     def point_to_parameter(self, pt):
+        """
+        Get the UV parameter by projecting the point on this face
+
+        Args:
+            pt (np.ndarray): 3D point
+
+        Returns:
+            np.ndarray: UV-coordinate
+        """
         uv = ShapeAnalysis_Surface(self.surface()).ValueOfUV(gp_Pnt(pt[0], pt[1], pt[2]), 1e-9)
         return np.array(uv.Coord())
 
     def surface_type(self):
+        """
+        Get the type of the surface geometry
+
+        Returns:
+            str: Type of the surface geometry
+        """
         surf_type = BRepAdaptor_Surface(self._face).GetType()
         if surf_type == GeomAbs_Plane:
             return "plane"
@@ -145,29 +296,64 @@ class Face:
         return "unknown"
 
     def topods_face(self):
+        """
+        Get the underlying OCC face type
+
+        Returns:
+            OCC.Core.TopoDS.TopoDS_Face: Face
+        """
         return self._face
 
     def closed_u(self):
+        """
+        Whether the surface is closed along the U-direction
+
+        Returns:
+            bool: Is closed along U
+        """
         sa = ShapeAnalysis_Surface(self.surface())
         return sa.IsUClosed()
     
     def closed_v(self):
+        """
+        Whether the surface is closed along the V-direction
+
+        Returns:
+            bool: Is closed along V
+        """
         sa = ShapeAnalysis_Surface(self.surface())
         return sa.IsVClosed()
 
     def periodic_u(self):
+        """
+        Whether the surface is periodic along the U-direction
+
+        Returns:
+            bool: Is periodic along U
+        """
         adaptor = BRepAdaptor_Surface(self._face)
         return adaptor.IsUPeriodic()
     
     def periodic_v(self):
+        """
+        Whether the surface is periodic along the V-direction
+
+        Returns:
+            bool: Is periodic along V
+        """
         adaptor = BRepAdaptor_Surface(self._face)
         return adaptor.IsVPeriodic()
 
     def get_triangles(self):
         """
-        First you must call solid.triangulate_all_faces()
+        Get the tessellation of this face as a triangle mesh
+        NOTE: First you must call solid.triangulate_all_faces()
         Then call this method to get the triangles for the
         face.
+
+        Returns:
+            2D np.ndarray: Vertices
+            2D np.ndarray: Faces
         """
         location = TopLoc_Location()
         bt = BRep_Tool()
@@ -193,4 +379,4 @@ class Face:
 
             tris.append([index1 - 1, index2 - 1, index3 - 1])
     
-        return verts, tris
+        return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int)

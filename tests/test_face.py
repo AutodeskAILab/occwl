@@ -42,18 +42,30 @@ class FaceTester(TestBase):
 
         curv_g = face.gaussian_curvature(uv)
         self.assertTrue(isinstance(curv_g, float))
+        curv_g_rev = face.reversed_face().gaussian_curvature(uv)
+        self.assertTrue(np.allclose(curv_g, curv_g_rev))
 
         curv_max = face.max_curvature(uv)
         self.assertTrue(isinstance(curv_max, float))
+        curv_max_rev = face.reversed_face().max_curvature(uv)
+        self.assertTrue(np.allclose(curv_max, -curv_max_rev))
 
         curv_min = face.min_curvature(uv)
         self.assertTrue(isinstance(curv_min, float))
+        curv_min_rev = face.reversed_face().min_curvature(uv)
+        self.assertTrue(np.allclose(curv_min, -curv_min_rev))
 
         curv_mean = face.mean_curvature(uv)
         self.assertTrue(isinstance(curv_mean, float))
+        curv_mean_rev = face.reversed_face().mean_curvature(uv)
+        self.assertTrue(np.allclose(curv_mean, -curv_mean_rev))
 
         area = face.area()
         self.assertTrue(isinstance(area, float))
+
+        reversed_face = face.reversed_face()
+        self.assertTrue(type(face) == type(reversed_face))
+        self.assertTrue(face.reversed() != reversed_face.reversed())
 
     def run_test(self, solid):
         faces = solid.faces()

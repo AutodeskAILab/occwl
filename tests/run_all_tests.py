@@ -11,6 +11,7 @@ from test_box import BoxTester
 from test_edge import EdgeTester
 from test_face import FaceTester
 from test_get_triangles import TriangleTester
+from test_graph import GraphTester
 
 if __name__ == '__main__':
     unittest.main()

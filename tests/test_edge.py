@@ -3,12 +3,12 @@
 import numpy as np
 
 # Geometry
-from geometry.interval import Interval
+from occwl.geometry.interval import Interval
 from OCC.Core.gp import gp_XOY, gp_Pnt
 from OCC.Core.GC import GC_MakeSegment
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 from OCC.Core.Geom import Geom_Circle
-from occam.edge import Edge
+from occwl.edge import Edge
 
 # Test
 from test_base import TestBase
@@ -49,6 +49,7 @@ class EdgeTester(TestBase):
         reversed = edge.reversed()
         self.assertTrue(isinstance(reversed, bool))
         self._test_curve_type()
+        self._test_specific_curve(edge)
 
     def _test_closed_periodic(self):
         # Circle
@@ -74,6 +75,11 @@ class EdgeTester(TestBase):
         curve_type = circle.curve_type()
         self.assertTrue(isinstance(curve_type, str))
         self.assertTrue(curve_type == "circle")
+    
+    def _test_specific_curve(self, edge):
+        if edge.has_curve():
+            crv = edge.specific_curve()
+            self.assertTrue(crv is not None)
 
     def run_test(self, solid):
         edges = solid.edges()

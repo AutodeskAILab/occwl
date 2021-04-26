@@ -3,7 +3,7 @@
 import numpy as np
 from pathlib import Path
 
-from geometry.tri_utils import write_obj 
+from occwl.geometry.tri_utils import write_obj 
 
 # Test
 from test_base import TestBase
@@ -15,15 +15,11 @@ class TriangleTester(TestBase):
         self.run_test_on_all_files_in_folder(data_folder)
 
     def check_tris(self, verts, tris):
-        for v in verts:
-            self.assertTrue(v.size == 3)
-            
-        for tri in tris:
-            self.assertTrue(isinstance(tri, list))
-            self.assertTrue(len(tri)==3)
-            for index in tri:
-                self.assertTrue(isinstance(index, int))
-                self.assertTrue(index < len(verts))
+        self.assertTrue(verts.shape[1] == 3)
+        self.assertTrue(verts.dtype == np.float32)
+        self.assertTrue(tris.shape[1] == 3)
+        self.assertTrue(tris.dtype == np.int)
+        self.assertTrue(np.all(tris < len(verts)))
 
     def run_test_with_pathname(self, file, solid):
         verts, tris = solid.get_triangles()
