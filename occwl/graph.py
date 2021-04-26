@@ -70,18 +70,20 @@ def vertex_adjacency(solid, self_loops=False):
 
     for ei in solid.edges():
         connected_verts = list(solid.vertices_from_edge(ei))
+        if not ei.has_curve():
+            continue
         if len(connected_verts) < 2:
-            # FIXME: Need to properly account for edges that are
-            # only connected to one vertex
-            pass
-        else:
-            for (vi, vj) in itertools.permutations(connected_verts):
-                ind1 = vert2ind[vi]
-                ind2 = vert2ind[vj]
-                if not self_loops:
-                    if ind1 == ind2:
-                        continue
-                connectivity.append((min(ind1, ind2), max(ind1, ind2)))
-                edges[(ind1, ind2)] = ei
+            if ei.closed():
+                connected_verts.append(connected_verts[-1])
+            else:
+                continue
+        for (vi, vj) in itertools.permutations(connected_verts):
+            ind1 = vert2ind[vi]
+            ind2 = vert2ind[vj]
+            if not self_loops:
+                if ind1 == ind2:
+                    continue
+            connectivity.append((min(ind1, ind2), max(ind1, ind2)))
+            edges[(ind1, ind2)] = ei
     connectivity = list(set(connectivity))
     return nodes, edges, connectivity
