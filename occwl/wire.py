@@ -31,6 +31,12 @@ class Wire:
             int: Hash value
         """
         return self.topods_wire().__hash__()
+    
+    def __eq__(self, other):
+        """
+        Equality check for the wire
+        """
+        return self.topods_wire().__hash__() == other.topods_wire().__hash__()
 
     def ordered_edges(self):
         """

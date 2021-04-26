@@ -44,6 +44,12 @@ class Edge:
         """
         return self.topods_edge().__hash__()
     
+    def __eq__(self, other):
+        """
+        Equality check for the edge
+        """
+        return self.topods_edge().__hash__() == other.topods_edge().__hash__()
+    
     def point(self, u):
         """
         Evaluate the edge geometry at given parameter
@@ -133,6 +139,7 @@ class Edge:
 
         Returns:
             OCC.Geom.Handle_Geom_*: Specific geometry type for the curve geometry
+                                    or None if the curve type is GeomAbs_OtherCurve
         """
         brep_adaptor_curve = BRepAdaptor_Curve(self._edge)
         curv_type = brep_adaptor_curve.GetType()
@@ -152,7 +159,7 @@ class Edge:
             return brep_adaptor_curve.BSplineCurve()
         if curv_type == GeomAbs_OffsetCurve:
             return brep_adaptor_curve.OffsetCurve()
-        raise ValueError("Unknown curve type: ", curv_type)
+        return None
 
     def has_curve(self):
         """
