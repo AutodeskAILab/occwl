@@ -176,6 +176,23 @@ class Face(Shape):
             normal = -normal
         return normal
 
+    def is_left_of(self, edge):
+        """
+        Is this face on the left hand side of the given edge.
+
+        Args:
+            edge (occwl.edge.Edge): Edge
+
+        Returns:
+            bool: True if the face is to the left of the edge
+        """
+        top_exp = TopologyUtils.TopologyExplorer(self.topods_face(), ignore_orientation=False)
+        for topo_edge_from_face in top_exp.edges():
+            edge_from_face = Edge(topo_edge_from_face)
+            if edge == edge_from_face:
+                return edge.reversed() == edge_from_face.reversed()
+        assert False, "Edge doesn't belong to face"
+
     def gaussian_curvature(self, uv):
         """
         Compute the gaussian curvature of the surface geometry at given parameter
