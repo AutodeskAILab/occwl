@@ -20,13 +20,14 @@ from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Core.TopLoc import TopLoc_Location
 
-from occwl.entity import Entity
+from occwl.edge import Edge
+from occwl.shape import Shape
 
 import occwl.geometry.geom_utils as geom_utils
 import occwl.geometry.interval as Interval
 from occwl.geometry.box import Box
 
-class Face(Entity):
+class Face(Shape):
     """
     A topological face in a solid model
     Represents a 3D surface bounded by a Wire
@@ -129,7 +130,7 @@ class Face(Entity):
 
     def point(self, uv):
         """
-        Evaluate the edge geometry at given parameter
+        Evaluate the face geometry at given parameter
 
         Args:
             uv (np.ndarray or tuple): Surface parameter
