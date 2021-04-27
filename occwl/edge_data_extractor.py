@@ -57,6 +57,8 @@ class EdgeDataExtractor:
         # Find the parameters to evaluate.   These will be
         # ordered based on the reverse flag of the edge
         self.u_params = self.find_arclength_parameters()
+        if not self.good:
+            return
         self.left_uvs = self.find_uvs(self.left_pcurve)
         self.right_uvs = self.find_uvs(self.right_pcurve)
 
@@ -66,12 +68,6 @@ class EdgeDataExtractor:
         # flag
         self.points = self.evaluate_3d_points()
         self.tangents = self.evaluate_curve_tangents()
-
-        # Test here on watertight models to make sure
-        # that the uvs we found are parameterized in the
-        # same way as the 3d curve
-        self.sanity_check_uvs(self.left_uvs, edge.tolerance())
-        self.sanity_check_uvs(self.right_uvs, edge.tolerance())
 
         # Generate the normals.  These will be ordered
         # based on the direction of the edge and the 
@@ -87,7 +83,10 @@ class EdgeDataExtractor:
         This function works it out
         """
         if face1.is_left_of(edge):
-            assert not face2.is_left_of(edge)
+            # In some cases (like a cylinder) the left and right faces
+            # of the edge are the same face
+            if face1 != face2:
+                assert not face2.is_left_of(edge)
             self.left_face = face1
             self.right_face = face2
         else:
@@ -99,6 +98,7 @@ class EdgeDataExtractor:
         """
         Compute the convexity of the edge
         """
+        assert self.good
         continuity = self.edge.continuity(self.left_face, self.right_face)
         is_smooth = self.check_smooth(angle_tol_rads)
         if is_smooth:
@@ -119,6 +119,9 @@ class EdgeDataExtractor:
     def find_arclength_parameters(self):
         num_points_arclength = 100
         interval = self.edge.u_bounds()
+        if interval.invalid():
+            self.good = False
+            return
         points = []
         us = []
         for i in range(num_points_arclength):
