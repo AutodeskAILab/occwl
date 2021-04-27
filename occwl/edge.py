@@ -213,7 +213,7 @@ class Edge(Shape):
         """
         return Edge(self.topods_edge().Reversed())
     
-    def closed(self):
+    def closed_curve(self):
         """
         Returns whether the 3D curve of this edge is closed.
         i.e. the start and edge points are coincident.
@@ -222,6 +222,16 @@ class Edge(Shape):
             bool: If closed
         """
         return self.curve().IsClosed()
+
+    def closed_edge(self):
+        """
+        Returns whether the edge forms a closed ring.  i.e.
+        whether the start and end vertices are the same.
+        
+        Returns:
+            bool: If closed
+        """
+        return BRep_Tool().IsClosed(self.topods_edge())
 
     def seam(self, face):
         """

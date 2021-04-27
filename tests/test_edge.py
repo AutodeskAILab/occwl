@@ -51,11 +51,24 @@ class EdgeTester(TestBase):
         self._test_curve_type()
         self._test_specific_curve(edge)
 
+    def test_closed(self):
+        block_hole = self.load_single_solid_from_test_data("Block_hole.step")
+        closed_edge = block_hole.find_closest_edge_slow(np.array([16.893010, 26.381480, 20.000000]))
+        self.assertTrue(closed_edge.closed_edge())
+        self.assertTrue(closed_edge.closed_curve())
+
+        fillet1 = self.load_single_solid_from_test_data("block_fillet1.step")
+        closed_curve_edge = fillet1.find_closest_edge_slow(np.array([0.000000, 4.393398, 35.606602]))
+        self.assertFalse(closed_curve_edge.closed_edge())
+        self.assertTrue(closed_curve_edge.closed_curve())
+
+        
+
     def _test_closed_periodic(self):
         # Circle
         circle = BRepBuilderAPI_MakeEdge(Geom_Circle(gp_XOY(), 1)).Edge()
         circle = Edge(circle)
-        is_closed = circle.closed()
+        is_closed = circle.closed_curve()
         is_periodic = circle.periodic()
         self.assertTrue(isinstance(is_closed, bool))
         self.assertTrue(isinstance(is_periodic, bool))
@@ -64,7 +77,7 @@ class EdgeTester(TestBase):
         # Line segment
         line = BRepBuilderAPI_MakeEdge(GC_MakeSegment(gp_Pnt(0, 0, 0), gp_Pnt(1, 1, 1)).Value()).Edge()
         line = Edge(line)
-        is_closed = line.closed()
+        is_closed = line.closed_curve()
         is_periodic = line.periodic()
         self.assertTrue(not is_closed)
         self.assertTrue(not is_periodic)

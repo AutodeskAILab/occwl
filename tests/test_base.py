@@ -13,6 +13,13 @@ class TestBase(unittest.TestCase):
     def test_folder(self):
         return Path(os.path.dirname(__file__))
 
+    def load_single_solid_from_test_data(self, filename):
+        solid_pathname = self.test_folder() / "test_data" /filename
+        self.assertTrue(solid_pathname.exists())
+        solids = load_step(solid_pathname)
+        self.assertEqual(len(solids), 1)
+        return solids[0]
+
     def run_test_on_all_files_in_folder(self, folder):
         step_files = [ f for f in folder.glob("**/*.step")]
         stp_files = [ f for f in folder.glob("**/*.stp")]
