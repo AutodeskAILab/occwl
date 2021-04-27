@@ -313,3 +313,47 @@ class Edge(Shape):
             float The edge tolerance
         """
         return BRep_Tool().Tolerance(self._edge)
+
+
+    def find_left_and_right_faces(self, faces):
+        """
+        Given a list of 1 or 2 faces which are adjacent to this edge,
+        we want to return the left and right face when looking from 
+        outside the solid.
+
+                      Edge direction
+                            ^
+                            |   
+                  Left      |   Right 
+                  face      |   face
+                            |
+
+        In the case of a cylinder the left and right face will be
+        the same.
+
+        Args:
+            faces (list(occwl.face.Face): The faces
+
+        Returns:
+            occwl.face.Face, occwl.face.Face: The left and then right face
+        """
+        assert len(faces) > 0
+        face1 = faces[0]
+        if len(faces) == 1:
+            face2 = faces[0]
+        else:
+            face2 = faces[1]
+
+        if face1.is_left_of(self):
+            # In some cases (like a cylinder) the left and right faces
+            # of the edge are the same face
+            if face1 != face2:
+                assert not face2.is_left_of(self)
+            left_face = face1
+            right_face = face2
+        else:
+            assert face2.is_left_of(self)
+            left_face = face2
+            right_face = face1
+
+        return left_face, right_face

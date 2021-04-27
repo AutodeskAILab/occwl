@@ -178,8 +178,15 @@ class Face(Shape):
 
     def is_left_of(self, edge):
         """
-        Is this face on the left hand side of the given edge.
+        Is this face on the left hand side of the given edge.   We take the 
+        orientation of the edge into account here
 
+                     Edge direction
+                            ^
+                            |   
+                  Left      |   Right 
+                  face      |   face
+                            |
         Args:
             edge (occwl.edge.Edge): Edge
 
