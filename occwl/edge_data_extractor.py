@@ -19,7 +19,7 @@ class EdgeConvexity(Enum):
     SMOOTH = 3
 
 class EdgeDataExtractor:
-    def __init__(self, edge, face1, face2, num_samples):
+    def __init__(self, edge, faces, num_samples):
         """
         Compute point and normal data for an oriented edge of the model.
         The arrays of points, tangents and normals are all oriented based
@@ -38,13 +38,11 @@ class EdgeDataExtractor:
         """
         assert num_samples > 0
         assert edge is not None
-        assert face1 is not None
-        assert face2 is not None
+        assert len(faces) > 0
 
         self.num_samples = num_samples
         self.good = True
-
-        self.find_left_and_right_faces(edge, face1, face2)
+        self.left_face, self.right_face = edge.find_left_and_right_faces(faces)
 
         self.edge = edge
         # self.left_surf = BRepAdaptor_Surface(self.left_face.topods_face())
@@ -76,23 +74,7 @@ class EdgeDataExtractor:
         self.left_normals = self.evaluate_surface_normals(self.left_uvs, self.left_face)
         self.right_normals = self.evaluate_surface_normals(self.right_uvs, self.right_face)
 
-    def find_left_and_right_faces(self, edge, face1, face2):
-        """
-        We know two faces on either side of the edge, but we
-        don't know which is to the left and which to the right.
-        This function works it out
-        """
-        if face1.is_left_of(edge):
-            # In some cases (like a cylinder) the left and right faces
-            # of the edge are the same face
-            if face1 != face2:
-                assert not face2.is_left_of(edge)
-            self.left_face = face1
-            self.right_face = face2
-        else:
-            assert face2.is_left_of(edge)
-            self.left_face = face2
-            self.right_face = face1
+  
 
     def edge_convexity(self, angle_tol_rads):
         """

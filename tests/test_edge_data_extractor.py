@@ -46,11 +46,8 @@ class EdgeDataExtractorTester(TestBase):
 
     def check_edge(self, datum, edge, solid, edge_checks):
         faces = list(solid.faces_from_edge(edge))
-        if len(faces) == 1:
-            faces.append(faces[0])
-        self.assertEqual(len(faces), 2)
         num_samples = 10
-        extractor = EdgeDataExtractor(edge, faces[0], faces[1], num_samples)
+        extractor = EdgeDataExtractor(edge, faces, num_samples)
         self.assertTrue(extractor.good)
 
         self.sanity_check_uvs_for_watertight_edge(edge, extractor)
@@ -294,11 +291,8 @@ class EdgeDataExtractorTester(TestBase):
     def check_extract_data_for_all_edges(self, solid):
         for edge in solid.edges():
             faces = list(solid.faces_from_edge(edge))
-            if len(faces) == 1:
-                faces.append(faces[0])
-            self.assertEqual(len(faces), 2)
             num_samples = 10
-            extractor = EdgeDataExtractor(edge, faces[0], faces[1], num_samples)
+            extractor = EdgeDataExtractor(edge, faces, num_samples)
             if not extractor.good:
                 # Skip polar edges
                 continue
