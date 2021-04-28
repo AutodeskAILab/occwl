@@ -12,6 +12,7 @@ from OCC.Core.gp import gp_Pnt2d
 
 # occwl
 from occwl.geometry.interval import Interval
+from occwl.geometry.arc_length_param_finder import ArcLengthParamFinder
 
 class EdgeConvexity(Enum):
     CONCAVE = 1
@@ -19,7 +20,7 @@ class EdgeConvexity(Enum):
     SMOOTH = 3
 
 class EdgeDataExtractor:
-    def __init__(self, edge, faces, num_samples):
+    def __init__(self, edge, faces, num_samples=10, use_arclength_params=True):
         """
         Compute point and normal data for an oriented edge of the model.
         The arrays of points, tangents and normals are all oriented based
@@ -45,16 +46,16 @@ class EdgeDataExtractor:
         self.left_face, self.right_face = edge.find_left_and_right_faces(faces)
 
         self.edge = edge
-        # self.left_surf = BRepAdaptor_Surface(self.left_face.topods_face())
-        # self.right_surf = BRepAdaptor_Surface(self.right_face.topods_face())
-
         self.curve3d = edge.curve()
         self.left_pcurve = BRepAdaptor_Curve2d(edge.topods_edge(), self.left_face.topods_face())
         self.right_pcurve = BRepAdaptor_Curve2d(edge.topods_edge(), self.right_face.topods_face())
 
         # Find the parameters to evaluate.   These will be
         # ordered based on the reverse flag of the edge
-        self.u_params = self.find_arclength_parameters()
+        if use_arclength_params:
+            self.u_params = self.find_arclength_parameters()
+        else:
+            self.u_params = self.find_uniform_parameters()
         if not self.good:
             return
         self.left_uvs = self.find_uvs(self.left_pcurve)
@@ -98,63 +99,27 @@ class EdgeDataExtractor:
         average_dot_product = dot_prod.mean()
         return average_dot_product > np.cos(angle_tol_rads)
 
-    def find_arclength_parameters(self):
-        num_points_arclength = 100
+    def find_uniform_parameters(self):
         interval = self.edge.u_bounds()
         if interval.invalid():
             self.good = False
             return
-        points = []
-        us = []
-        for i in range(num_points_arclength):
-            u = interval.interpolate(i/(num_points_arclength-1))
-            points.append(self.edge.point(u))
-            us.append(u)
-
-        # Find the arc lengths between the sample points
-        lengths = []
-        total_length = 0
-        prev_point = None
-        for point in points:
-            if prev_point is not None:
-                length = np.linalg.norm(point-prev_point)
-                lengths.append(length)
-                total_length += length
-            prev_point = point
-
-        arc_length_fraction = [ 0.0 ]
-        cumulative_length = 0.0
-        for length in lengths:
-            cumulative_length += length
-            arc_length_fraction.append(cumulative_length/total_length)
-            
-
-        arc_length_params = []
-        arc_length_index = 0
+        params = []
         for i in range(self.num_samples):
-            desired_arc_length_fraction = i/(self.num_samples-1)
-            while arc_length_fraction[arc_length_index] < desired_arc_length_fraction:
-                arc_length_index += 1
-                if arc_length_index >= len(arc_length_fraction)-1:
-                    break
+            t = i/(self.num_samples-1)
+            params.append(interval.interpolate(t))
+        # Now we need to check the orientation of the edge and 
+        # reverse the array is necessary
+        if self.edge.reversed():
+            params.reverse()
+        return params
 
-            if arc_length_index == 0:
-                u_low = us[0]
-                frac_low = arc_length_fraction[0]
-            else:
-                u_low = us[arc_length_index-1]
-                frac_low = arc_length_fraction[arc_length_index-1]
-            u_high = us[arc_length_index]
-            frac_high = arc_length_fraction[arc_length_index]
-            d_frac = frac_high-frac_low
-            if d_frac <= 0.0:
-                u_param = u_low
-            else:
-                u_interval = Interval(u_low, u_high)
-                position_in_interval = (desired_arc_length_fraction-frac_low)/(d_frac)
-                u_param = u_interval.interpolate(position_in_interval)
-            arc_length_params.append(u_param)
-
+    def find_arclength_parameters(self):
+        arc_length_finder = ArcLengthParamFinder(edge=self.edge)
+        if not arc_length_finder.good:
+            self.good = False
+            return
+        arc_length_params = arc_length_finder.find_arc_length_parameters(self.num_samples)
         # Now we need to check the orientation of the edge and 
         # reverse the array is necessary
         if self.edge.reversed():

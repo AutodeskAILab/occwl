@@ -44,39 +44,57 @@ class EdgeDataExtractorTester(TestBase):
             # Run the checks
             self.check_edge(datum, edge, solid, edge_checks)
 
+    def check_normals(self, datum, expected_normals, extractor):
+        num_samples = extractor.points.shape[0]
+        closest_normals = self.find_closest_normals_to_datum(datum, extractor)
+        for expected_normal in expected_normals:
+            expected_num_occurrences = expected_normal["num_occurrences"]
+            expected_normal = np.array(expected_normal["vector"])
+
+            found_num_occurrences = 0
+            for normal in closest_normals:
+                # Make sure the angle tolerance for the normals is big enough
+                # If we polygonize the curve with num_samples points then we have
+                # num_samples-1 spans.
+                normal_angle_tol = 2*3.141/(num_samples-1)
+                angle_rads = self.angle_between_vectors(normal, expected_normal)
+                if angle_rads < normal_angle_tol:
+                    found_num_occurrences += 1
+            self.assertEqual(expected_num_occurrences, found_num_occurrences)
+
     def check_edge(self, datum, edge, solid, edge_checks):
         faces = list(solid.faces_from_edge(edge))
-        num_samples = 10
-        extractor = EdgeDataExtractor(edge, faces, num_samples)
-        self.assertTrue(extractor.good)
-
-        self.sanity_check_uvs_for_watertight_edge(edge, extractor)
+        num_samples = 12
+        extractor_arc_length = EdgeDataExtractor(edge, faces, num_samples, use_arclength_params=True)
+        self.assertEqual(extractor_arc_length.points.shape[0], num_samples)
+        self.assertEqual(extractor_arc_length.tangents.shape[0], num_samples)
+        self.assertEqual(extractor_arc_length.left_normals.shape[0], num_samples)
+        self.assertEqual(extractor_arc_length.right_normals.shape[0], num_samples)
+        self.assertTrue(extractor_arc_length.good)
+        self.sanity_check_uvs_for_watertight_edge(edge, extractor_arc_length)
+        
+        extractor_uniform = EdgeDataExtractor(edge, faces, num_samples, use_arclength_params=False)
+        self.assertEqual(extractor_arc_length.points.shape[0], num_samples)
+        self.assertEqual(extractor_uniform.tangents.shape[0], num_samples)
+        self.assertEqual(extractor_uniform.left_normals.shape[0], num_samples)
+        self.assertEqual(extractor_uniform.right_normals.shape[0], num_samples)
+        self.assertTrue(extractor_uniform.good)
+        self.sanity_check_uvs_for_watertight_edge(edge, extractor_uniform)
 
         angle_tol_rads = 0.0872664626 # 5 degrees 
         if "expected_convexity" in edge_checks:
             expected_convexity = edge_checks["expected_convexity"]
 
-            convexity = extractor.edge_convexity(angle_tol_rads)
-            self.assertEqual(convexity, expected_convexity)
+            convexity_uniform = extractor_uniform.edge_convexity(angle_tol_rads)
+            self.assertEqual(convexity_uniform, expected_convexity)
+
+            convexity_arclength = extractor_arc_length.edge_convexity(angle_tol_rads)
+            self.assertEqual(convexity_arclength, expected_convexity)
 
         if "normals" in edge_checks:
-            closest_normals = self.find_closest_normals_to_datum(datum, extractor)
-            expected_normals = edge_checks["normals"]
-            for expected_normal in expected_normals:
-                expected_num_occurrences = expected_normal["num_occurrences"]
-                expected_normal = np.array(expected_normal["vector"])
-
-                found_num_occurrences = 0
-                for normal in closest_normals:
-                    # Make sure the angle tolerance for the normals is big enough
-                    # If we polygonize the curve with num_samples points then we have
-                    # num_samples-1 spans.
-                    normal_angle_tol = 2*3.141/(num_samples-1)
-                    angle_rads = self.angle_between_vectors(normal, expected_normal)
-                    if angle_rads < normal_angle_tol:
-                        found_num_occurrences += 1
-                self.assertEqual(expected_num_occurrences, found_num_occurrences)
-
+            self.check_normals(datum, edge_checks["normals"], extractor_uniform)
+            self.check_normals(datum, edge_checks["normals"], extractor_arc_length)
+            
 
     def find_closest_normals_to_datum(self, datum, extractor):
         normals = []
@@ -306,11 +324,8 @@ class EdgeDataExtractorTester(TestBase):
         v.display(solid)
         for edge in solid.edges():
             faces = list(solid.faces_from_edge(edge))
-            if len(faces) == 1:
-                faces.append(faces[0])
-            self.assertEqual(len(faces), 2)
             num_samples = 10
-            extractor = EdgeDataExtractor(edge, faces[0], faces[1], num_samples)
+            extractor = EdgeDataExtractor(edge, faces, num_samples)
             if not extractor.good:
                 # Skip polar edges
                 continue
