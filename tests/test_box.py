@@ -7,7 +7,7 @@ from occwl.geometry.box import Box
 from occwl.geometry.interval import Interval
 
 # Test
-from test_base import TestBase
+from tests.test_base import TestBase
 
 class BoxTester(TestBase):
 

@@ -35,6 +35,15 @@ should display a box:
 More examples are available in the `examples` folder.
 
 
+## Running the tests
+
+To run the occwl tests use the following command
+
+```
+python -m unittest tests
+```
+
+
 ## Maintainers
 
 - Pradeep Kumar Jayaraman (pradeep.kumar.jayaraman@autodesk.com)

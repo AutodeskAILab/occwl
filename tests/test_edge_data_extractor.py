@@ -16,7 +16,7 @@ from occwl.io import load_step
 from occwl.viewer import Viewer
 
 # Test
-from test_base import TestBase
+from tests.test_base import TestBase
 
 
 class EdgeDataExtractorTester(TestBase):

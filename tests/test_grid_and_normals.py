@@ -7,7 +7,7 @@ from occwl.solid import Solid
 from occwl.uvgrid import uvgrid, ugrid, _uvgrid_reverse_u
 
 # Test
-from test_base import TestBase
+from tests.test_base import TestBase
 
 class GridTester(TestBase):
 
