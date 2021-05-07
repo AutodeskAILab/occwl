@@ -150,15 +150,18 @@ class EntityMapper:
         for wire in wires:
             oriented_edges = wire.ordered_edges()
             for oriented_edge in oriented_edges:
-                self.append_oriented_edge(oriented_edge)
+                self._append_oriented_edge(oriented_edge)
 
     def _append_oriented_edge(self, oriented_edge):
         h = self._get_hash(oriented_edge)
+        orientation = oriented_edge.topods_edge().Orientation()
         is_reversed = oriented_edge.reversed()
         tup = (h,is_reversed)
-        index = len(self.halfedge_map)
-        if not tup in self.halfedge_map:
-            self.halfedge_map[tup] = index
+        index = len(self.oriented_edge_map)
+        if tup in self.oriented_edge_map:
+            print("Warning! - The same oriented edge appears twice in the same solid")
+        if not tup in self.oriented_edge_map:
+            self.oriented_edge_map[tup] = index
 
     def _append_vertices(self, solid):
         vertices = solid.vertices()
@@ -169,4 +172,4 @@ class EntityMapper:
         h = self._get_hash(vertex)
         index = len(self.vertex_map)
         assert not h in self.vertex_map
-        self._vertex_map[h] = index
+        self.vertex_map[h] = index

@@ -34,6 +34,10 @@ class TestBase(unittest.TestCase):
             for solid in solids: 
                 self.run_test_with_pathname(file, solid)
 
+    def run_test_on_solid_from_filename(self, filename):
+        solid = self.load_single_solid_from_test_data(filename)
+        self.run_test(solid)
+        
     def run_test_with_pathname(self, file, solid):
         self.run_test(solid)
 

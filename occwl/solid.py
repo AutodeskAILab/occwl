@@ -19,6 +19,7 @@ from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1
 import math
 from occwl.edge import Edge
 from occwl.face import Face
+from occwl.wire import Wire
 from occwl.vertex import Vertex
 
 import occwl.geometry.geom_utils as geom_utils
@@ -102,7 +103,7 @@ class Solid(Shape):
         Returns:
             Iterator[occwl.wire.Wire]: Wire iterator
         """
-        return map(Face, self._top_exp.wires())
+        return map(Wire, self._top_exp.wires())
 
     def edges_from_face(self, face):
         """
