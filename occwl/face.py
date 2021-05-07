@@ -20,11 +20,14 @@ from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Core.TopLoc import TopLoc_Location
 
+from occwl.edge import Edge
+from occwl.shape import Shape
+
 import occwl.geometry.geom_utils as geom_utils
 import occwl.geometry.interval as Interval
 from occwl.geometry.box import Box
 
-class Face:
+class Face(Shape):
     """
     A topological face in a solid model
     Represents a 3D surface bounded by a Wire
@@ -33,7 +36,16 @@ class Face:
         assert isinstance(topods_face, TopoDS_Face)
         self._face = topods_face
         self._trimmed = BRepTopAdaptor_FClass2d(self._face, 1e-9)
-    
+
+    def topods_shape(self):
+        """
+        Get the underlying OCC face as a shape
+
+        Returns:
+            OCC.Core.TopoDS.TopoDS_Face: Face
+        """
+        return self._face
+
     def __hash__(self):
         """
         Hash for the face
@@ -45,7 +57,16 @@ class Face:
     
     def __eq__(self, other):
         """
-        Equality check for the face
+        Equality check for the face.
+
+        NOTE: This function only checks if the face is the same.
+              It doesn't check the face orienation, so 
+
+              face1 == face2
+
+              does not necessarily mean 
+
+              face1.reversed() == face2.reversed()
         """
         return self.topods_face().__hash__() == other.topods_face().__hash__()
 
@@ -109,7 +130,7 @@ class Face:
 
     def point(self, uv):
         """
-        Evaluate the edge geometry at given parameter
+        Evaluate the face geometry at given parameter
 
         Args:
             uv (np.ndarray or tuple): Surface parameter
@@ -154,6 +175,30 @@ class Face:
         if self.reversed():
             normal = -normal
         return normal
+
+    def is_left_of(self, edge):
+        """
+        Is this face on the left hand side of the given edge.   We take the 
+        orientation of the edge into account here
+
+                     Edge direction
+                            ^
+                            |   
+                  Left      |   Right 
+                  face      |   face
+                            |
+        Args:
+            edge (occwl.edge.Edge): Edge
+
+        Returns:
+            bool: True if the face is to the left of the edge
+        """
+        top_exp = TopologyUtils.TopologyExplorer(self.topods_face(), ignore_orientation=False)
+        for topo_edge_from_face in top_exp.edges():
+            edge_from_face = Edge(topo_edge_from_face)
+            if edge == edge_from_face:
+                return edge.reversed() == edge_from_face.reversed()
+        assert False, "Edge doesn't belong to face"
 
     def gaussian_curvature(self, uv):
         """

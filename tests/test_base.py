@@ -13,6 +13,13 @@ class TestBase(unittest.TestCase):
     def test_folder(self):
         return Path(os.path.dirname(__file__))
 
+    def load_single_solid_from_test_data(self, filename):
+        solid_pathname = self.test_folder() / "test_data" /filename
+        self.assertTrue(solid_pathname.exists())
+        solids = load_step(solid_pathname)
+        self.assertEqual(len(solids), 1)
+        return solids[0]
+
     def run_test_on_all_files_in_folder(self, folder):
         step_files = [ f for f in folder.glob("**/*.step")]
         stp_files = [ f for f in folder.glob("**/*.stp")]
@@ -50,4 +57,7 @@ class TestBase(unittest.TestCase):
             # Case where one or both vectors had zero length
             return 0.0
         d = np.dot(unit_v1, unit_v2)
+        d = np.clip(d, -1.0, 1.0)
+        assert -1.0 <= d
+        assert d <= 1.0
         return np.arccos(d)

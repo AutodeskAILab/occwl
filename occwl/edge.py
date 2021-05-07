@@ -1,7 +1,7 @@
 import numpy as np
 
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d
-from OCC.Core.BRep import BRep_Tool_Curve, BRep_Tool_Continuity
+from OCC.Core.BRep import BRep_Tool, BRep_Tool_Curve, BRep_Tool_Continuity
 from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.BRepGProp import brepgprop_LinearProperties
@@ -16,8 +16,9 @@ from OCC.Core.ShapeAnalysis import ShapeAnalysis_Edge
 
 import occwl.geometry.geom_utils as geom_utils
 from occwl.geometry.interval import Interval
+from occwl.shape import Shape
 
-class Edge:
+class Edge(Shape):
     """
     A topological edge in a solid model
     Represents a 3D curve bounded by vertices
@@ -26,6 +27,15 @@ class Edge:
         assert isinstance(topods_edge, TopoDS_Edge)
         self._edge = topods_edge
     
+    def topods_shape(self):
+        """
+        Get the underlying OCC edge as a shape
+
+        Returns:
+            OCC.Core.TopoDS.TopoDS_Edge: Edge
+        """
+        return self._edge
+
     def topods_edge(self):
         """
         Get the underlying OCC edge type
@@ -46,7 +56,16 @@ class Edge:
     
     def __eq__(self, other):
         """
-        Equality check for the edge
+        Equality check for the edge.
+
+        NOTE: This function only checks if the edge is the same.
+        It doesn't check the edge orienation, so 
+
+        edge1 == edge2
+
+        does not necessarily mean 
+
+        edge1.reversed() == edge2.reversed()
         """
         return self.topods_edge().__hash__() == other.topods_edge().__hash__()
     
@@ -194,7 +213,7 @@ class Edge:
         """
         return Edge(self.topods_edge().Reversed())
     
-    def closed(self):
+    def closed_curve(self):
         """
         Returns whether the 3D curve of this edge is closed.
         i.e. the start and edge points are coincident.
@@ -203,6 +222,16 @@ class Edge:
             bool: If closed
         """
         return self.curve().IsClosed()
+
+    def closed_edge(self):
+        """
+        Returns whether the edge forms a closed ring.  i.e.
+        whether the start and end vertices are the same.
+        
+        Returns:
+            bool: If closed
+        """
+        return BRep_Tool().IsClosed(self.topods_edge())
 
     def seam(self, face):
         """
@@ -283,3 +312,58 @@ class Edge:
         if curv_type == GeomAbs_OtherCurve:
             return "other"
         return "unknown"
+
+
+    def tolerance(self):
+        """
+        Get tolerance of this edge.  The 3d curve of the edge should not
+        deviate from the surfaces of adjacent faces by more than this value
+
+        Returns:
+            float The edge tolerance
+        """
+        return BRep_Tool().Tolerance(self._edge)
+
+
+    def find_left_and_right_faces(self, faces):
+        """
+        Given a list of 1 or 2 faces which are adjacent to this edge,
+        we want to return the left and right face when looking from 
+        outside the solid.
+
+                      Edge direction
+                            ^
+                            |   
+                  Left      |   Right 
+                  face      |   face
+                            |
+
+        In the case of a cylinder the left and right face will be
+        the same.
+
+        Args:
+            faces (list(occwl.face.Face): The faces
+
+        Returns:
+            occwl.face.Face, occwl.face.Face: The left and then right face
+        """
+        assert len(faces) > 0
+        face1 = faces[0]
+        if len(faces) == 1:
+            face2 = faces[0]
+        else:
+            face2 = faces[1]
+
+        if face1.is_left_of(self):
+            # In some cases (like a cylinder) the left and right faces
+            # of the edge are the same face
+            if face1 != face2:
+                assert not face2.is_left_of(self)
+            left_face = face1
+            right_face = face2
+        else:
+            assert face2.is_left_of(self)
+            left_face = face2
+            right_face = face1
+
+        return left_face, right_face

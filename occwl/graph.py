@@ -73,7 +73,7 @@ def vertex_adjacency(solid, self_loops=False):
         if not ei.has_curve():
             continue
         if len(connected_verts) < 2:
-            if ei.closed():
+            if ei.closed_edge():
                 connected_verts.append(connected_verts[-1])
             else:
                 continue
