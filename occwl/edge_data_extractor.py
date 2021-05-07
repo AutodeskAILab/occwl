@@ -81,7 +81,6 @@ class EdgeDataExtractor:
         Compute the convexity of the edge
         """
         assert self.good
-        continuity = self.edge.continuity(self.left_face, self.right_face)
         is_smooth = self._check_smooth(angle_tol_rads)
         if is_smooth:
             return EdgeConvexity.SMOOTH
@@ -107,7 +106,7 @@ class EdgeDataExtractor:
             point2 = self.right_face.point(right_uv)
             assert np.linalg.norm(point-point1) < edge_tolerance
             assert np.linalg.norm(point-point2) < edge_tolerance
-            
+
 
     """
     Private member functions
