@@ -332,11 +332,11 @@ class EdgeDataExtractorTester(TestBase):
             angle_tol_rads = 0.0872664626 # 5 degrees 
             convexity = extractor.edge_convexity(angle_tol_rads)
             if convexity == EdgeConvexity.CONCAVE:
-                edge_color = Quantity_Color(1, 0, 0, Quantity_TOC_RGB)
+                edge_color = Quantity_Color(Quantity_NOC_RED)
             elif convexity == EdgeConvexity.CONVEX:
-                edge_color = Quantity_Color(0, 1, 0, Quantity_TOC_RGB)
+                edge_color = Quantity_Color(Quantity_NOC_GREEN)
             elif convexity == EdgeConvexity.SMOOTH:
-                edge_color = Quantity_Color(0, 0, 1, Quantity_TOC_RGB)
+                edge_color = Quantity_Color(Quantity_NOC_BLUE1)
             else:
                 self.fail("Unknown edge type")
             v.display(edge, color=edge_color)
