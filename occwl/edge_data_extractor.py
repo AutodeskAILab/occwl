@@ -34,8 +34,7 @@ class EdgeDataExtractor:
             EdgeDataExtractor.right_normals
 
         If a problem was detected during the calculation then 
-        EdgeDataExtractor.false and all arrays get set to 
-        zero vectors
+        EdgeDataExtractor.good == false
         """
         assert num_samples > 0
         assert edge is not None
