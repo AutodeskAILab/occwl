@@ -1,5 +1,4 @@
 import numpy as np
-import sys
 from typing import Any, Iterable, Iterator, List, Optional, Tuple
 
 from OCC.Core.TopoDS import (topods, TopoDS_Wire, TopoDS_Vertex, TopoDS_Edge,
@@ -362,7 +361,7 @@ class Solid(Shape):
         which may be a face, edge or vertex.  For this you can
         use Solid.find_closest_point_data()
         """
-        closest_dist_yet = sys.float_info.max
+        closest_dist_yet = np.inf
         closest_shape = None
         for s in shapes:
             closest_point_data = s.find_closest_point_data(datum)
