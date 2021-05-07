@@ -1,6 +1,6 @@
 """
-Extract points, normals and potentially other information from an edge and its
-adjacent faces
+A class to extract points and normals from the two faces adjacent to an edge.
+This can then be used to compute the edges convexity.
 """
 # System
 from enum import Enum
@@ -52,27 +52,27 @@ class EdgeDataExtractor:
         # Find the parameters to evaluate.   These will be
         # ordered based on the reverse flag of the edge
         if use_arclength_params:
-            self.u_params = self.find_arclength_parameters()
+            self.u_params = self._find_arclength_parameters()
         else:
-            self.u_params = self.find_uniform_parameters()
+            self.u_params = self._find_uniform_parameters()
         if not self.good:
             return
-        self.left_uvs = self.find_uvs(self.left_pcurve)
-        self.right_uvs = self.find_uvs(self.right_pcurve)
+        self.left_uvs = self._find_uvs(self.left_pcurve)
+        self.right_uvs = self._find_uvs(self.right_pcurve)
 
         # Find 3d points and tangents.
         # These will be ordered and oriented based on the 
         # direction of the edge.  i.e. we will apply the reverse
         # flag
-        self.points = self.evaluate_3d_points()
-        self.tangents = self.evaluate_curve_tangents()
+        self.points = self._evaluate_3d_points()
+        self.tangents = self._evaluate_curve_tangents()
 
         # Generate the normals.  These will be ordered
         # based on the direction of the edge and the 
         # normals will be reversed based on the orientation
         # of the faces
-        self.left_normals = self.evaluate_surface_normals(self.left_uvs, self.left_face)
-        self.right_normals = self.evaluate_surface_normals(self.right_uvs, self.right_face)
+        self.left_normals = self._evaluate_surface_normals(self.left_uvs, self.left_face)
+        self.right_normals = self._evaluate_surface_normals(self.right_uvs, self.right_face)
 
   
 
@@ -82,7 +82,7 @@ class EdgeDataExtractor:
         """
         assert self.good
         continuity = self.edge.continuity(self.left_face, self.right_face)
-        is_smooth = self.check_smooth(angle_tol_rads)
+        is_smooth = self._check_smooth(angle_tol_rads)
         if is_smooth:
             return EdgeConvexity.SMOOTH
 
@@ -93,12 +93,32 @@ class EdgeDataExtractor:
             return EdgeConvexity.CONVEX
         return EdgeConvexity.CONCAVE
 
-    def check_smooth(self, angle_tol_rads):
+
+    def sanity_check_uvs(self, uvs, edge_tolerance):
+        """
+        Assert that the points we get by evaluating uvs on both sides of the edge 
+        are within the specified tolerance.
+
+        This function is intended for testing/debugging
+        """
+        for u, left_uv, right_uv in zip(self.u_params, self.left_uvs, self.right_uvs):
+            point = self.edge.point(u)
+            point1 = self.left_face.point(left_uv)
+            point2 = self.right_face.point(right_uv)
+            assert np.linalg.norm(point-point1) < edge_tolerance
+            assert np.linalg.norm(point-point2) < edge_tolerance
+            
+
+    """
+    Private member functions
+    """
+
+    def _check_smooth(self, angle_tol_rads):
         dot_prod = np.multiply(self.left_normals, self.right_normals).sum(1)
         average_dot_product = dot_prod.mean()
         return average_dot_product > np.cos(angle_tol_rads)
 
-    def find_uniform_parameters(self):
+    def _find_uniform_parameters(self):
         interval = self.edge.u_bounds()
         if interval.invalid():
             self.good = False
@@ -113,7 +133,7 @@ class EdgeDataExtractor:
             params.reverse()
         return params
 
-    def find_arclength_parameters(self):
+    def _find_arclength_parameters(self):
         arc_length_finder = ArcLengthParamFinder(edge=self.edge)
         if not arc_length_finder.good:
             self.good = False
@@ -126,7 +146,7 @@ class EdgeDataExtractor:
         return arc_length_params
 
 
-    def find_uvs(self, pcurve):
+    def _find_uvs(self, pcurve):
         uvs = []
         for u in self.u_params:
             uv = gp_Pnt2d()
@@ -135,7 +155,7 @@ class EdgeDataExtractor:
             uvs.append(uv)
         return uvs
 
-    def evaluate_3d_points(self):
+    def _evaluate_3d_points(self):
         points = []
         for u in self.u_params:
             point = self.edge.point(u)
@@ -143,22 +163,15 @@ class EdgeDataExtractor:
         return np.stack(points)
 
 
-    def evaluate_curve_tangents(self):
+    def _evaluate_curve_tangents(self):
         tangents = []
         for u in self.u_params:
             tangent = self.edge.tangent(u)
             tangents.append(tangent)
         return np.stack(tangents)
 
-    def sanity_check_uvs(self, uvs, edge_tolerance):
-        for u, left_uv, right_uv in zip(self.u_params, self.left_uvs, self.right_uvs):
-            point = self.edge.point(u)
-            point1 = self.left_face.point(left_uv)
-            point2 = self.right_face.point(right_uv)
-            assert np.linalg.norm(point-point1) < edge_tolerance
-            assert np.linalg.norm(point-point2) < edge_tolerance
 
-    def evaluate_surface_normals(self, uvs, face):
+    def _evaluate_surface_normals(self, uvs, face):
         normals = []
         for uv in uvs:
             normal = face.normal(uv)
