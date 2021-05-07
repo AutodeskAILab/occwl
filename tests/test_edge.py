@@ -11,7 +11,7 @@ from OCC.Core.Geom import Geom_Circle
 from occwl.edge import Edge
 
 # Test
-from test_base import TestBase
+from tests.test_base import TestBase
 
 class EdgeTester(TestBase):
 

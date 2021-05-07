@@ -3,7 +3,7 @@
 import numpy as np
 
 # Test
-from test_base import TestBase
+from tests.test_base import TestBase
 
 class FaceTester(TestBase):
         

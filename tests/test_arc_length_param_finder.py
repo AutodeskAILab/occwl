@@ -15,7 +15,7 @@ from occwl.geometry.arc_length_param_finder import ArcLengthParamFinder
 
 
 # Test
-from test_base import TestBase
+from tests.test_base import TestBase
 
 
 

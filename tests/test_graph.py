@@ -11,7 +11,7 @@ from OCC.Core.Geom import Geom_Circle
 from occwl.graph import vertex_adjacency, face_adjacency
 
 # Test
-from test_base import TestBase
+from tests.test_base import TestBase
 
 
 class GraphTester(TestBase):

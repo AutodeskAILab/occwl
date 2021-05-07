@@ -6,7 +6,7 @@ from pathlib import Path
 from occwl.geometry.tri_utils import write_obj 
 
 # Test
-from test_base import TestBase
+from tests.test_base import TestBase
 
 class TriangleTester(TestBase):
         
