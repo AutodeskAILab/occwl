@@ -133,3 +133,6 @@ dmypy.json
 
 # Folder for results
 results/*
+
+# Mac meta-data files
+.DS_Store
