@@ -175,7 +175,7 @@ class Edge(Shape):
         if curv_type == GeomAbs_BezierCurve:
             return brep_adaptor_curve.BezierCurve()
         if curv_type == GeomAbs_BSplineCurve:
-            return brep_adaptor_curve.BSplineCurve()
+            return brep_adaptor_curve.BSpline()
         if curv_type == GeomAbs_OffsetCurve:
             return brep_adaptor_curve.OffsetCurve()
         return None
