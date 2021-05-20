@@ -1,5 +1,5 @@
 
-# This script provided configurations for conda build.
+# This script provides configurations for Conda Build.
 
 # The following is required to specify pythonocc-core 
 # (that is on conda-forge) as dependency. For more details
