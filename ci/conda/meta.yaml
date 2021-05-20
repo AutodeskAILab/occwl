@@ -15,11 +15,11 @@ build:
 
 requirements:
   host:
-    - python >=3.6
+    - python >=3.7
     - pip
     - setuptools
   run:
-    - python >=3.6
+    - python >=3.7
     - pythonocc-core  7.5.1 {{ pythonocc_core_build }}
     - numpy
     - pyqt >=5
