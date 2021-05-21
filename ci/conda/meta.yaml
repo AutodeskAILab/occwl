@@ -20,7 +20,7 @@ requirements:
     - setuptools
   run:
     - python >=3.7
-    - pythonocc-core  7.5.1 {{ pythonocc_core_build }}
+    - pythonocc-core =7.5.1
     - numpy
     - pyqt >=5
     - wxpython >=4
