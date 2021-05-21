@@ -42,17 +42,18 @@ OCCWL is a simple, lightweight Pythonic wrapper around pythonocc (python binding
 ## Install Conda Package
 - Install conda package from local channel
     ```
-    conda install --user-local occwt
+    conda install --user-local occwl
     ```
     or
     ```
-    conda install -c file:///Users/<user_name>/miniconda/envs/<env_name>/conda-bld/ occwt
+    conda install -c file:///Users/<user_name>/miniconda/envs/<env_name>/conda-bld/ occwl
     ```
 
 - Install conda Package from Anaconda
 
     ```
-    conda install -c <anaconda_username> occwt
+    conda config --add channels conda-forge
+    conda install -c <anaconda_username> occwl
     ```
     Note that packages in Anaconda account are public by default and can be installed
     by other usesr without login to Anaconda.
