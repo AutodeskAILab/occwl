@@ -23,9 +23,14 @@ fi
 # install libgl1-mesa-glx in Linux. refre to 
 # https://github.com/conda-forge/pygridgen-feedstock/issues/10 for more information
 unamestr=$(uname)
-if [[ "$unamestr" == 'Linux' ]]; then
-   sudo apt update
-   sudo apt install libgl1-mesa-glx
+if [ "$unamestr" = 'Linux' ]; then
+    if command -v sudo; then
+        sudo apt update -y
+        sudo apt install libgl1-mesa-glx -y
+    else
+        apt update -y
+        apt install libgl1-mesa-glx -y
+    fi
 fi
 
 # add conda-forge channel to fetch/install required packages
