@@ -33,10 +33,7 @@ if [ "$unamestr" = 'Linux' ]; then
     fi
 fi
 
-# add conda-forge channel to fetch/install required packages
-conda config --add channels conda-forge
-
 # build conda package
-conda build .
+conda build . -c conda-forge
 
 # conda install --use-local occwl
