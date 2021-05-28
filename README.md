@@ -42,7 +42,7 @@ OCCWL is a simple, lightweight Pythonic wrapper around pythonocc (python binding
 ## Install Conda Package
 - Install conda package from local channel
     ```
-    conda install --user-local occwl
+    conda install --use-local occwl
     ```
     or
     ```
