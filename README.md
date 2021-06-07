@@ -33,7 +33,7 @@ More examples are available in the `examples` folder.
 
 ## Developing and maintaining OCCWL
 
-Please see (here)[docs/occwl_developers_guide.md] for information useful for developers and maintainers of OCCWL.  This includes details on how to run tests and publish the conda package.
+Please see [here](docs/occwl_developers_guide.md) for information useful for developers and maintainers of OCCWL.  This includes details on how to run tests and publish the conda package.
 
 
 ## Maintainers
