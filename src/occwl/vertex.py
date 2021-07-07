@@ -19,7 +19,7 @@ class Vertex(Shape):
             topods_vertex (OCC.Core.TopoDS.TopoDS_Vertex): OCC Vertex
         """
         assert isinstance(topods_vertex, TopoDS_Vertex)
-        self._vertex = topods_vertex
+        super().__init__(topods_vertex)
 
     @staticmethod
     def make_vertex(point):
@@ -37,30 +37,6 @@ class Vertex(Shape):
         vertex = vertex_maker.Shape()
         return Vertex(vertex)
 
-    def topods_shape(self):
-        """
-        Get the underlying OCC vertex as a shape
-
-        Returns:
-            OCC.Core.TopoDS.TopoDS_Vertex: Vertex
-        """
-        return self._vertex
-
-    def __hash__(self):
-        """
-        Hash for the vertex
-
-        Returns:
-            int: Hash value
-        """
-        return self.topods_shape().__hash__()
-    
-    def __eq__(self, other):
-        """
-        Equality check for the vertex
-        """
-        return self.topods_shape().__hash__() == other.topods_shape().__hash__()
-
     def point(self):
         """
         3D point stored in this vertex
@@ -73,9 +49,11 @@ class Vertex(Shape):
 
     def topods_vertex(self):
         """
-        DEPRECATED: Get the underlying OCC vertex type
+        DEPRECATED by Shape.topods_shape()
+        
+        Get the underlying OCC vertex type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Vertex: Vertex
         """
-        return self._vertex
+        return self.topods_shape()

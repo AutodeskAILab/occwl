@@ -25,7 +25,7 @@ class Edge(Shape):
     """
     def __init__(self, topods_edge):
         assert isinstance(topods_edge, TopoDS_Edge)
-        self._edge = topods_edge
+        super().__init__(topods_edge)
     
     @staticmethod
     def make_from_vertices(start_vertex, end_vertex):
@@ -52,41 +52,8 @@ class Edge(Shape):
         Returns:
             OCC.Core.TopoDS.TopoDS_Edge: Edge
         """
-        return self._edge
+        return self.topods_shape()
 
-    def topods_shape(self):
-        """
-        Get the underlying OCC edge as a shape
-
-        Returns:
-            OCC.Core.TopoDS.TopoDS_Edge: Edge
-        """
-        return self._edge
-
-    def __hash__(self):
-        """
-        Hash for the edge
-
-        Returns:
-            int: Hash value
-        """
-        return self.topods_shape().__hash__()
-    
-    def __eq__(self, other):
-        """
-        Equality check for the edge.
-
-        NOTE: This function only checks if the edge is the same.
-        It doesn't check the edge orienation, so 
-
-        edge1 == edge2
-
-        does not necessarily mean 
-
-        edge1.reversed() == edge2.reversed()
-        """
-        return self.topods_shape().__hash__() == other.topods_shape().__hash__()
-    
     def point(self, u):
         """
         Evaluate the edge geometry at given parameter
@@ -168,7 +135,7 @@ class Edge(Shape):
         Returns:
             OCC.Geom.Handle_Geom_Curve: Interface to all curve geometry
         """
-        return BRep_Tool_Curve(self._edge)[0]
+        return BRep_Tool_Curve(self.topods_shape())[0]
 
     def specific_curve(self):
         """
@@ -178,7 +145,7 @@ class Edge(Shape):
             OCC.Geom.Handle_Geom_*: Specific geometry type for the curve geometry
                                     or None if the curve type is GeomAbs_OtherCurve
         """
-        brep_adaptor_curve = BRepAdaptor_Curve(self._edge)
+        brep_adaptor_curve = BRepAdaptor_Curve(self.topods_shape())
         curv_type = brep_adaptor_curve.GetType()
         if curv_type == GeomAbs_Line:
             return brep_adaptor_curve.Line()
@@ -310,7 +277,7 @@ class Edge(Shape):
         Returns:
             str: Type of the curve geometry
         """
-        curv_type = BRepAdaptor_Curve(self._edge).GetType()
+        curv_type = BRepAdaptor_Curve(self.topods_shape()).GetType()
         if curv_type == GeomAbs_Line:
             return "line"
         if curv_type == GeomAbs_Circle:
@@ -340,7 +307,7 @@ class Edge(Shape):
         Returns:
             float The edge tolerance
         """
-        return BRep_Tool().Tolerance(self._edge)
+        return BRep_Tool().Tolerance(self.topods_shape())
 
 
     def find_left_and_right_faces(self, faces):

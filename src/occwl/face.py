@@ -38,8 +38,8 @@ class Face(Shape):
     """
     def __init__(self, topods_face):
         assert isinstance(topods_face, TopoDS_Face)
-        self._face = topods_face
-        self._trimmed = BRepTopAdaptor_FClass2d(self._face, 1e-9)
+        super.__init__(topods_face)
+        self._trimmed = BRepTopAdaptor_FClass2d(self.topods_shape(), 1e-9)
 
     @staticmethod
     def make_prism(profile_edge, vector, return_first_last_shapes=False):
@@ -116,39 +116,6 @@ class Face(Shape):
         face = fill.Face()
         return Face(face)
 
-    def topods_shape(self):
-        """
-        Get the underlying OCC face as a shape
-
-        Returns:
-            OCC.Core.TopoDS.TopoDS_Face: Face
-        """
-        return self._face
-
-    def __hash__(self):
-        """
-        Hash for the face
-
-        Returns:
-            int: Hash value
-        """
-        return self.topods_shape().__hash__()
-    
-    def __eq__(self, other):
-        """
-        Equality check for the face.
-
-        NOTE: This function only checks if the face is the same.
-              It doesn't check the face orienation, so 
-
-              face1 == face2
-
-              does not necessarily mean 
-
-              face1.reversed() == face2.reversed()
-        """
-        return self.topods_shape().__hash__() == other.topods_shape().__hash__()
-
     def inside(self, uv):
         """
         Check if the uv-coordinate in on the visible region of the face
@@ -169,7 +136,7 @@ class Face(Shape):
         Returns:
             OCC.Geom.Handle_Geom_Surface: Interface to all surface geometry
         """
-        return BRep_Tool_Surface(self._face)
+        return BRep_Tool_Surface(self.topods_shape())
     
     def reversed_face(self):
         """
@@ -187,7 +154,7 @@ class Face(Shape):
         Returns:
             OCC.Geom.Handle_Geom_*: Specific geometry type for the surface geometry
         """
-        srf = BRepAdaptor_Surface(self._face)
+        srf = BRepAdaptor_Surface(self.topods_shape())
         surf_type = self.surface_type()
         if surf_type == "plane":
             return srf.Plane()
@@ -205,7 +172,7 @@ class Face(Shape):
         """
         Returns if the orientation of the face is reversed i.e. TopAbs_REVERSED
         """
-        return self._face.Orientation() == TopAbs_REVERSED
+        return self.topods_shape().Orientation() == TopAbs_REVERSED
 
     def point(self, uv):
         """
@@ -344,7 +311,7 @@ class Face(Shape):
             float: Area
         """
         geometry_properties = GProp_GProps()
-        brepgprop_SurfaceProperties(self._face, geometry_properties)
+        brepgprop_SurfaceProperties(self.topods_shape(), geometry_properties)
         return geometry_properties.Mass()
     
     def pcurve(self, edge):
@@ -369,7 +336,7 @@ class Face(Shape):
         Returns:
             Box: UV-domain bounds
         """
-        umin, umax, vmin, vmax = breptools_UVBounds(self._face)
+        umin, umax, vmin, vmax = breptools_UVBounds(self.topods_shape())
         bounds = Box(np.array([umin, vmin]))
         bounds.encompass_point(np.array([umax, vmax]))
         return bounds
@@ -394,7 +361,7 @@ class Face(Shape):
         Returns:
             str: Type of the surface geometry
         """
-        surf_type = BRepAdaptor_Surface(self._face).GetType()
+        surf_type = BRepAdaptor_Surface(self.topods_shape()).GetType()
         if surf_type == GeomAbs_Plane:
             return "plane"
         if surf_type == GeomAbs_Cylinder:
@@ -421,12 +388,14 @@ class Face(Shape):
 
     def topods_face(self):
         """
-        DEPRECATED: Get the underlying OCC face type
+        DEPRECATED by Shape.topods_shape()
+        
+        Get the underlying OCC face type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Face: Face
         """
-        return self._face
+        return self.topods_shape()
 
     def closed_u(self):
         """
@@ -455,7 +424,7 @@ class Face(Shape):
         Returns:
             bool: Is periodic along U
         """
-        adaptor = BRepAdaptor_Surface(self._face)
+        adaptor = BRepAdaptor_Surface(self.topods_shape())
         return adaptor.IsUPeriodic()
     
     def periodic_v(self):
@@ -465,7 +434,7 @@ class Face(Shape):
         Returns:
             bool: Is periodic along V
         """
-        adaptor = BRepAdaptor_Surface(self._face)
+        adaptor = BRepAdaptor_Surface(self.topods_shape())
         return adaptor.IsVPeriodic()
 
     def get_triangles(self):
@@ -481,7 +450,7 @@ class Face(Shape):
         """
         location = TopLoc_Location()
         bt = BRep_Tool()
-        facing = (bt.Triangulation(self._face, location))
+        facing = (bt.Triangulation(self.topods_shape(), location))
         if facing == None:
             return [], []
 

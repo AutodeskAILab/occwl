@@ -12,41 +12,19 @@ class Wire(Shape):
     """
     def __init__(self, topods_wire):
         assert isinstance(topods_wire, TopoDS_Wire)
-        self._wire = topods_wire
-        self._wire_exp = TopologyUtils.WireExplorer(self._wire)
-        
-    def topods_shape(self):
-        """
-        Get the underlying OCC wire as a shape
-
-        Returns:
-            OCC.Core.TopoDS.TopoDS_Wire: Wire
-        """
-        return self._wire
+        super().__init__(topods_wire)
+        self._wire_exp = TopologyUtils.WireExplorer(self.topods_shape())
 
     def topods_wire(self):
         """
-        DEPRECATED: Get the underlying OCC wire type
+        DEPRECATED by Shape.topods_shape()
+        
+        Get the underlying OCC wire type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Wire: Wire
         """
-        return self._wire
-
-    def __hash__(self):
-        """
-        Hash for the wire
-
-        Returns:
-            int: Hash value
-        """
-        return self.topods_shape().__hash__()
-    
-    def __eq__(self, other):
-        """
-        Equality check for the wire
-        """
-        return self.topods_wire().__hash__() == other.topods_wire().__hash__()
+        return self.topods_shape()
 
     def ordered_edges(self):
         """
