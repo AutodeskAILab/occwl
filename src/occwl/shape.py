@@ -39,7 +39,7 @@ class Shape:
         """
         if type(self) == Shape:
             raise Exception("Shape must be subclassed and instantiated.")
-        assert isinstance(topods_shape, [TopoDS_Vertex, TopoDS_Edge, TopoDS_Face, TopoDS_Wire, TopoDS_Shell, TopoDS_Solid])
+        assert isinstance(topods_shape, (TopoDS_Vertex, TopoDS_Edge, TopoDS_Face, TopoDS_Wire, TopoDS_Shell, TopoDS_Solid))
         self._shape = topods_shape
     
     def topods_shape(self):
