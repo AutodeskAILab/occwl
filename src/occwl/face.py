@@ -472,4 +472,4 @@ class Face(Shape):
 
             tris.append([index1 - 1, index2 - 1, index3 - 1])
     
-        return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int)
+        return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int32)
