@@ -2,7 +2,6 @@ import numpy as np
 
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d
 from OCC.Core.BRep import BRep_Tool, BRep_Tool_Curve, BRep_Tool_Continuity
-from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.BRepGProp import brepgprop_LinearProperties
 from OCC.Core.GProp import GProp_GProps
@@ -13,6 +12,7 @@ from OCC.Core.TopoDS import TopoDS_Edge
 from OCC.Core.GCPnts import GCPnts_AbscissaPoint
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Edge
+from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 
 import occwl.geometry.geom_utils as geom_utils
 from occwl.geometry.interval import Interval
@@ -27,18 +27,36 @@ class Edge(Shape):
         assert isinstance(topods_edge, TopoDS_Edge)
         self._edge = topods_edge
     
-    def topods_shape(self):
+    @staticmethod
+    def make_from_vertices(start_vertex, end_vertex):
         """
-        Get the underlying OCC edge as a shape
+        Make an edge from two given vertices
+
+        Args:
+            start_vertex (occwl.vertex.Vertex): Starting vertex
+            end_vertex (occwl.vertex.Vertex): Ending vertex
+
+        Returns:
+            occwl.Edge: Edge joining the two given vertices
+            or None: if error
+        """
+        edge_builder = BRepBuilderAPI_MakeEdge(start_vertex.point(), end_vertex.point())
+        if not edge_builder.IsDone():
+            return None
+        return Edge(edge_builder.Edge())
+
+    def topods_edge(self):
+        """
+        DEPRECATED: Get the underlying OCC type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Edge: Edge
         """
         return self._edge
 
-    def topods_edge(self):
+    def topods_shape(self):
         """
-        Get the underlying OCC edge type
+        Get the underlying OCC edge as a shape
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Edge: Edge
@@ -52,7 +70,7 @@ class Edge(Shape):
         Returns:
             int: Hash value
         """
-        return self.topods_edge().__hash__()
+        return self.topods_shape().__hash__()
     
     def __eq__(self, other):
         """
@@ -67,7 +85,7 @@ class Edge(Shape):
 
         edge1.reversed() == edge2.reversed()
         """
-        return self.topods_edge().__hash__() == other.topods_edge().__hash__()
+        return self.topods_shape().__hash__() == other.topods_shape().__hash__()
     
     def point(self, u):
         """
@@ -140,7 +158,7 @@ class Edge(Shape):
         if not self.has_curve():
             return 0.0
         geometry_properties = GProp_GProps()
-        brepgprop_LinearProperties(self.topods_edge(), geometry_properties)
+        brepgprop_LinearProperties(self.topods_shape(), geometry_properties)
         return geometry_properties.Mass()
 
     def curve(self):
@@ -173,7 +191,7 @@ class Edge(Shape):
         if curv_type == GeomAbs_Parabola:
             return brep_adaptor_curve.Parabola()
         if curv_type == GeomAbs_BezierCurve:
-            return brep_adaptor_curve.BezierCurve()
+            return brep_adaptor_curve.Bezier()
         if curv_type == GeomAbs_BSplineCurve:
             return brep_adaptor_curve.BSpline()
         if curv_type == GeomAbs_OffsetCurve:
@@ -188,7 +206,7 @@ class Edge(Shape):
         Returns:
             bool: Whether this edge has a valid curve
         """
-        curve = BRepAdaptor_Curve(self.topods_edge())
+        curve = BRepAdaptor_Curve(self.topods_shape())
         return curve.Is3DCurve() 
 
     def u_bounds(self):
@@ -201,7 +219,7 @@ class Edge(Shape):
         if not self.has_curve():
             # Return an empty interval
             return Interval()
-        _, umin, umax = BRep_Tool_Curve(self.topods_edge())
+        _, umin, umax = BRep_Tool_Curve(self.topods_shape())
         return Interval(umin, umax)
     
     def reversed_edge(self):
@@ -211,7 +229,7 @@ class Edge(Shape):
         Returns:
             occwl.edge.Edge: An edge with the opposite orientation to this edge.
         """
-        return Edge(self.topods_edge().Reversed())
+        return Edge(self.topods_shape().Reversed())
     
     def closed_curve(self):
         """
@@ -231,7 +249,7 @@ class Edge(Shape):
         Returns:
             bool: If closed
         """
-        return BRep_Tool().IsClosed(self.topods_edge())
+        return BRep_Tool().IsClosed(self.topods_shape())
 
     def seam(self, face):
         """
@@ -243,7 +261,7 @@ class Edge(Shape):
         Returns:
             bool: If seam
         """
-        return ShapeAnalysis_Edge().IsSeam(self.topods_edge(), face.topods_face())
+        return ShapeAnalysis_Edge().IsSeam(self.topods_shape(), face.topods_shape())
 
     def periodic(self):
         """
@@ -252,7 +270,7 @@ class Edge(Shape):
         Returns:
             bool: If periodic
         """
-        return BRepAdaptor_Curve(self.topods_edge()).IsPeriodic()
+        return BRepAdaptor_Curve(self.topods_shape()).IsPeriodic()
 
     def rational(self):
         """
@@ -261,7 +279,7 @@ class Edge(Shape):
         Returns:
             bool: If rational
         """
-        return BRepAdaptor_Curve(self.topods_edge()).IsRational()
+        return BRepAdaptor_Curve(self.topods_shape()).IsRational()
 
     def continuity(self, face1, face2):
         """
@@ -274,7 +292,7 @@ class Edge(Shape):
         Returns:
             GeomAbs_Shape: enum describing the continuity order
         """
-        return BRep_Tool_Continuity(self.topods_edge(), face1.topods_face(), face2.topods_face())
+        return BRep_Tool_Continuity(self.topods_shape(), face1.topods_face(), face2.topods_face())
 
     def reversed(self):
         """
@@ -283,7 +301,7 @@ class Edge(Shape):
         Returns:
             bool: If rational
         """
-        return self.topods_edge().Orientation() == TopAbs_REVERSED
+        return self.topods_shape().Orientation() == TopAbs_REVERSED
     
     def curve_type(self):
         """

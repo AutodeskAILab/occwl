@@ -26,7 +26,7 @@ class Wire(Shape):
 
     def topods_wire(self):
         """
-        Get the underlying OCC wire type
+        DEPRECATED: Get the underlying OCC wire type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Wire: Wire
@@ -40,7 +40,7 @@ class Wire(Shape):
         Returns:
             int: Hash value
         """
-        return self.topods_wire().__hash__()
+        return self.topods_shape().__hash__()
     
     def __eq__(self, other):
         """

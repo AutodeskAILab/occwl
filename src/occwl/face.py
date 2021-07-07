@@ -15,10 +15,14 @@ from OCC.Core.GeomAbs import GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, \
                              GeomAbs_Sphere, GeomAbs_Torus, GeomAbs_BezierSurface, \
                              GeomAbs_BSplineSurface, GeomAbs_SurfaceOfRevolution, \
                              GeomAbs_SurfaceOfExtrusion, GeomAbs_OffsetSurface, \
-                             GeomAbs_OtherSurface
+                             GeomAbs_OtherSurface, GeomAbs_C0, GeomAbs_C1, GeomAbs_C2, \
+                             GeomAbs_C3, GeomAbs_G1, GeomAbs_G2
+
 from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Core.TopLoc import TopLoc_Location
+from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakePrism
+from OCC.Core.BRepFill import BRepFill_Filling
 
 from occwl.edge import Edge
 from occwl.shape import Shape
@@ -37,6 +41,81 @@ class Face(Shape):
         self._face = topods_face
         self._trimmed = BRepTopAdaptor_FClass2d(self._face, 1e-9)
 
+    @staticmethod
+    def make_prism(profile_edge, vector, return_first_last_shapes=False):
+        """
+        Make a face from a profile edge by sweeping/extrusion
+
+        Args:
+            profile_edge (occwl.edge.Edge): Edge
+            vector (np.ndarray): Direction and length of extrusion
+            return_first_last_shapes (bool, optional): Whether to return the base and top shapes of the result. Defaults to False.
+
+        Returns:
+            occwl.Face: Face created by sweeping the edge
+            or None: if error
+            occwl.Edge, occwl.Edge (optional): Returns the base and top edges of return_first_last_shapes is True.
+        """
+        assert isinstance(profile_edge, Edge)
+        gp_vector = geom_utils.numpy_to_gp_vec(vector)
+        prism = BRepPrimAPI_MakePrism(profile_edge.topods_shape(), gp_vector)
+        if not prism.IsDone():
+            return None
+        if return_first_last_shapes:
+            return Face(prism.Shape()), Edge(prism.FirstShape()), Edge(prism.LastShape())
+        return Face(prism.Shape())
+    
+    @staticmethod
+    def make_nsided(edges, continuity, points=None):
+        """
+        Make an n-sided fill-in face with the given edges, their continuities, and optionally a
+        set of punctual points
+
+        Args:
+            edges (List[occwl.edge.Edge]): A list of edges for creating the fill-in face
+            continuity (str or List[str]): A single string or a list of strings, one for each given edge.
+                                           Must be one of "C0", "C1", "G1", "C2", "G2", "C3"
+            points (np.ndarray, optional): Set of points to constrain the fill-in surface. Defaults to None.
+
+        Returns:
+            occwl.face.Face: Filled-in face
+        """
+        fill = BRepFill_Filling()
+
+        # A helper function to convert strings to Geom_Abs_ enums
+        def str_to_continuity(string):
+            if string == "C0":
+                return GeomAbs_C0
+            elif string == "C1":
+                return GeomAbs_C1
+            elif string == "G1":
+                return GeomAbs_G1
+            elif string == "C2":
+                return GeomAbs_C2
+            elif string == "G2":
+                return GeomAbs_G2
+            elif string == "C3":
+                return GeomAbs_C3
+
+        if isinstance(continuity, str):
+            assert continuity in ("C0", "C1", "C2")
+            occ_continuity = str_to_continuity(continuity)
+            for edg in edges:
+                fill.Add(edg.topods_shape(), occ_continuity)
+        elif isinstance(continuity, list):
+            assert len(edges) == len(continuity)
+            for edg, cont in zip(edges, continuity):
+                occ_cont = str_to_continuity(cont)
+                fill.Add(edg.topods_shape(), occ_cont)
+        
+        # Add points to contrain shape if provided
+        if points:
+            for pt in points:
+                fill.Add(geom_utils.numpy_to_gp(pt))
+        fill.Build()
+        face = fill.Face()
+        return Face(face)
+
     def topods_shape(self):
         """
         Get the underlying OCC face as a shape
@@ -53,7 +132,7 @@ class Face(Shape):
         Returns:
             int: Hash value
         """
-        return self.topods_face().__hash__()
+        return self.topods_shape().__hash__()
     
     def __eq__(self, other):
         """
@@ -68,7 +147,7 @@ class Face(Shape):
 
               face1.reversed() == face2.reversed()
         """
-        return self.topods_face().__hash__() == other.topods_face().__hash__()
+        return self.topods_shape().__hash__() == other.topods_shape().__hash__()
 
     def inside(self, uv):
         """
@@ -99,7 +178,7 @@ class Face(Shape):
         Returns:
             occwl.face.Face: A face with the opposite orientation to this face.
         """
-        return Face(self.topods_face().Reversed())
+        return Face(self.topods_shape().Reversed())
 
     def specific_surface(self):
         """
@@ -193,7 +272,7 @@ class Face(Shape):
         Returns:
             bool: True if the face is to the left of the edge
         """
-        top_exp = TopologyUtils.TopologyExplorer(self.topods_face(), ignore_orientation=False)
+        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=False)
         for topo_edge_from_face in top_exp.edges():
             edge_from_face = Edge(topo_edge_from_face)
             if edge == edge_from_face:
@@ -280,7 +359,7 @@ class Face(Shape):
             Geom2d_Curve: 2D curve
             Interval: domain of the parametric curve
         """
-        crv, umin, umax = BRep_Tool().CurveOnSurface(edge.topods_edge(), self.topods_face())
+        crv, umin, umax = BRep_Tool().CurveOnSurface(edge.topods_edge(), self.topods_shape())
         return crv, Interval(umin, umax)
 
     def uv_bounds(self):
@@ -342,7 +421,7 @@ class Face(Shape):
 
     def topods_face(self):
         """
-        Get the underlying OCC face type
+        DEPRECATED: Get the underlying OCC face type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Face: Face
