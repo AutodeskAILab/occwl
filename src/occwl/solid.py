@@ -62,6 +62,15 @@ class Solid(Shape):
 
     def topods_solid(self):
         """
+        [DEPRECATED] Get the underlying OCC solid type
+
+        Returns:
+            OCC.Core.TopoDS.TopoDS_Solid: Solid
+        """
+        return self._solid
+    
+    def topods_shape(self):
+        """
         Get the underlying OCC solid type
 
         Returns:
