@@ -38,7 +38,7 @@ class Face(Shape):
     """
     def __init__(self, topods_face):
         assert isinstance(topods_face, TopoDS_Face)
-        super.__init__(topods_face)
+        super().__init__(topods_face)
         self._trimmed = BRepTopAdaptor_FClass2d(self.topods_shape(), 1e-9)
 
     @staticmethod
