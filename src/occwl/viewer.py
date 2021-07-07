@@ -1,15 +1,55 @@
-from OCC.Display.SimpleGui import init_display
-from OCC.Core.AIS import AIS_Shape, AIS_Shaded, AIS_TexturedShape, AIS_WireFrame, AIS_Shape_SelectionMode
 from datetime import datetime
-import time
-from occwl.solid import Solid
-from occwl.face import Face
+from typing import Any, Callable, List, Optional, Tuple
+
+from OCC.Core.AIS import (
+    AIS_Shaded,
+    AIS_Shape,
+    AIS_Shape_SelectionMode,
+    AIS_TexturedShape,
+    AIS_WireFrame,
+)
+from OCC.Display.SimpleGui import init_display
+
 from occwl.edge import Edge
+from occwl.face import Face
+from occwl.solid import Solid
 
 
 class Viewer:
-    def __init__(self):
-        self._display, self._start_display, self._add_menu, self._add_function_to_menu = init_display()
+    """
+    A Viewer for solid models
+    """
+
+    def __init__(
+        self,
+        backend: str = None,
+        size: Optional[Tuple[int, int]] = (1024, 768),
+        axes: Optional[bool] = True,
+        background_gradient_color1: Optional[List[int]] = [206, 215, 222],
+        background_gradient_color2: Optional[List[int]] = [128, 128, 128],
+    ):
+        """
+        Construct the Viewer
+
+        Args:
+            backend (str, optional): Backend use to create the viewer. Must be one of wx, pyqt4, pyqt5 or pyside. Defaults to None.
+            size (Optional[Tuple[int, int]], optional): Size of the viewer window. Defaults to (1024, 768).
+            axes (Optional[bool], optional): Show arrows for coordinate axes. Defaults to True.
+            background_gradient_color1 (Optional[List[int]], optional): Background color at the top. Defaults to [206, 215, 222].
+            background_gradient_color2 (Optional[List[int]], optional): Background color at the bottom. Defaults to [128, 128, 128].
+        """
+        (
+            self._display,
+            self._start_display,
+            self._add_menu,
+            self._add_function_to_menu,
+        ) = init_display(
+            backend_str=backend,
+            size=size,
+            display_triedron=axes,
+            background_gradient_color1=background_gradient_color1,
+            background_gradient_color2=background_gradient_color2,
+        )
         self.add_menu("file")
         self.add_submenu("file", self.exit)
         self.add_menu("camera")
@@ -20,74 +60,180 @@ class Viewer:
         self.add_submenu("rendering", self.wireframe)
         self.add_submenu("rendering", self.shaded)
         self.add_submenu("rendering", self.save_image)
+        self.add_menu("select")
+        self.add_submenu("select", self.selection_mode_vertex)
+        self.add_submenu("select", self.selection_mode_edge)
+        self.add_submenu("select", self.selection_mode_face)
+        self.add_submenu("select", self.selection_mode_shape)
 
-    def display(self, shape, update=False, color=None):
+    def display(self, shape, update=False, color=None, transparency=0.0):
+        """
+        Display a shape (must be a Solid, Face, or Edge)
+
+        Args:
+            shape (Solid, Face, or Edge): Shape to display
+            update (bool, optional): Whether to update and repaint. Defaults to False.
+            color ([type], optional): Color of the shape.
+                                      Can be 'WHITE', 'BLUE', 'RED', 'GREEN', 'YELLOW',
+                                      'CYAN', 'BLACK', 'ORANGE'. Defaults to None.
+            transparency (float, optional): How transparent the shape is. Defaults to 0.0.
+        """
         if isinstance(shape, Solid):
             shape = shape.topods_solid()
         if isinstance(shape, Face):
             shape = shape.topods_face()
         if isinstance(shape, Edge):
             shape = shape.topods_edge()
-        if color:
-            self._display.DisplayColoredShape(shape, update=False, color=color)
-        else:
-            self._display.DisplayShape(shape, update=False)
+        self._display.DisplayShape(
+            shape, update=update, color=color, transparency=transparency
+        )
+
+    def display_colored(self, shape, color, update=False):
+        """
+        Display a colored shape
+
+        Args:
+            shape (Solid, Face, or Edge): Shape to display
+            color ([type], optional): Color of the shape.
+                                      Can be 'WHITE', 'BLUE', 'RED', 'GREEN', 'YELLOW',
+                                      'CYAN', 'BLACK', 'ORANGE'. Defaults to None.
+            update (bool, optional): Whether to update and repaint. Defaults to False.
+        """
+        if isinstance(shape, Solid):
+            shape = shape.topods_solid()
+        if isinstance(shape, Face):
+            shape = shape.topods_face()
+        if isinstance(shape, Edge):
+            shape = shape.topods_edge()
+        self._display.DisplayColoredShape(shape, update=update, color=color)
 
     def on_select(self, callback):
+        """
+        Callback to execute when a selection is made
+
+        Args:
+            callback (function): Called when a selection is made
+        """
         self._display.register_select_callback(callback)
 
+    def selected_shapes(self):
+        """
+        Get the selected shapes
+
+        Returns:
+            List[TopoDS_Shape]: List of selected shapes
+        """
+        shapes = self._display.GetSelectedShapes()
+        # FIXME: these should be converted to occwl types
+        return shapes
+
     def show(self):
+        """
+        Show the viewer
+        """
         self._start_display()
 
     def clear(self):
+        """
+        Clear all shapes from the viewer
+        """
         self._display.EraseAll()
 
     def fit(self):
+        """
+        Fit the camera to the scene
+        """
         self._display.FitAll()
 
     def add_menu(self, name):
+        """
+        Add a custom menu to the viewer
+
+        Args:
+            name (str): Name of the menu
+        """
         self._add_menu(name)
-    
+
     def add_submenu(self, menu, callback):
+        """
+        Add a sub-menu to an existing menu
+
+        Args:
+            menu (str): Name of the menu
+            callback (function): Function to be added as a sub-menu. The name of the function will appear under menu.
+        """
         self._add_function_to_menu(menu, callback)
-    
+
     def exit(self, event=None):
+        """
+        Exit the viewer
+        """
         import sys
+
         sys.exit()
-    
+
     def perspective(self, event=None):
+        """
+        Set perspective camera projection
+        """
         self._display.SetPerspectiveProjection()
         self._display.FitAll()
 
     def orthographic(self, event=None):
+        """
+        Set orthographic camera projection
+        """
         self._display.SetOrthographicProjection()
         self._display.FitAll()
-    
+
     def wireframe(self):
+        """
+        Set all shapes to appear as wireframes
+        """
         self._display.View.SetComputedMode(False)
         self._display.Context.SetDisplayMode(AIS_WireFrame, True)
 
     def shaded(self):
+        """
+        Shade all shapes
+        """
         self._display.View.SetComputedMode(False)
         self._display.Context.SetDisplayMode(AIS_Shaded, True)
 
-    def selection_mode(self, entity):
-        if entity == "vertex":
-            self._display.SetSelectionModeVertex()
-        elif entity == "edge":
-            self._display.SetSelectionModeEdge()
-        elif entity == "face":
-            self._display.SetSelectionModeFace()
-        elif entity == "solid":
-            self._display.SetSelectionModeShape()
-        else:
-            raise NotImplementedError("Invalid entity type. Expected one of ('vertex', 'edge', 'face', 'solid')")
+    def selection_mode_vertex(self):
+        """
+        Allow vertices to be selected
+        """
+        self._display.SetSelectionModeVertex()
 
-    def add_sphere(self):
-        pass
+    def selection_mode_edge(self):
+        """
+        Allow edges to be selected
+        """
+        self._display.SetSelectionModeEdge()
 
-    def save_image(self):
-        now = datetime.now()
-        current_time = str(now)
-        self._display.View.Dump(current_time + ".png")
-    
+    def selection_mode_face(self):
+        """
+        Allow faces to be selected
+        """
+        self._display.SetSelectionModeFace()
+
+    def selection_mode_shape(self):
+        """
+        Allow all shapes to be selected
+        """
+        self._display.SetSelectionModeShape()
+
+    def save_image(self, filename=None):
+        """
+        Save a screenshot of the viewer
+
+        Args:
+            filename (str or pathlib.Path, optional): Image file to save the screenshot. Defaults to None.
+                                                      If None, writes a PNG file named with the current timestamp
+        """
+        if filename is None:
+            now = datetime.now()
+            current_time = str(now)
+            filename = current_time + ".png"
+        self._display.View.Dump(str(filename))
