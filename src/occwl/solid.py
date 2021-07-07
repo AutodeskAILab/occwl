@@ -144,7 +144,7 @@ class Solid(Shape):
         """
         return self._top_exp.number_of_faces()
     
-    def num_of_wires(self):
+    def num_wires(self):
         """
         Number of wires in the solid
 
