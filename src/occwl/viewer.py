@@ -8,6 +8,7 @@ from OCC.Core.AIS import (
     AIS_TexturedShape,
     AIS_WireFrame,
 )
+from OCC.Core.gp import gp_Pnt, gp_Pnt2d
 from OCC.Display.SimpleGui import init_display
 from OCC.Core.TopAbs import TopAbs_VERTEX, TopAbs_EDGE, TopAbs_FACE, TopAbs_SHELL, TopAbs_SOLID
 from occwl.edge import Edge
@@ -72,25 +73,6 @@ class Viewer:
         self._display.DisplayShape(
             shape, update=update, color=color, transparency=transparency
         )
-
-    def display_colored(self, shape, color, update=False):
-        """
-        Display a colored shape
-
-        Args:
-            shape (Solid, Face, or Edge): Shape to display
-            color ([type], optional): Color of the shape.
-                                      Can be 'WHITE', 'BLUE', 'RED', 'GREEN', 'YELLOW',
-                                      'CYAN', 'BLACK', 'ORANGE'. Defaults to None.
-            update (bool, optional): Whether to update and repaint. Defaults to False.
-        """
-        if isinstance(shape, Solid):
-            shape = shape.topods_solid()
-        if isinstance(shape, Face):
-            shape = shape.topods_face()
-        if isinstance(shape, Edge):
-            shape = shape.topods_edge()
-        self._display.DisplayColoredShape(shape, update=update, color=color)
 
     def on_select(self, callback):
         """
