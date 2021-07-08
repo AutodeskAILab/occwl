@@ -74,6 +74,18 @@ class Viewer:
             shape, update=update, color=color, transparency=transparency
         )
 
+    def display_text(self, xyz, text, height=None, color=None):
+        """
+        Display a text
+
+        Args:
+            xyz (tuple of floats or 3D np.ndarray): Coordinate in model space where text would appear
+            text (str): Text to display
+            height (float, optional): Height of the text font. Defaults to None.
+            color (tuple of 3 floats, optional): RGB color. Defaults to None.
+        """
+        self._display.DisplayMessage(gp_Pnt(xyz[0], xyz[1], xyz[2]), text, height=height, message_color=color)
+
     def on_select(self, callback):
         """
         Callback to execute when a selection is made
