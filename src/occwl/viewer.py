@@ -9,7 +9,7 @@ from OCC.Core.AIS import (
     AIS_WireFrame,
 )
 from OCC.Display.SimpleGui import init_display
-
+from OCC.Core.TopAbs import TopAbs_VERTEX, TopAbs_EDGE, TopAbs_FACE, TopAbs_SHELL, TopAbs_SOLID
 from occwl.edge import Edge
 from occwl.face import Face
 from occwl.solid import Solid
@@ -50,21 +50,6 @@ class Viewer:
             background_gradient_color1=background_gradient_color1,
             background_gradient_color2=background_gradient_color2,
         )
-        self.add_menu("file")
-        self.add_submenu("file", self.exit)
-        self.add_menu("camera")
-        self.add_submenu("camera", self.fit)
-        self.add_submenu("camera", self.perspective)
-        self.add_submenu("camera", self.orthographic)
-        self.add_menu("rendering")
-        self.add_submenu("rendering", self.wireframe)
-        self.add_submenu("rendering", self.shaded)
-        self.add_submenu("rendering", self.save_image)
-        self.add_menu("select")
-        self.add_submenu("select", self.selection_mode_vertex)
-        self.add_submenu("select", self.selection_mode_edge)
-        self.add_submenu("select", self.selection_mode_face)
-        self.add_submenu("select", self.selection_mode_shape)
 
     def display(self, shape, update=False, color=None, transparency=0.0):
         """
@@ -164,7 +149,7 @@ class Viewer:
         """
         self._add_function_to_menu(menu, callback)
 
-    def exit(self, event=None):
+    def exit(self):
         """
         Exit the viewer
         """
@@ -172,14 +157,14 @@ class Viewer:
 
         sys.exit()
 
-    def perspective(self, event=None):
+    def perspective(self):
         """
         Set perspective camera projection
         """
         self._display.SetPerspectiveProjection()
         self._display.FitAll()
 
-    def orthographic(self, event=None):
+    def orthographic(self):
         """
         Set orthographic camera projection
         """
@@ -204,23 +189,35 @@ class Viewer:
         """
         Allow vertices to be selected
         """
-        self._display.SetSelectionModeVertex()
+        self._display.SetSelectionMode(TopAbs_VERTEX)
 
     def selection_mode_edge(self):
         """
         Allow edges to be selected
         """
-        self._display.SetSelectionModeEdge()
+        self._display.SetSelectionMode(TopAbs_EDGE)
 
     def selection_mode_face(self):
         """
         Allow faces to be selected
         """
-        self._display.SetSelectionModeFace()
+        self._display.SetSelectionMode(TopAbs_FACE)
 
-    def selection_mode_shape(self):
+    def selection_mode_shell(self):
         """
         Allow all shapes to be selected
+        """
+        self._display.SetSelectionMode(TopAbs_SHELL)
+
+    def selection_mode_solid(self):
+        """
+        Allow no shapes to be selected
+        """
+        self._display.SetSelectionMode(TopAbs_SOLID)
+
+    def selection_mode_none(self):
+        """
+        Allow no shapes to be selected
         """
         self._display.SetSelectionModeShape()
 
