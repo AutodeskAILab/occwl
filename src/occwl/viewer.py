@@ -234,3 +234,18 @@ class Viewer:
             current_time = str(now)
             filename = current_time + ".png"
         self._display.View.Dump(str(filename))
+
+    def use_rasterization(self):
+        """
+        Render using rasterization
+        """
+        self._display.SetRasterizationMode()
+    
+    def use_raytracing(self, depth=3):
+        """
+        Render using raytracing
+
+        Args:
+            depth (int, optional): Number of bounces for rays Defaults to 3.
+        """
+        self._display.SetRaytracingMode(depth=depth)
