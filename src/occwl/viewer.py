@@ -8,8 +8,11 @@ from OCC.Core.AIS import (
     AIS_TexturedShape,
     AIS_WireFrame,
 )
+from OCC.Core.gp import gp_Pnt, gp_Pnt2d
 from OCC.Display.SimpleGui import init_display
-
+from OCC.Core.TopAbs import TopAbs_VERTEX, TopAbs_EDGE, TopAbs_FACE, TopAbs_SHELL, TopAbs_SOLID
+from OCC.Core.TopoDS import TopoDS_Vertex, TopoDS_Edge, TopoDS_Face, TopoDS_Shell, TopoDS_Solid
+from occwl.vertex import Vertex
 from occwl.edge import Edge
 from occwl.face import Face
 from occwl.solid import Solid
@@ -50,21 +53,6 @@ class Viewer:
             background_gradient_color1=background_gradient_color1,
             background_gradient_color2=background_gradient_color2,
         )
-        self.add_menu("file")
-        self.add_submenu("file", self.exit)
-        self.add_menu("camera")
-        self.add_submenu("camera", self.fit)
-        self.add_submenu("camera", self.perspective)
-        self.add_submenu("camera", self.orthographic)
-        self.add_menu("rendering")
-        self.add_submenu("rendering", self.wireframe)
-        self.add_submenu("rendering", self.shaded)
-        self.add_submenu("rendering", self.save_image)
-        self.add_menu("select")
-        self.add_submenu("select", self.selection_mode_vertex)
-        self.add_submenu("select", self.selection_mode_edge)
-        self.add_submenu("select", self.selection_mode_face)
-        self.add_submenu("select", self.selection_mode_shape)
 
     def display(self, shape, update=False, color=None, transparency=0.0):
         """
@@ -84,37 +72,45 @@ class Viewer:
             shape = shape.topods_face()
         if isinstance(shape, Edge):
             shape = shape.topods_edge()
-        self._display.DisplayShape(
+        return self._display.DisplayShape(
             shape, update=update, color=color, transparency=transparency
         )
 
-    def display_colored(self, shape, color, update=False):
+    def display_text(self, xyz, text, height=None, color=None):
         """
-        Display a colored shape
+        Display a text
 
         Args:
-            shape (Solid, Face, or Edge): Shape to display
-            color ([type], optional): Color of the shape.
-                                      Can be 'WHITE', 'BLUE', 'RED', 'GREEN', 'YELLOW',
-                                      'CYAN', 'BLACK', 'ORANGE'. Defaults to None.
-            update (bool, optional): Whether to update and repaint. Defaults to False.
+            xyz (tuple of floats or 3D np.ndarray): Coordinate in model space where text would appear
+            text (str): Text to display
+            height (float, optional): Height of the text font. Defaults to None.
+            color (tuple of 3 floats, optional): RGB color. Defaults to None.
         """
-        if isinstance(shape, Solid):
-            shape = shape.topods_solid()
-        if isinstance(shape, Face):
-            shape = shape.topods_face()
-        if isinstance(shape, Edge):
-            shape = shape.topods_edge()
-        self._display.DisplayColoredShape(shape, update=update, color=color)
+        return self._display.DisplayMessage(gp_Pnt(xyz[0], xyz[1], xyz[2]), text, height=height, message_color=color)
 
     def on_select(self, callback):
         """
         Callback to execute when a selection is made
 
         Args:
-            callback (function): Called when a selection is made
+            callback (function): Called when a selection is made. Must have signature:
+                                 def callback(selected_shapes, mouse_x, mouse_y)
         """
-        self._display.register_select_callback(callback)
+        def wrapped_callback(selected_shapes, x, y):
+            selected_shapes = self.selected_shapes()
+            selected_shapes = self._convert_to_occwl_types(selected_shapes)
+            return callback(selected_shapes, x, y)
+        self._display.register_select_callback(wrapped_callback)
+
+    def _convert_to_occwl_types(self, shapes):
+        for i in range(len(shapes)):
+            if type(shapes[i]) == TopoDS_Vertex:
+                shapes[i] = Vertex(shapes[i])
+            elif type(shapes[i]) == TopoDS_Edge:
+                shapes[i] = Edge(shapes[i])
+            elif type(shapes[i]) == TopoDS_Face:
+                shapes[i] = Face(shapes[i])
+        return shapes
 
     def selected_shapes(self):
         """
@@ -124,7 +120,7 @@ class Viewer:
             List[TopoDS_Shape]: List of selected shapes
         """
         shapes = self._display.GetSelectedShapes()
-        # FIXME: these should be converted to occwl types
+        shapes = self._convert_to_occwl_types(shapes)
         return shapes
 
     def show(self):
@@ -164,7 +160,7 @@ class Viewer:
         """
         self._add_function_to_menu(menu, callback)
 
-    def exit(self, event=None):
+    def exit(self):
         """
         Exit the viewer
         """
@@ -172,14 +168,14 @@ class Viewer:
 
         sys.exit()
 
-    def perspective(self, event=None):
+    def perspective(self):
         """
         Set perspective camera projection
         """
         self._display.SetPerspectiveProjection()
         self._display.FitAll()
 
-    def orthographic(self, event=None):
+    def orthographic(self):
         """
         Set orthographic camera projection
         """
@@ -204,23 +200,35 @@ class Viewer:
         """
         Allow vertices to be selected
         """
-        self._display.SetSelectionModeVertex()
+        self._display.SetSelectionMode(TopAbs_VERTEX)
 
     def selection_mode_edge(self):
         """
         Allow edges to be selected
         """
-        self._display.SetSelectionModeEdge()
+        self._display.SetSelectionMode(TopAbs_EDGE)
 
     def selection_mode_face(self):
         """
         Allow faces to be selected
         """
-        self._display.SetSelectionModeFace()
+        self._display.SetSelectionMode(TopAbs_FACE)
 
-    def selection_mode_shape(self):
+    def selection_mode_shell(self):
         """
         Allow all shapes to be selected
+        """
+        self._display.SetSelectionMode(TopAbs_SHELL)
+
+    def selection_mode_solid(self):
+        """
+        Allow no shapes to be selected
+        """
+        self._display.SetSelectionMode(TopAbs_SOLID)
+
+    def selection_mode_none(self):
+        """
+        Allow no shapes to be selected
         """
         self._display.SetSelectionModeShape()
 
@@ -237,3 +245,18 @@ class Viewer:
             current_time = str(now)
             filename = current_time + ".png"
         self._display.View.Dump(str(filename))
+
+    def use_rasterization(self):
+        """
+        Render using rasterization
+        """
+        self._display.SetRasterizationMode()
+    
+    def use_raytracing(self, depth=3):
+        """
+        Render using raytracing
+
+        Args:
+            depth (int, optional): Number of bounces for rays Defaults to 3.
+        """
+        self._display.SetRaytracingMode(depth=depth)
