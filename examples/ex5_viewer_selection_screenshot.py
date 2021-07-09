@@ -43,7 +43,7 @@ v.display(cyl, transparency=0.5)
 # Set the selection mode to face
 v.selection_mode_face()
 
-# Tooltip that's displayed when face is clicked on
+# Tooltip that's displayed an entity is clicked on
 tooltip = None
 
 
