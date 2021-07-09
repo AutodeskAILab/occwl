@@ -28,12 +28,12 @@ def dump(event=None):
     v.save_image(filename)
 
 
-# Add menu for screencapture
+# Add menu for selection mode
 v.add_menu("select")
 v.add_submenu("select", select_vertex)
 v.add_submenu("select", select_edge)
 v.add_submenu("select", select_face)
-# Add menu for selection mode
+# Add menu for screencapture
 v.add_menu("screenshot")
 v.add_submenu("screenshot", dump)
 
