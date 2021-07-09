@@ -7,17 +7,21 @@ from occwl.shape import Shape
 from deprecate import deprecated
 import logging
 
+
 class Wire(Shape):
     """
     A topological wire in a solid model
     Represents a closed loop of edges
     """
+
     def __init__(self, topods_wire):
         assert isinstance(topods_wire, TopoDS_Wire)
         super().__init__(topods_wire)
         self._wire_exp = TopologyUtils.WireExplorer(self.topods_shape())
 
-    @deprecated(target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning)
+    @deprecated(
+        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
+    )
     def topods_wire(self):
         """
         Get the underlying OCC wire type

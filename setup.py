@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="occwl", # package name
+    name="occwl",  # package name
     version="0.0.1",
     author="Pradeep Kumar Jayaraman, Joseph G. Lambourne",
     author_email="pradeep.kumar.jayaraman@autodesk.com, joseph.lambourne@autodesk.com",
@@ -17,5 +17,5 @@ setuptools.setup(
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
-    python_requires='>=3.7',
+    python_requires=">=3.7",
 )

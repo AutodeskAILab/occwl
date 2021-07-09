@@ -11,12 +11,25 @@ from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.GProp import GProp_GProps
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
 from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
-from OCC.Core.GeomAbs import GeomAbs_Plane, GeomAbs_Cylinder, GeomAbs_Cone, \
-                             GeomAbs_Sphere, GeomAbs_Torus, GeomAbs_BezierSurface, \
-                             GeomAbs_BSplineSurface, GeomAbs_SurfaceOfRevolution, \
-                             GeomAbs_SurfaceOfExtrusion, GeomAbs_OffsetSurface, \
-                             GeomAbs_OtherSurface, GeomAbs_C0, GeomAbs_C1, GeomAbs_C2, \
-                             GeomAbs_C3, GeomAbs_G1, GeomAbs_G2
+from OCC.Core.GeomAbs import (
+    GeomAbs_Plane,
+    GeomAbs_Cylinder,
+    GeomAbs_Cone,
+    GeomAbs_Sphere,
+    GeomAbs_Torus,
+    GeomAbs_BezierSurface,
+    GeomAbs_BSplineSurface,
+    GeomAbs_SurfaceOfRevolution,
+    GeomAbs_SurfaceOfExtrusion,
+    GeomAbs_OffsetSurface,
+    GeomAbs_OtherSurface,
+    GeomAbs_C0,
+    GeomAbs_C1,
+    GeomAbs_C2,
+    GeomAbs_C3,
+    GeomAbs_G1,
+    GeomAbs_G2,
+)
 
 from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Face
@@ -33,11 +46,13 @@ from occwl.geometry.box import Box
 from deprecate import deprecated
 import logging
 
+
 class Face(Shape):
     """
     A topological face in a solid model
     Represents a 3D surface bounded by a Wire
     """
+
     def __init__(self, topods_face):
         assert isinstance(topods_face, TopoDS_Face)
         super().__init__(topods_face)
@@ -64,9 +79,13 @@ class Face(Shape):
         if not prism.IsDone():
             return None
         if return_first_last_shapes:
-            return Face(prism.Shape()), Edge(prism.FirstShape()), Edge(prism.LastShape())
+            return (
+                Face(prism.Shape()),
+                Edge(prism.FirstShape()),
+                Edge(prism.LastShape()),
+            )
         return Face(prism.Shape())
-    
+
     @staticmethod
     def make_nsided(edges, continuity, points=None):
         """
@@ -109,7 +128,7 @@ class Face(Shape):
             for edg, cont in zip(edges, continuity):
                 occ_cont = str_to_continuity(cont)
                 fill.Add(edg.topods_shape(), occ_cont)
-        
+
         # Add points to contrain shape if provided
         if points:
             for pt in points:
@@ -139,7 +158,7 @@ class Face(Shape):
             OCC.Geom.Handle_Geom_Surface: Interface to all surface geometry
         """
         return BRep_Tool_Surface(self.topods_shape())
-    
+
     def reversed_face(self):
         """
         Return a copy of this face with the orientation reversed.
@@ -206,7 +225,7 @@ class Face(Shape):
             return (geom_utils.gp_to_numpy(dU)), (geom_utils.gp_to_numpy(dV))
         return None, None
 
-    def normal(self,uv):
+    def normal(self, uv):
         """
         Compute the normal of the surface geometry at given parameter
 
@@ -241,7 +260,9 @@ class Face(Shape):
         Returns:
             bool: True if the face is to the left of the edge
         """
-        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=False)
+        top_exp = TopologyUtils.TopologyExplorer(
+            self.topods_shape(), ignore_orientation=False
+        )
         for topo_edge_from_face in top_exp.edges():
             edge_from_face = Edge(topo_edge_from_face)
             if edge == edge_from_face:
@@ -258,7 +279,9 @@ class Face(Shape):
         Returns:
             float: Gaussian curvature
         """
-        return GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).GaussianCurvature()
+        return GeomLProp_SLProps(
+            self.surface(), uv[0], uv[1], 2, 1e-9
+        ).GaussianCurvature()
 
     def min_curvature(self, uv):
         """
@@ -270,7 +293,9 @@ class Face(Shape):
         Returns:
             float: Min. curvature
         """
-        min_curv = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MinCurvature()
+        min_curv = GeomLProp_SLProps(
+            self.surface(), uv[0], uv[1], 2, 1e-9
+        ).MinCurvature()
         if self.reversed():
             min_curv *= -1
         return min_curv
@@ -285,7 +310,9 @@ class Face(Shape):
         Returns:
             float: Mean curvature
         """
-        mean_curv = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MeanCurvature()
+        mean_curv = GeomLProp_SLProps(
+            self.surface(), uv[0], uv[1], 2, 1e-9
+        ).MeanCurvature()
         if self.reversed():
             mean_curv *= -1
         return mean_curv
@@ -300,7 +327,9 @@ class Face(Shape):
         Returns:
             float: Max. curvature
         """
-        max_curv = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9).MaxCurvature()
+        max_curv = GeomLProp_SLProps(
+            self.surface(), uv[0], uv[1], 2, 1e-9
+        ).MaxCurvature()
         if self.reversed():
             max_curv *= -1
         return max_curv
@@ -315,7 +344,7 @@ class Face(Shape):
         geometry_properties = GProp_GProps()
         brepgprop_SurfaceProperties(self.topods_shape(), geometry_properties)
         return geometry_properties.Mass()
-    
+
     def pcurve(self, edge):
         """
         Get the given edge's curve geometry as a 2D parametric curve
@@ -328,7 +357,9 @@ class Face(Shape):
             Geom2d_Curve: 2D curve
             Interval: domain of the parametric curve
         """
-        crv, umin, umax = BRep_Tool().CurveOnSurface(edge.topods_edge(), self.topods_shape())
+        crv, umin, umax = BRep_Tool().CurveOnSurface(
+            edge.topods_edge(), self.topods_shape()
+        )
         return crv, Interval(umin, umax)
 
     def uv_bounds(self):
@@ -342,7 +373,7 @@ class Face(Shape):
         bounds = Box(np.array([umin, vmin]))
         bounds.encompass_point(np.array([umax, vmax]))
         return bounds
-    
+
     def point_to_parameter(self, pt):
         """
         Get the UV parameter by projecting the point on this face
@@ -353,7 +384,9 @@ class Face(Shape):
         Returns:
             np.ndarray: UV-coordinate
         """
-        uv = ShapeAnalysis_Surface(self.surface()).ValueOfUV(gp_Pnt(pt[0], pt[1], pt[2]), 1e-9)
+        uv = ShapeAnalysis_Surface(self.surface()).ValueOfUV(
+            gp_Pnt(pt[0], pt[1], pt[2]), 1e-9
+        )
         return np.array(uv.Coord())
 
     def surface_type(self):
@@ -388,7 +421,9 @@ class Face(Shape):
             return "other"
         return "unknown"
 
-    @deprecated(target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning)
+    @deprecated(
+        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
+    )
     def topods_face(self):
         """
         Get the underlying OCC type
@@ -407,7 +442,7 @@ class Face(Shape):
         """
         sa = ShapeAnalysis_Surface(self.surface())
         return sa.IsUClosed()
-    
+
     def closed_v(self):
         """
         Whether the surface is closed along the V-direction
@@ -427,7 +462,7 @@ class Face(Shape):
         """
         adaptor = BRepAdaptor_Surface(self.topods_shape())
         return adaptor.IsUPeriodic()
-    
+
     def periodic_v(self):
         """
         Whether the surface is periodic along the V-direction
@@ -451,19 +486,19 @@ class Face(Shape):
         """
         location = TopLoc_Location()
         bt = BRep_Tool()
-        facing = (bt.Triangulation(self.topods_shape(), location))
+        facing = bt.Triangulation(self.topods_shape(), location)
         if facing == None:
             return [], []
 
         tab = facing.Nodes()
         tri = facing.Triangles()
         verts = []
-        for i in range(1, facing.NbNodes()+1):
+        for i in range(1, facing.NbNodes() + 1):
             verts.append(np.array(list(tab.Value(i).Coord())))
 
         tris = []
         reversed = self.reversed()
-        for i in range(1, facing.NbTriangles()+1):
+        for i in range(1, facing.NbTriangles() + 1):
             # OCC triangle normals point in the surface normal
             # direction
             if reversed:
@@ -472,5 +507,5 @@ class Face(Shape):
                 index1, index2, index3 = tri.Value(i).Get()
 
             tris.append([index1 - 1, index2 - 1, index3 - 1])
-    
+
         return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int32)

@@ -1,4 +1,3 @@
-
 # PythonOCC
 from OCC.Extend.TopologyUtils import TopologyExplorer, WireExplorer
 
@@ -13,8 +12,8 @@ from occwl.vertex import Vertex
 # Tests
 from tests.test_base import TestBase
 
-class EntityMapperTester(TestBase):
 
+class EntityMapperTester(TestBase):
     def test_entity_mapper(self):
         data_folder = self.test_folder() / "test_data"
         # 100027_258e3965_0.stp fails test check_unique_coedges()
@@ -46,10 +45,11 @@ class EntityMapperTester(TestBase):
             e = Edge(edge)
             mapped_index = entity_mapper.edge_index(e)
             self.assertEqual(mapped_index, index)
-           
 
     def check_oriented_edge_order(self, entity_mapper, solid):
-        oriented_top_exp = TopologyExplorer(solid.topods_solid(), ignore_orientation=False)
+        oriented_top_exp = TopologyExplorer(
+            solid.topods_solid(), ignore_orientation=False
+        )
         index = 0
         for wire in oriented_top_exp.wires():
             wire_exp = WireExplorer(wire)
@@ -73,7 +73,7 @@ class EntityMapperTester(TestBase):
             for oriented_edge in wire.ordered_edges():
                 reversed = oriented_edge.reversed()
                 tup = (oriented_edge, reversed)
-                
+
                 # We want to detect the case where the oriented edges
                 # are not unique
                 if tup in oriented_edge_set:
@@ -82,7 +82,6 @@ class EntityMapperTester(TestBase):
                 oriented_edge_set.add(tup)
 
         return True
-
 
     def run_test(self, solid):
         """

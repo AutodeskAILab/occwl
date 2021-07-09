@@ -29,13 +29,15 @@ def load_step(step_filename):
     return bodies
 
 
-def save_svg(shape,
-             filename,
-             export_hidden_edges=True,
-             location=(0, 0, 0),
-             direction=(1, 1, 1),
-             color="black",
-             line_width=0.1):
+def save_svg(
+    shape,
+    filename,
+    export_hidden_edges=True,
+    location=(0, 0, 0),
+    direction=(1, 1, 1),
+    color="black",
+    line_width=0.1,
+):
     """Saves the shape outline as an SVG file
 
     Args:
@@ -55,10 +57,17 @@ def save_svg(shape,
         shape = shape.topods_edge()
     else:
         raise NotImplementedError
-    svg_string = export_shape_to_svg(shape, filename=filename, export_hidden_edges=export_hidden_edges,
-                                     location=gp_Pnt(*location), direction=gp_Dir(*direction),
-                                     color=color, line_width=line_width,
-                                     margin_left=0, margin_top=0)
+    svg_string = export_shape_to_svg(
+        shape,
+        filename=filename,
+        export_hidden_edges=export_hidden_edges,
+        location=gp_Pnt(*location),
+        direction=gp_Dir(*direction),
+        color=color,
+        line_width=line_width,
+        margin_left=0,
+        margin_top=0,
+    )
 
 
 def save_stl(shape, filename, binary=True):
@@ -71,6 +80,5 @@ def save_stl(shape, filename, binary=True):
         binary (bool, optional): [description]. Defaults to True.
     """
     from OCC.Extend.DataExchange import write_stl_file
-    write_stl_file(shape,
-                   filename,
-                   mode="binary" if binary else "ascii")
+
+    write_stl_file(shape, filename, mode="binary" if binary else "ascii")

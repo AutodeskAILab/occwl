@@ -1,15 +1,14 @@
-
 # System
 import numpy as np
 from pathlib import Path
 
-from occwl.geometry.tri_utils import write_obj 
+from occwl.geometry.tri_utils import write_obj
 
 # Test
 from tests.test_base import TestBase
 
+
 class TriangleTester(TestBase):
-        
     def test_triangles(self):
         data_folder = self.test_folder() / "test_data"
         self.run_test_on_all_files_in_folder(data_folder)

@@ -12,14 +12,14 @@ NOTE:
     EntityMapper.oriented_edge_exists(oriented_edge)
 
     to check if an oriented edge is used by a wire and known to the entity mapper.    
-""" 
+"""
 
 # PythonOCC
 from OCC.Extend.TopologyUtils import TopologyExplorer, WireExplorer
 
 # occwl
 from occwl.solid import Solid
-    
+
 
 class EntityMapper:
     """
@@ -27,6 +27,7 @@ class EntityMapper:
     identifiers which can be used as indices into arrays of feature vectors
     or the rows and columns of incidence matrices. 
     """
+
     def __init__(self, solid):
         """
         Create a mapper object for solid
@@ -43,7 +44,7 @@ class EntityMapper:
         self.edge_map = dict()
         self.oriented_edge_map = dict()
         self.vertex_map = dict()
-    
+
         # Build the index lookup tables
         self._append_faces(solid)
         self._append_wires(solid)
@@ -51,11 +52,10 @@ class EntityMapper:
         self._append_oriented_edges(solid)
         self._append_vertices(solid)
 
-
-    # The following functions are the interface for 
+    # The following functions are the interface for
     # users of the class to access the indices
     # which will reptresent the Open Cascade entities
-    
+
     def get_num_edges(self):
         return len(self.edge_map.keys())
 
@@ -82,20 +82,20 @@ class EntityMapper:
         """
         h = self._get_hash(edge)
         return self.edge_map[h]
-    
+
     def oriented_edge_index(self, oriented_edge):
         """
         Find the index of a oriented edge.  i.e. a coedge
         """
         h = self._get_hash(oriented_edge)
         is_reversed = oriented_edge.reversed()
-        tup = (h,is_reversed)
+        tup = (h, is_reversed)
         return self.oriented_edge_map[tup]
 
     def oriented_edge_exists(self, oriented_edge):
         h = self._get_hash(oriented_edge)
         is_reversed = oriented_edge.reversed()
-        tup = (h,orientation)
+        tup = (h, orientation)
         return tup in self.oriented_edge_map
 
     def vertex_index(self, vertex):
@@ -104,8 +104,6 @@ class EntityMapper:
         """
         h = self._get_hash(vertex)
         return self.vertex_map[h]
-
-
 
     # These functions are used internally to build the map
 
@@ -156,7 +154,7 @@ class EntityMapper:
         h = self._get_hash(oriented_edge)
         orientation = oriented_edge.topods_edge().Orientation()
         is_reversed = oriented_edge.reversed()
-        tup = (h,is_reversed)
+        tup = (h, is_reversed)
         index = len(self.oriented_edge_map)
         if tup in self.oriented_edge_map:
             print("Warning! - The same oriented edge appears twice in the same solid")

@@ -38,7 +38,9 @@ def face_adjacency(solid, self_loops=False):
                 face_i_index = mapper.face_index(face_i)
                 face_j_index = mapper.face_index(face_j)
                 edge_idx = mapper.edge_index(edge)
-                graph.add_edge(face_i_index, face_j_index, edge=edge, edge_index=edge_idx)
+                graph.add_edge(
+                    face_i_index, face_j_index, edge=edge, edge_index=edge_idx
+                )
     return graph
 
 
@@ -78,5 +80,7 @@ def vertex_adjacency(solid, self_loops=False):
                 edge_idx = mapper.edge_index(edge)
                 vert_i_index = mapper.vertex_index(vert_i)
                 vert_j_index = mapper.vertex_index(vert_j)
-                graph.add_edge(vert_i_index, vert_j_index, edge=edge, edge_index=edge_idx)
+                graph.add_edge(
+                    vert_i_index, vert_j_index, edge=edge, edge_index=edge_idx
+                )
     return graph

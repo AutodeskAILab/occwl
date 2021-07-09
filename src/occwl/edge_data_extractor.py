@@ -14,10 +14,12 @@ from OCC.Core.gp import gp_Pnt2d
 from occwl.geometry.interval import Interval
 from occwl.geometry.arc_length_param_finder import ArcLengthParamFinder
 
+
 class EdgeConvexity(Enum):
     CONCAVE = 1
     CONVEX = 2
     SMOOTH = 3
+
 
 class EdgeDataExtractor:
     def __init__(self, edge, faces, num_samples=10, use_arclength_params=True):
@@ -46,8 +48,12 @@ class EdgeDataExtractor:
 
         self.edge = edge
         self.curve3d = edge.curve()
-        self.left_pcurve = BRepAdaptor_Curve2d(edge.topods_edge(), self.left_face.topods_face())
-        self.right_pcurve = BRepAdaptor_Curve2d(edge.topods_edge(), self.right_face.topods_face())
+        self.left_pcurve = BRepAdaptor_Curve2d(
+            edge.topods_edge(), self.left_face.topods_face()
+        )
+        self.right_pcurve = BRepAdaptor_Curve2d(
+            edge.topods_edge(), self.right_face.topods_face()
+        )
 
         # Find the parameters to evaluate.   These will be
         # ordered based on the reverse flag of the edge
@@ -61,20 +67,22 @@ class EdgeDataExtractor:
         self.right_uvs = self._find_uvs(self.right_pcurve)
 
         # Find 3d points and tangents.
-        # These will be ordered and oriented based on the 
+        # These will be ordered and oriented based on the
         # direction of the edge.  i.e. we will apply the reverse
         # flag
         self.points = self._evaluate_3d_points()
         self.tangents = self._evaluate_curve_tangents()
 
         # Generate the normals.  These will be ordered
-        # based on the direction of the edge and the 
+        # based on the direction of the edge and the
         # normals will be reversed based on the orientation
         # of the faces
-        self.left_normals = self._evaluate_surface_normals(self.left_uvs, self.left_face)
-        self.right_normals = self._evaluate_surface_normals(self.right_uvs, self.right_face)
-
-  
+        self.left_normals = self._evaluate_surface_normals(
+            self.left_uvs, self.left_face
+        )
+        self.right_normals = self._evaluate_surface_normals(
+            self.right_uvs, self.right_face
+        )
 
     def edge_convexity(self, angle_tol_rads):
         """
@@ -86,12 +94,13 @@ class EdgeDataExtractor:
             return EdgeConvexity.SMOOTH
 
         cross_prod_of_normals = np.cross(self.left_normals, self.right_normals, axis=1)
-        dot_product_with_tangents = np.multiply(cross_prod_of_normals, self.tangents).sum(1)
+        dot_product_with_tangents = np.multiply(
+            cross_prod_of_normals, self.tangents
+        ).sum(1)
 
         if dot_product_with_tangents.sum() > 0.0:
             return EdgeConvexity.CONVEX
         return EdgeConvexity.CONCAVE
-
 
     def sanity_check_uvs(self, uvs, edge_tolerance):
         """
@@ -104,9 +113,8 @@ class EdgeDataExtractor:
             point = self.edge.point(u)
             point1 = self.left_face.point(left_uv)
             point2 = self.right_face.point(right_uv)
-            assert np.linalg.norm(point-point1) < edge_tolerance
-            assert np.linalg.norm(point-point2) < edge_tolerance
-
+            assert np.linalg.norm(point - point1) < edge_tolerance
+            assert np.linalg.norm(point - point2) < edge_tolerance
 
     """
     Private member functions
@@ -124,9 +132,9 @@ class EdgeDataExtractor:
             return
         params = []
         for i in range(self.num_samples):
-            t = i/(self.num_samples-1)
+            t = i / (self.num_samples - 1)
             params.append(interval.interpolate(t))
-        # Now we need to check the orientation of the edge and 
+        # Now we need to check the orientation of the edge and
         # reverse the array is necessary
         if self.edge.reversed():
             params.reverse()
@@ -137,13 +145,14 @@ class EdgeDataExtractor:
         if not arc_length_finder.good:
             self.good = False
             return
-        arc_length_params = arc_length_finder.find_arc_length_parameters(self.num_samples)
-        # Now we need to check the orientation of the edge and 
+        arc_length_params = arc_length_finder.find_arc_length_parameters(
+            self.num_samples
+        )
+        # Now we need to check the orientation of the edge and
         # reverse the array is necessary
         if self.edge.reversed():
             arc_length_params.reverse()
         return arc_length_params
-
 
     def _find_uvs(self, pcurve):
         uvs = []
@@ -161,14 +170,12 @@ class EdgeDataExtractor:
             points.append(point)
         return np.stack(points)
 
-
     def _evaluate_curve_tangents(self):
         tangents = []
         for u in self.u_params:
             tangent = self.edge.tangent(u)
             tangents.append(tangent)
         return np.stack(tangents)
-
 
     def _evaluate_surface_normals(self, uvs, face):
         normals = []

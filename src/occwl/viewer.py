@@ -10,8 +10,20 @@ from OCC.Core.AIS import (
 )
 from OCC.Core.gp import gp_Pnt, gp_Pnt2d
 from OCC.Display.SimpleGui import init_display
-from OCC.Core.TopAbs import TopAbs_VERTEX, TopAbs_EDGE, TopAbs_FACE, TopAbs_SHELL, TopAbs_SOLID
-from OCC.Core.TopoDS import TopoDS_Vertex, TopoDS_Edge, TopoDS_Face, TopoDS_Shell, TopoDS_Solid
+from OCC.Core.TopAbs import (
+    TopAbs_VERTEX,
+    TopAbs_EDGE,
+    TopAbs_FACE,
+    TopAbs_SHELL,
+    TopAbs_SOLID,
+)
+from OCC.Core.TopoDS import (
+    TopoDS_Vertex,
+    TopoDS_Edge,
+    TopoDS_Face,
+    TopoDS_Shell,
+    TopoDS_Solid,
+)
 from occwl.vertex import Vertex
 from occwl.edge import Edge
 from occwl.face import Face
@@ -82,7 +94,9 @@ class Viewer:
             height (float, optional): Height of the text font. Defaults to None.
             color (tuple of 3 floats, optional): RGB color. Defaults to None.
         """
-        return self._display.DisplayMessage(gp_Pnt(xyz[0], xyz[1], xyz[2]), text, height=height, message_color=color)
+        return self._display.DisplayMessage(
+            gp_Pnt(xyz[0], xyz[1], xyz[2]), text, height=height, message_color=color
+        )
 
     def on_select(self, callback):
         """
@@ -92,9 +106,11 @@ class Viewer:
             callback (function): Called when a selection is made. Must have signature:
                                  def callback(selected_shapes, mouse_x, mouse_y)
         """
+
         def wrapped_callback(selected_shapes, x, y):
             selected_shapes = self._convert_to_occwl_types(selected_shapes)
             return callback(selected_shapes, x, y)
+
         self._display.register_select_callback(wrapped_callback)
 
     def _convert_to_occwl_types(self, shapes):
@@ -246,7 +262,7 @@ class Viewer:
         Render using rasterization
         """
         self._display.SetRasterizationMode()
-    
+
     def use_raytracing(self, depth=3):
         """
         Render using raytracing

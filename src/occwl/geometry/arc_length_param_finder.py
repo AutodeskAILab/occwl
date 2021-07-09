@@ -5,10 +5,10 @@ curve interval or surface iso-parametric curve
 import numpy as np
 
 # occwl
-from occwl.geometry.interval import Interval 
+from occwl.geometry.interval import Interval
+
 
 class ArcLengthParamFinder:
-
     def __init__(self, points=None, us=None, edge=None, num_arc_length_samples=100):
         """
         Create a class to generate arc-length parameters
@@ -32,8 +32,6 @@ class ArcLengthParamFinder:
             assert us is not None
             self.points = points
             self.us = us
-            
-
 
     def find_arc_length_parameters(self, num_samples):
         """
@@ -50,28 +48,28 @@ class ArcLengthParamFinder:
         prev_point = None
         for point in self.points:
             if prev_point is not None:
-                length = np.linalg.norm(point-prev_point)
+                length = np.linalg.norm(point - prev_point)
                 lengths.append(length)
                 total_length += length
             prev_point = point
 
         # Find the cumulative arc length over the points
-        arc_length_fraction = [ 0.0 ]
+        arc_length_fraction = [0.0]
         cumulative_length = 0.0
         for length in lengths:
             cumulative_length += length
-            arc_length_fraction.append(cumulative_length/total_length)
-            
+            arc_length_fraction.append(cumulative_length / total_length)
+
         # Build the arc-length parameterization
         arc_length_params = []
         arc_length_index = 0
         for i in range(num_samples):
-            desired_arc_length_fraction = i/(num_samples-1)
+            desired_arc_length_fraction = i / (num_samples - 1)
 
             # Find the correct span of the polyline
             while arc_length_fraction[arc_length_index] < desired_arc_length_fraction:
                 arc_length_index += 1
-                if arc_length_index >= len(arc_length_fraction)-1:
+                if arc_length_index >= len(arc_length_fraction) - 1:
                     break
 
             # Handle the special case at the first point
@@ -79,28 +77,29 @@ class ArcLengthParamFinder:
                 u_low = self.us[0]
                 frac_low = arc_length_fraction[0]
             else:
-                u_low = self.us[arc_length_index-1]
-                frac_low = arc_length_fraction[arc_length_index-1]
+                u_low = self.us[arc_length_index - 1]
+                frac_low = arc_length_fraction[arc_length_index - 1]
 
-            # Find the arc length parameter by interpolation  
+            # Find the arc length parameter by interpolation
             u_high = self.us[arc_length_index]
             frac_high = arc_length_fraction[arc_length_index]
 
             # Check we found the correct range
             assert desired_arc_length_fraction >= frac_low
             assert desired_arc_length_fraction <= frac_high
-            
-            d_frac = frac_high-frac_low
+
+            d_frac = frac_high - frac_low
             if d_frac <= 0.0:
                 u_param = u_low
             else:
                 u_interval = Interval(u_low, u_high)
-                position_in_interval = (desired_arc_length_fraction-frac_low)/(d_frac)
+                position_in_interval = (desired_arc_length_fraction - frac_low) / (
+                    d_frac
+                )
                 u_param = u_interval.interpolate(position_in_interval)
             arc_length_params.append(u_param)
 
         return arc_length_params
-
 
     def _generate_data_from_edge(self, edge, num_points_arclength):
         interval = edge.u_bounds()
@@ -110,11 +109,9 @@ class ArcLengthParamFinder:
         self.points = []
         self.us = []
         for i in range(num_points_arclength):
-            u = interval.interpolate(i/(num_points_arclength-1))
+            u = interval.interpolate(i / (num_points_arclength - 1))
             self.points.append(edge.point(u))
             self.us.append(u)
-
-
 
     def _check_non_decreasing(self, us):
         prev = us[0]

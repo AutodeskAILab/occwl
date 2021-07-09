@@ -2,12 +2,11 @@ import numpy as np
 
 from occwl.geometry.interval import Interval
 
+
 class Box:
     """A 2d or 3d box for points defined as numpy arrays"""
-    def __init__(
-            self, 
-            pt = None
-        ):
+
+    def __init__(self, pt=None):
         self.intervals = []
         if pt is not None:
             for value in pt:
@@ -24,23 +23,23 @@ class Box:
 
     def encompass_point(self, point):
         if len(self.intervals) == 0:
-            for i, value in enumerate(point): 
+            for i, value in enumerate(point):
                 self.intervals.append(Interval(value, value))
         else:
             assert len(self.intervals) == point.size
-            for i, value in enumerate(point): 
+            for i, value in enumerate(point):
                 self.intervals[i].encompass_value(value)
 
     def contains_point(self, point):
         assert len(self.intervals) == point.size
-        for i, value in enumerate(point): 
+        for i, value in enumerate(point):
             if not self.intervals[i].contains_value(value):
                 return False
         return True
 
     def contains_box(self, box):
         assert len(self.intervals) == len(box.intervals)
-        for i, interval in enumerate(self.intervals): 
+        for i, interval in enumerate(self.intervals):
             if not interval.contains_interval(box.intervals[i]):
                 return False
         return True
@@ -52,7 +51,7 @@ class Box:
     def y_length(self):
         assert len(self.intervals) >= 2
         return self.intervals[1].length()
-        
+
     def z_length(self):
         assert len(self.intervals) >= 2
         return self.intervals[2].length()
@@ -67,7 +66,7 @@ class Box:
 
     def min_point(self):
         return np.array([interval.a for interval in self.intervals])
-        
+
     def max_point(self):
         return np.array([interval.b for interval in self.intervals])
 
@@ -80,4 +79,3 @@ class Box:
     def offset(self, dist):
         for i in range(len(self.intervals)):
             self.intervals[i].offset(dist)
-

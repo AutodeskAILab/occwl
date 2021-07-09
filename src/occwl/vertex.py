@@ -8,11 +8,13 @@ from occwl.geometry import geom_utils
 from occwl.shape import Shape
 from deprecate import deprecated
 
+
 class Vertex(Shape):
     """
     A topological vertex in a solid model
     Represents a 3D geometric point
     """
+
     def __init__(self, topods_vertex):
         """
         Constructor to initialize a vertex from a TodoDS_Vertex
@@ -49,7 +51,9 @@ class Vertex(Shape):
         pt = BRep_Tool.Pnt(self.topods_shape())
         return geom_utils.gp_to_numpy(pt)
 
-    @deprecated(target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning)
+    @deprecated(
+        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
+    )
     def topods_vertex(self):
         """
         Get the underlying OCC type
