@@ -11,6 +11,8 @@ from OCC.Core.AIS import (
 from OCC.Core.gp import gp_Pnt, gp_Pnt2d
 from OCC.Display.SimpleGui import init_display
 from OCC.Core.TopAbs import TopAbs_VERTEX, TopAbs_EDGE, TopAbs_FACE, TopAbs_SHELL, TopAbs_SOLID
+from OCC.Core.TopoDS import TopoDS_Vertex, TopoDS_Edge, TopoDS_Face, TopoDS_Shell, TopoDS_Solid
+from occwl.vertex import Vertex
 from occwl.edge import Edge
 from occwl.face import Face
 from occwl.solid import Solid
@@ -70,7 +72,7 @@ class Viewer:
             shape = shape.topods_face()
         if isinstance(shape, Edge):
             shape = shape.topods_edge()
-        self._display.DisplayShape(
+        return self._display.DisplayShape(
             shape, update=update, color=color, transparency=transparency
         )
 
@@ -84,16 +86,32 @@ class Viewer:
             height (float, optional): Height of the text font. Defaults to None.
             color (tuple of 3 floats, optional): RGB color. Defaults to None.
         """
-        self._display.DisplayMessage(gp_Pnt(xyz[0], xyz[1], xyz[2]), text, height=height, message_color=color)
+        return self._display.DisplayMessage(gp_Pnt(xyz[0], xyz[1], xyz[2]), text, height=height, message_color=color)
 
     def on_select(self, callback):
         """
         Callback to execute when a selection is made
 
         Args:
-            callback (function): Called when a selection is made
+            callback (function): Called when a selection is made. Must have signature:
+                                 def callback(selected_shapes, mouse_x, mouse_y)
         """
-        self._display.register_select_callback(callback)
+        def wrapped_callback(selected_shapes, x, y):
+            selected_shapes = self.selected_shapes()
+            selected_shapes = self._convert_to_occwl_types(selected_shapes)
+            return callback(selected_shapes, x, y)
+        self._display.register_select_callback(wrapped_callback)
+
+    def _convert_to_occwl_types(self, shapes):
+        for i in range(len(shapes)):
+            print(shapes[i])
+            if type(shapes[i]) == TopoDS_Vertex:
+                shapes[i] = Vertex(shapes[i])
+            elif type(shapes[i]) == TopoDS_Edge:
+                shapes[i] = Edge(shapes[i])
+            elif type(shapes[i]) == TopoDS_Face:
+                shapes[i] = Face(shapes[i])
+        return shapes
 
     def selected_shapes(self):
         """
@@ -103,7 +121,7 @@ class Viewer:
             List[TopoDS_Shape]: List of selected shapes
         """
         shapes = self._display.GetSelectedShapes()
-        # FIXME: these should be converted to occwl types
+        shapes = self._convert_to_occwl_types(shapes)
         return shapes
 
     def show(self):
