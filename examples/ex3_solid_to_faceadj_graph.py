@@ -16,24 +16,24 @@ print(f"Number of nodes (faces): {len(g.nodes)}")
 print(f"Number of edges: {len(g.edges)}")
 
 v = Viewer(backend="wx")
+v.display(example, transparency=0.8)
+
 # Get the points at each face's center
 face_centers = {}
-for face in g.nodes():
+for face_idx in g.nodes():
     # Display a sphere for each face's center
+    face = g.nodes[face_idx]["face"]
     parbox = face.uv_bounds()
     umin, vmin = parbox.min_point()
     umax, vmax = parbox.max_point()
     center_uv = (0.5 * (umax - umin), vmin + 0.5 * (vmax - vmin))
     center = face.point(center_uv)
     v.display(Solid.make_sphere(center=center, radius=0.25))
-    # Show the face
-    v.display(face, transparency=0.8)
-    v.display_text(face.bo)
-    face_centers[g.nodes[face]["index"]] = center
+    face_centers[face_idx] = center
 
 for fi, fj in g.edges():
-    pt1 = np.asarray(face_centers[g.nodes[fi]["index"]])
-    pt2 = np.asarray(face_centers[g.nodes[fj]["index"]])
+    pt1 = face_centers[fi]
+    pt2 = face_centers[fj]
     # Make a cylinder for each edge connecting a pair of faces
     up_dir = pt2 - pt1
     height = np.linalg.norm(up_dir)
