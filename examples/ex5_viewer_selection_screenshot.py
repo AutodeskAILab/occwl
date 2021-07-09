@@ -1,9 +1,15 @@
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 import pathlib
-from occwl.viewer import Viewer
-from occwl.solid import Solid
-from occwl.face import Face
+
 from occwl.edge import Edge
+from occwl.face import Face
+from occwl.solid import Solid
 from occwl.vertex import Vertex
+from occwl.viewer import Viewer
+from occwl.io import load_step
 
 v = Viewer(backend="wx")
 
@@ -37,9 +43,9 @@ v.add_submenu("select", select_face)
 v.add_menu("screenshot")
 v.add_submenu("screenshot", dump)
 
-# Display a cylinder
-cyl = Solid.make_cylinder(5, 10)
-v.display(cyl, transparency=0.5)
+# Display a solid
+solid = load_step(pathlib.Path(__file__).resolve().parent.joinpath("example.stp"))[0]
+v.display(solid, transparency=0.5)
 # Set the selection mode to face
 v.selection_mode_face()
 
