@@ -1,6 +1,11 @@
 # System
 import unittest
 
+# Add the src directory to path so that occwl can be found
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
 # OCC
 from tests.test_entity_mapper import EntityMapperTester
 from tests.test_arc_length_param_finder import ArcLengthParamFinderTester

@@ -21,10 +21,10 @@ class GraphTester(TestBase):
         self.run_test_on_all_files_in_folder(data_folder)
 
     def perform_tests_on_solid(self, solid):
-        brep_vertices, brep_edges, vag_edges = vertex_adjacency(solid)
-        print(f"\tVertex Adjacency Graph has {len(brep_vertices)} vertices, {len(vag_edges)} edges")
-        brep_faces, brep_dual_edges, fag_edges = face_adjacency(solid)
-        print(f"\tFace Adjacency Graph has {len(brep_faces)} vertices, {len(fag_edges)} edges")
+        vag = vertex_adjacency(solid)
+        print(f"\tVertex Adjacency Graph has {len(vag.nodes)} vertices, {len(vag.edges)} edges")
+        fag = face_adjacency(solid)
+        print(f"\tFace Adjacency Graph has {len(fag.nodes)} vertices, {len(fag.edges)} edges")
 
     def run_test(self, solid):
         self.perform_tests_on_solid(solid)
