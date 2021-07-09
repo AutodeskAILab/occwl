@@ -301,7 +301,7 @@ class Solid(Shape):
                 new_indices = [index+last_vert_index for index in tri]
                 tris.append(new_indices)
             last_vert_index = len(verts)
-        return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int)
+        return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int32)
 
     def edge_continuity(self, edge):
         """
