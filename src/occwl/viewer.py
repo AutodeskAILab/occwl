@@ -97,7 +97,6 @@ class Viewer:
                                  def callback(selected_shapes, mouse_x, mouse_y)
         """
         def wrapped_callback(selected_shapes, x, y):
-            selected_shapes = self.selected_shapes()
             selected_shapes = self._convert_to_occwl_types(selected_shapes)
             return callback(selected_shapes, x, y)
         self._display.register_select_callback(wrapped_callback)
