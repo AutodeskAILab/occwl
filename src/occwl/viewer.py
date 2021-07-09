@@ -104,7 +104,6 @@ class Viewer:
 
     def _convert_to_occwl_types(self, shapes):
         for i in range(len(shapes)):
-            print(shapes[i])
             if type(shapes[i]) == TopoDS_Vertex:
                 shapes[i] = Vertex(shapes[i])
             elif type(shapes[i]) == TopoDS_Edge:
