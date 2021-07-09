@@ -4,6 +4,8 @@ from occwl.edge import Edge
 from occwl.vertex import Vertex
 
 from occwl.shape import Shape
+from deprecate import deprecated
+import logging
 
 class Wire(Shape):
     """
@@ -15,10 +17,9 @@ class Wire(Shape):
         super().__init__(topods_wire)
         self._wire_exp = TopologyUtils.WireExplorer(self.topods_shape())
 
+    @deprecated(target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning)
     def topods_wire(self):
         """
-        DEPRECATED by Shape.topods_shape()
-        
         Get the underlying OCC wire type
 
         Returns:

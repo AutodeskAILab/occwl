@@ -9,3 +9,4 @@ dependencies:
   - pythonocc-core=7.5.1
   - networkx
   - wxPython
+  - pydeprecate

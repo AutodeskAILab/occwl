@@ -17,6 +17,8 @@ from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 import occwl.geometry.geom_utils as geom_utils
 from occwl.geometry.interval import Interval
 from occwl.shape import Shape
+from deprecate import deprecated
+import logging
 
 class Edge(Shape):
     """
@@ -45,9 +47,10 @@ class Edge(Shape):
             return None
         return Edge(edge_builder.Edge())
 
+    @deprecated(target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning)
     def topods_edge(self):
         """
-        DEPRECATED: Get the underlying OCC type
+        Get the underlying OCC type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Edge: Edge

@@ -2,9 +2,11 @@ from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d
 from OCC.Core.TopoDS import TopoDS_Vertex
 from OCC.Core.BRep import BRep_Tool
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeVertex
+import logging
 
 from occwl.geometry import geom_utils
 from occwl.shape import Shape
+from deprecate import deprecated
 
 class Vertex(Shape):
     """
@@ -47,11 +49,10 @@ class Vertex(Shape):
         pt = BRep_Tool.Pnt(self.topods_shape())
         return geom_utils.gp_to_numpy(pt)
 
+    @deprecated(target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning)
     def topods_vertex(self):
         """
-        DEPRECATED by Shape.topods_shape()
-        
-        Get the underlying OCC vertex type
+        Get the underlying OCC type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Vertex: Vertex

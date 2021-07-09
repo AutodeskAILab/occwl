@@ -30,6 +30,8 @@ from occwl.shape import Shape
 import occwl.geometry.geom_utils as geom_utils
 import occwl.geometry.interval as Interval
 from occwl.geometry.box import Box
+from deprecate import deprecated
+import logging
 
 class Face(Shape):
     """
@@ -386,11 +388,10 @@ class Face(Shape):
             return "other"
         return "unknown"
 
+    @deprecated(target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning)
     def topods_face(self):
         """
-        DEPRECATED by Shape.topods_shape()
-        
-        Get the underlying OCC face type
+        Get the underlying OCC type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Face: Face

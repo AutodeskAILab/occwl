@@ -25,6 +25,8 @@ from occwl.vertex import Vertex
 import occwl.geometry.geom_utils as geom_utils
 from occwl.geometry.box import Box
 from occwl.shape import Shape
+from deprecate import deprecated
+import logging
 
 class Solid(Shape):
     """
@@ -60,9 +62,10 @@ class Solid(Shape):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCylinder
         return Solid(BRepPrimAPI_MakeCylinder(gp_Ax2(gp_Pnt(*base_point), gp_Dir(*up_dir)), radius, height, angle).Shape())
 
+    @deprecated(target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning)
     def topods_solid(self):
         """
-        [DEPRECATED] Get the underlying OCC solid type
+        Get the underlying OCC type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Solid: Solid
