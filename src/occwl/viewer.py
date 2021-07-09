@@ -66,12 +66,8 @@ class Viewer:
                                       'CYAN', 'BLACK', 'ORANGE'. Defaults to None.
             transparency (float, optional): How transparent the shape is. Defaults to 0.0.
         """
-        if isinstance(shape, Solid):
-            shape = shape.topods_solid()
-        if isinstance(shape, Face):
-            shape = shape.topods_face()
-        if isinstance(shape, Edge):
-            shape = shape.topods_edge()
+        if isinstance(shape, (Solid, Face, Edge, Vertex)):
+            shape = shape.topods_shape()
         return self._display.DisplayShape(
             shape, update=update, color=color, transparency=transparency
         )
