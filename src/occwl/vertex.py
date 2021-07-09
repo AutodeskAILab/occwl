@@ -45,7 +45,7 @@ class Vertex(Shape):
             np.ndarray: 3D Point
         """
         pt = BRep_Tool.Pnt(self.topods_shape())
-        return (pt.X(), pt.Y(), pt.Z())
+        return geom_utils.gp_to_numpy(pt)
 
     def topods_vertex(self):
         """
