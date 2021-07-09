@@ -11,6 +11,9 @@ import math
 box = Solid.make_box(10, 10, 10)
 g = vertex_adjacency(box, self_loops=True)
 
+print(f"Number of nodes (vertices): {len(g.nodes)}")
+print(f"Number of edges: {len(g.edges)}")
+
 v = Viewer(backend="wx")
 # Get the points for each vertex
 points = {}
