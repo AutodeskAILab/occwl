@@ -32,8 +32,8 @@ class Solid(Shape):
     """
     def __init__(self, shape):
         assert isinstance(shape, TopoDS_Solid)
-        self._solid = shape
-        self._top_exp = TopologyUtils.TopologyExplorer(self._solid, True)
+        super().__init__(shape)
+        self._top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), True)
 
     @staticmethod
     def make_box(width, height, depth):
@@ -67,16 +67,7 @@ class Solid(Shape):
         Returns:
             OCC.Core.TopoDS.TopoDS_Solid: Solid
         """
-        return self._solid
-    
-    def topods_shape(self):
-        """
-        Get the underlying OCC solid type
-
-        Returns:
-            OCC.Core.TopoDS.TopoDS_Solid: Solid
-        """
-        return self._solid
+        return self.topods_shape()
 
     def vertices(self):
         """
@@ -237,7 +228,7 @@ class Solid(Shape):
             Box: Bounding box
         """
         b = Bnd_Box()
-        brepbndlib_Add(self._solid, b)
+        brepbndlib_Add(self.topods_shape(), b)
         max_corner = b.CornerMax()
         min_corner = b.CornerMin()
 
@@ -268,7 +259,7 @@ class Solid(Shape):
             bool: Is successful
         """
         mesh = BRepMesh_IncrementalMesh(
-            self._solid, 
+            self.topods_shape(), 
             triangle_face_tol, 
             tol_relative_to_face, 
             angle_tol_rads, 
