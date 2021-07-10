@@ -21,7 +21,7 @@ example = Solid.make_cylinder(5, 10)
 g = face_adjacency(example, self_loops=True)
 
 bbox = example.box()
-point_radius = min(bbox.x_length(), bbox.y_length(), bbox.z_length()) * 0.05
+point_radius = min(bbox.x_length(), bbox.y_length(), bbox.z_length()) * 0.03
 arrow_radius = point_radius * 0.85
 arrow_length = arrow_radius * 4
 edge_radius = point_radius * 0.9
@@ -38,7 +38,7 @@ print(f"Number of nodes (faces): {len(g.nodes)}")
 print(f"Number of edges: {len(g.edges)}")
 
 v = Viewer(backend="wx")
-v.display(example, transparency=0.8)
+v.display(example, transparency=0.3)
 
 # Get the points at each face's center for visualizing edges
 face_centers = {}
