@@ -1,6 +1,6 @@
 import numpy as np
 
-from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d
+from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d, gp_Ax2, gp_Circ
 from OCC.Core.BRep import BRep_Tool, BRep_Tool_Curve, BRep_Tool_Continuity
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.BRepGProp import brepgprop_LinearProperties
@@ -54,7 +54,7 @@ class Edge(Shape):
             occwl.Edge: Edge joining the two given vertices
             or None: if error
         """
-        edge_builder = BRepBuilderAPI_MakeEdge(start_point, end_point)
+        edge_builder = BRepBuilderAPI_MakeEdge(geom_utils.to_gp_pnt(start_point), geom_utils.to_gp_pnt(end_point))
         if not edge_builder.IsDone():
             return None
         return Edge(edge_builder.Edge())
@@ -72,7 +72,7 @@ class Edge(Shape):
             occwl.Edge: Edge joining the two given vertices
             or None: if error
         """
-        return Edge.make_from_points(start_vertex.opint(), end_vertex.point())
+        return Edge.make_from_points(start_vertex.point(), end_vertex.point())
 
     @deprecated(
         target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning

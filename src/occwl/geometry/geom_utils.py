@@ -54,7 +54,8 @@ def to_gp_pnt(any_2d_or_3d_type):
     if len(any_2d_or_3d_type) == 3:
         return gp_Pnt(
             float(any_2d_or_3d_type[0]),
-            float(any_2d_or_3d_type[1], float(any_2d_or_3d_type[2])),
+            float(any_2d_or_3d_type[1]),
+            float(any_2d_or_3d_type[2]),
         )
     elif len(any_2d_or_3d_type) == 2:
         return gp_Pnt2d(float(any_2d_or_3d_type[0]), float(any_2d_or_3d_type[1]))
