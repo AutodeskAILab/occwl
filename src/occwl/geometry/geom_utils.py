@@ -66,12 +66,12 @@ def to_gp_pnt(any_2d_or_3d_type):
 
 def to_gp_dir(any_3d_type):
     assert len(any_3d_type) == 3
-    return gp_Dir(float(any_3d_type[0]), float(any_3d_type[1], float(any_3d_type[2])))
+    return gp_Dir(float(any_3d_type[0]), float(any_3d_type[1]), float(any_3d_type[2]))
 
 
 def to_gp_vec(any_3d_type):
     assert len(any_3d_type) == 3
-    return gp_Vec(float(any_3d_type[0]), float(any_3d_type[1], float(any_3d_type[2])))
+    return gp_Vec(float(any_3d_type[0]), float(any_3d_type[1]), float(any_3d_type[2]))
 
 
 def to_gp_axis(point_3d, dir_3d):
