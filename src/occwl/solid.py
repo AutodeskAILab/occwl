@@ -157,31 +157,53 @@ class Solid(Shape):
         """
         Get an iterator to go over the edges in a face
 
+        Args:
+            face (occwl.face.Face): Input face
+
         Returns:
             Iterator[occwl.edge.Edge]: Edge iterator
         """
         assert isinstance(face, Face)
-        return map(Edge, self._top_exp.edges_from_face(face.topods_face()))
+        return map(Edge, self._top_exp.edges_from_face(face.topods_shape()))
 
     def faces_from_edge(self, edge):
         """
         Get an iterator to go over the faces adjacent to an edge
 
+        Args:
+            edge (occwl.edge.Edge): Input edge
+
         Returns:
             Iterator[occwl.face.Face]: Face iterator
         """
         assert isinstance(edge, Edge)
-        return map(Face, self._top_exp.faces_from_edge(edge.topods_edge()))
+        return map(Face, self._top_exp.faces_from_edge(edge.topods_shape()))
 
     def vertices_from_edge(self, edge):
         """
         Get an iterator to go over the vertices bounding an edge
 
+        Args:
+            edge (occwl.edge.Edge): Input edge
+
         Returns:
             Iterator[occwl.vertex.Vertex]: Vertex iterator
         """
         assert isinstance(edge, Edge)
-        return map(Vertex, self._top_exp.vertices_from_edge(edge.topods_edge()))
+        return map(Vertex, self._top_exp.vertices_from_edge(edge.topods_shape()))
+
+    def wires_from_face(self, face) -> Iterator[TopoDS_Wire]:
+        """
+        Get an iterator to go over the wires bounding a face
+
+        Args:
+            face (occwl.face.Face): Input face
+
+        Returns:
+            Iterator[occwl.wire.Wire]: Wire iterator
+        """
+        assert isinstance(face, Face)
+        return map(Wire, self._top_exp.wires_from_face(face.topods_shape()))
 
     def num_faces(self):
         """
