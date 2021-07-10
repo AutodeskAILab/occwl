@@ -74,6 +74,25 @@ class Edge(Shape):
         """
         return Edge.make_from_points(start_vertex.point(), end_vertex.point())
 
+    @staticmethod
+    def make_circle(center, radius, direction=(0, 0, 1)):
+        """
+        Make a circular edge
+
+        Args:
+            center (np.ndarray or list or tuple with 3D point): Center of the circle
+            radius (float): Radius of the circle
+            direction (np.ndarray or list or tuple with 3D unit vector, optional): Normal of the circle's face. Defaults to (0, 0, 1).
+
+        Returns:
+            [type]: [description]
+        """
+        circle = gp_Circ(
+            gp_Ax2(geom_utils.to_gp_pnt(center), geom_utils.to_gp_dir(direction)),
+            radius,
+        )
+        return Edge(BRepBuilderAPI_MakeEdge(circle).Edge())
+
     @deprecated(
         target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
     )
