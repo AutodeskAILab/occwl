@@ -42,6 +42,24 @@ class Edge(Shape):
         super().__init__(topods_edge)
 
     @staticmethod
+    def make_from_points(start_point, end_point):
+        """
+        Make an edge from two given points
+
+        Args:
+            start_point (np.ndarray 3D vector): Starting point
+            end_point (np.ndarray 3D vector): Ending point
+
+        Returns:
+            occwl.Edge: Edge joining the two given vertices
+            or None: if error
+        """
+        edge_builder = BRepBuilderAPI_MakeEdge(start_point, end_point)
+        if not edge_builder.IsDone():
+            return None
+        return Edge(edge_builder.Edge())
+
+    @staticmethod
     def make_from_vertices(start_vertex, end_vertex):
         """
         Make an edge from two given vertices
@@ -54,10 +72,7 @@ class Edge(Shape):
             occwl.Edge: Edge joining the two given vertices
             or None: if error
         """
-        edge_builder = BRepBuilderAPI_MakeEdge(start_vertex.point(), end_vertex.point())
-        if not edge_builder.IsDone():
-            return None
-        return Edge(edge_builder.Edge())
+        return Edge.make_from_points(start_vertex.opint(), end_vertex.point())
 
     @deprecated(
         target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
