@@ -1,50 +1,36 @@
-import numpy as np
+import logging
 
-from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d
-from OCC.Core.BRepTools import breptools_UVBounds
-from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
-from OCC.Core.BRepTopAdaptor import BRepTopAdaptor_FClass2d
+import numpy as np
+from deprecate import deprecated
+from OCC.Core.BRep import BRep_Tool, BRep_Tool_Surface
+from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
+from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeFace
+from OCC.Core.BRepFill import BRepFill_Filling
 from OCC.Core.BRepGProp import brepgprop_SurfaceProperties
-from OCC.Core.BRep import BRep_Tool
-from OCC.Core.BRep import BRep_Tool_Surface
+from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakePrism
+from OCC.Core.BRepTools import breptools_UVBounds
+from OCC.Core.BRepTopAdaptor import BRepTopAdaptor_FClass2d
+from OCC.Core.GeomAbs import (GeomAbs_BezierSurface, GeomAbs_BSplineSurface,
+                              GeomAbs_C0, GeomAbs_C1, GeomAbs_C2, GeomAbs_C3,
+                              GeomAbs_Cone, GeomAbs_Cylinder, GeomAbs_G1,
+                              GeomAbs_G2, GeomAbs_OffsetSurface,
+                              GeomAbs_OtherSurface, GeomAbs_Plane,
+                              GeomAbs_Sphere, GeomAbs_SurfaceOfExtrusion,
+                              GeomAbs_SurfaceOfRevolution, GeomAbs_Torus)
 from OCC.Core.GeomLProp import GeomLProp_SLProps
+from OCC.Core.gp import gp_Dir, gp_Pnt, gp_Pnt2d
 from OCC.Core.GProp import GProp_GProps
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
-from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
-from OCC.Core.GeomAbs import (
-    GeomAbs_Plane,
-    GeomAbs_Cylinder,
-    GeomAbs_Cone,
-    GeomAbs_Sphere,
-    GeomAbs_Torus,
-    GeomAbs_BezierSurface,
-    GeomAbs_BSplineSurface,
-    GeomAbs_SurfaceOfRevolution,
-    GeomAbs_SurfaceOfExtrusion,
-    GeomAbs_OffsetSurface,
-    GeomAbs_OtherSurface,
-    GeomAbs_C0,
-    GeomAbs_C1,
-    GeomAbs_C2,
-    GeomAbs_C3,
-    GeomAbs_G1,
-    GeomAbs_G2,
-)
-
-from OCC.Extend import TopologyUtils
-from OCC.Core.TopoDS import TopoDS_Face
+from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
 from OCC.Core.TopLoc import TopLoc_Location
-from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakePrism
-from OCC.Core.BRepFill import BRepFill_Filling
-
-from occwl.edge import Edge
-from occwl.shape import Shape
+from OCC.Core.TopoDS import TopoDS_Face
+from OCC.Extend import TopologyUtils
 
 import occwl.geometry.geom_utils as geom_utils
 import occwl.geometry.interval as Interval
+from occwl.edge import Edge
 from occwl.geometry.box import Box
-from deprecate import deprecated
-import logging
+from occwl.shape import Shape
 
 
 class Face(Shape):
@@ -136,6 +122,25 @@ class Face(Shape):
         fill.Build()
         face = fill.Face()
         return Face(face)
+
+    @staticmethod
+    def make_from_wires(wires):
+        """
+        Make a face from a PLANAR wires
+
+        Args:
+            wires (List[occwl.wire.Wire]): List of wires
+
+        Returns:
+            occwl.face.Face or None: Returns a Face or None if the operation failed
+        """
+        face_builder = BRepBuilderAPI_MakeFace()
+        for wire in wires:
+            face_builder.Add(wire.topods_shape())
+        face_builder.Build()
+        if not face_builder.IsDone():
+            return None
+        return Face(face_builder.Face())
 
     def inside(self, uv):
         """
