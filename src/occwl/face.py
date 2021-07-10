@@ -110,7 +110,7 @@ class Face(Shape):
             for edg in edges:
                 fill.Add(edg.topods_shape(), occ_continuity)
         elif isinstance(continuity, list):
-            assert len(edges) == len(continuity)
+            assert len(edges) == len(continuity), "Continuity should be provided for each edge"
             for edg, cont in zip(edges, continuity):
                 occ_cont = str_to_continuity(cont)
                 fill.Add(edg.topods_shape(), occ_cont)
