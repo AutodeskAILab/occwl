@@ -87,12 +87,16 @@ class Edge(Shape):
 
         Returns:
             occwl.edge.Edge: Edge
+            or None: if error
         """
         circle = gp_Circ(
             gp_Ax2(geom_utils.to_gp_pnt(center), geom_utils.to_gp_dir(direction)),
             radius,
         )
-        return Edge(BRepBuilderAPI_MakeEdge(circle).Edge())
+        edge_builder = BRepBuilderAPI_MakeEdge(circle)
+        if not edge_builder.IsDone():
+            return None
+        return Edge(edge_builder.Edge())
 
     @staticmethod
     def make_arc_of_circle(pt1, pt2, pt3):
@@ -106,9 +110,13 @@ class Edge(Shape):
 
         Returns:
             occwl.edge.Edge: Edge
+            or None: if error
         """
         arc = GC_MakeArcOfCircle(geom_utils.to_gp_pnt(pt1), geom_utils.to_gp_pnt(pt2), geom_utils.to_gp_pnt(pt3))
-        return Edge(BRepBuilderAPI_MakeEdge(arc).Edge())
+        edge_builder = BRepBuilderAPI_MakeEdge(arc)
+        if not edge_builder.IsDone():
+            return None
+        return Edge(edge_builder.Edge())
 
     @deprecated(
         target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
