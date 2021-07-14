@@ -4,15 +4,13 @@
 
 - Clone OCCWL into a local directory
 - CD into the cloned repository: `cd /path/to/occwl`
-- Create an environment for the test
+- Create an environment
 
 ```
-conda create --name occwltest
-conda activate occwltest
-conda install -c conda-forge pythonocc-core=7.5.1
-conda install numpy
+conda env create -f environment.yml
+conda activate occwl_dev
 ```
-Then you can either use setuptools to install occwl locally.
+Then you can either use setuptools to install occwl locally
 ```
 pip install .
 ```
@@ -25,12 +23,6 @@ To check everything is working run
 ```
 python -m unittest
 ```
-
-Dependencies:
-
-- numpy
-- [pythonocc-core](https://github.com/tpaviot/pythonocc-core)
-- One of PyQt5, PyQt4, PySide, or WxWidgets for the viewer
 
 ## Running the tests
 
@@ -102,6 +94,8 @@ Note the following dependencies will also be automatically installed:
  - pyside2
  - wxpython
  - numpy
+ - networkx
+ - pyDeprecate
 
 However, in Linux platform, pyqt requires an additional system dependency, `libgl1-mesa-glx`, which needs to be installed as follows:
 ```
