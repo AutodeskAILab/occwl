@@ -73,7 +73,7 @@ class Face(Shape):
         return Face(prism.Shape())
 
     @staticmethod
-    def make_nsided(edges, continuity, points=None):
+    def make_nsided(edges, continuity="C0", points=None):
         """
         Make an n-sided fill-in face with the given edges, their continuities, and optionally a
         set of punctual points
@@ -118,7 +118,7 @@ class Face(Shape):
         # Add points to contrain shape if provided
         if points:
             for pt in points:
-                fill.Add(geom_utils.numpy_to_gp(pt))
+                fill.Add(geom_utils.to_gp_pnt(pt))
         fill.Build()
         face = fill.Face()
         return Face(face)
