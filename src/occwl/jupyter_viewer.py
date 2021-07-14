@@ -96,25 +96,16 @@ class MultiSelectJupyterRenderer(JupyterRenderer):
             update (bool): Update the display
         """
         line_cloud_id = "%s" % uuid.uuid4().hex
-        #attributes = {"position": BufferAttribute(points_array, normalized=False)}
-
-        points = np.concatenate([start_arr, end_arr], axis=1)
-        print(points)
-        points = np.reshape(-1, 3)
-        print(points)
-
-        lines = LineSegmentsGeometry(positions=points)
-        mat = LineMaterial(linewidth=line_width, color=edge_color)
-        edge_lines = LineSegments2(lines, mat)
-
-
-        mat = PointsMaterial(color=vertex_color, sizeAttenuation=True, size=vertex_width)
-        geom = BufferGeometry(attributes=attributes)
-        lines = Points(geometry=geom, material=mat, name=line_cloud_id)
+        points = np.stack([start_arr, end_arr], axis=1)       
+        points = np.array(points, dtype=np.float32)    
+        geom = LineSegmentsGeometry(positions=points)
+        mat = LineMaterial(linewidth=line_width, color=line_color)
+        lines = LineSegments2(geom, mat, name=line_cloud_id)
         self._displayed_pickable_objects.add(lines)
 
         if update:
             self.Display()
+
 
 class JupyterViewer:
     """
@@ -242,38 +233,76 @@ class JupyterViewer:
         self, 
         points, 
         normals=None, 
-        vertex_color="red", 
-        vertex_width=5,
-        line_color="blue", 
-        line_width=2,
+        point_color="red", 
+        point_width=4,
         update=False
     ):
         """
-        Display points and optionally normal vectors.
+        Display a set of points
 
         Args:
             points (np.array): Array of points size [ num_points x 3 ] 
         """
         self._renderer.add_points(
-                points, 
-                vertex_color=vertex_color, 
-                vertex_width=vertex_width, 
-                update=update
-            )
-        if normals is not None:
-            mins = np.min(points, axis=0)
-            maxs = np.max(points, axis=0)
-            diag = maxs - mins
-            longest = np.max(diag)
-            line_length = longest/100
-            end_points = points + longest*normals
+            points, 
+            vertex_color=point_color, 
+            vertex_width=point_width, 
+            update=update
+        )
 
-            self._renderer.add_lines(
+
+
+    def display_lines(
+        self, 
+        start_points,
+        end_points,
+        line_color="blue", 
+        line_width=1,
+        update=False
+    ):
+        """
+        Display points a set of points
+
+        Args:
+            start_points (np.array): Array of start_points size [ num_points x 3 ] 
+            end_points (np.array): Array of end_points size [ num_points x 3 ] 
+        """
+        self._renderer.add_lines(
+            start_points,
+            end_points,
+            line_color=line_color, 
+            line_width=line_width, 
+            update=update
+        )
+
+
+    def display_unit_vectors(
+        self, 
+        points,
+        directions,
+        line_color="blue", 
+        line_width=2,
+        update=False
+    ):
+        """
+        Display a set of unit vectors
+
+        Args:
+            points (np.array): Array of points size [ num_points x 3 ] 
+            directions (np.array): Array of directions size [ num_points x 3 ] 
+        """
+        mins = np.min(points, axis=0)
+        maxs = np.max(points, axis=0)
+        diag = maxs - mins
+        longest = np.max(diag)
+        line_length = longest/20
+        end_points = points + directions*line_length
+        self.display_lines(
                 points,
                 end_points,
                 line_color=line_color, 
-                line_width=line_width, 
-                update=update
+                line_width=line_width,
+                update=False
             )
 
 
