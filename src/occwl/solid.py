@@ -56,20 +56,26 @@ class Solid(Shape):
     def make_box(width, height, depth):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
 
-        return Solid(BRepPrimAPI_MakeBox(width, height, depth).Shape())
+        return Solid(
+            BRepPrimAPI_MakeBox(float(width), float(height), float(depth)).Shape()
+        )
 
     @staticmethod
     def make_sphere(radius, center=(0, 0, 0)):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
 
-        return Solid(BRepPrimAPI_MakeSphere(gp_Pnt(*center), radius).Shape())
+        return Solid(
+            BRepPrimAPI_MakeSphere(geom_utils.to_gp_pnt(center), float(radius)).Shape()
+        )
 
     @staticmethod
     def make_spherical_wedge(radius, center=(0, 0, 0), longitudinal_angle=2 * math.pi):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
 
         return Solid(
-            BRepPrimAPI_MakeSphere(gp_Pnt(*center), radius, longitudinal_angle).Shape()
+            BRepPrimAPI_MakeSphere(
+                geom_utils.to_gp_pnt(center), float(radius), float(longitudinal_angle)
+            ).Shape()
         )
 
     @staticmethod
@@ -85,11 +91,11 @@ class Solid(Shape):
 
         return Solid(
             BRepPrimAPI_MakeCone(
-                gp_Ax2(gp_Pnt(*base_point), gp_Dir(*up_dir)),
-                radius_bottom,
-                radius_top,
-                height,
-                apex_angle,
+                gp_Ax2(geom_utils.to_gp_pnt(base_point), geom_utils.to_gp_dir(up_dir)),
+                float(radius_bottom),
+                float(radius_top),
+                float(height),
+                float(apex_angle),
             ).Shape()
         )
 
@@ -101,7 +107,10 @@ class Solid(Shape):
 
         return Solid(
             BRepPrimAPI_MakeCylinder(
-                gp_Ax2(gp_Pnt(*base_point), gp_Dir(*up_dir)), radius, height, angle
+                gp_Ax2(geom_utils.to_gp_pnt(base_point), geom_utils.to_gp_dir(up_dir)),
+                float(radius),
+                float(height),
+                float(angle),
             ).Shape()
         )
 
