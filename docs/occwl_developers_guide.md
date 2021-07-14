@@ -14,11 +14,17 @@ Then you can either use setuptools to install occwl locally
 ```
 pip install .
 ```
-or you can add the full path to the `src/occwl` folder to the `PYTHONPATH` environment variable
+or you can add the full path to the `src/occwl` folder to the `PYTHONPATH` environment variable:
 
+- Linux:
 ```
  export PYTHONPATH=$PYTHONPATH:/path/to/occwl/src/occwl/
 ```
+- Windows:
+```
+set PYTHONPATH=%PYTHONPATH%;path\to\occwl\src\occwl
+```
+
 To check everything is working run 
 ```
 python -m unittest
