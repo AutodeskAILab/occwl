@@ -86,7 +86,7 @@ class Edge(Shape):
             direction (np.ndarray or list or tuple with 3D unit vector, optional): Normal of the circle's face. Defaults to (0, 0, 1).
 
         Returns:
-            [type]: [description]
+            occwl.edge.Edge: Edge
         """
         circle = gp_Circ(
             gp_Ax2(geom_utils.to_gp_pnt(center), geom_utils.to_gp_dir(direction)),
