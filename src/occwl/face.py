@@ -26,6 +26,10 @@ from OCC.Core.TopLoc import TopLoc_Location
 from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Extend import TopologyUtils
 
+from occwl.edge import Edge
+from occwl.shape import Shape
+from occwl.wire import Wire
+
 import occwl.geometry.geom_utils as geom_utils
 import occwl.geometry.interval as Interval
 from occwl.edge import Edge
@@ -141,6 +145,16 @@ class Face(Shape):
         if not face_builder.IsDone():
             return None
         return Face(face_builder.Face())
+
+    def wires(self):
+        """
+        Get an iterator to go over all wires on this face
+
+        Returns:
+            Iterator[occwl.wire.Wire]: Wire iterator
+        """
+        top_exp = TopologyUtils.TopologyExplorer(self.topods_face(), ignore_orientation=False)
+        return map(Wire, top_exp.wires())
 
     def inside(self, uv):
         """
@@ -265,14 +279,25 @@ class Face(Shape):
         Returns:
             bool: True if the face is to the left of the edge
         """
-        top_exp = TopologyUtils.TopologyExplorer(
-            self.topods_shape(), ignore_orientation=False
-        )
-        for topo_edge_from_face in top_exp.edges():
-            edge_from_face = Edge(topo_edge_from_face)
-            if edge == edge_from_face:
-                return edge.reversed() == edge_from_face.reversed()
-        assert False, "Edge doesn't belong to face"
+        found_edge = False
+        for wire in self.wires():
+            for edge_from_face in wire.ordered_edges():
+                if edge == edge_from_face:
+                    if edge.reversed() == edge_from_face.reversed():
+                        return True
+                    else:
+                        # We found the edge, but so far we only found an edge
+                        # with orientation such that the face is on the right
+                        found_edge = True
+
+        # If we didn't find the edge at all then this function was used incorrectly.
+        # To use it you need to pass in a edge around the given face.  Assert and warn 
+        # the user
+        assert found_edge, "Edge doesn't belong to face"
+
+        # We found an edge on the for which this face was on the right hand side,
+        # but not one of the left hand side
+        return False
 
     def gaussian_curvature(self, uv):
         """
