@@ -1,5 +1,8 @@
 import numpy as np
-import math 
+import math
+import sys
+import uuid
+
 from typing import Any, Callable, List, Optional, Tuple
 from OCC.Core.TopoDS import TopoDS_Vertex, TopoDS_Edge, TopoDS_Face, TopoDS_Shell, TopoDS_Solid
 
@@ -15,6 +18,18 @@ from occwl.vertex import Vertex
 from occwl.edge import Edge
 from occwl.face import Face
 from occwl.solid import Solid
+
+# pythreejs
+try:
+    from pythreejs import (CombinedCamera, BufferAttribute, BufferGeometry, Mesh,
+                           LineSegmentsGeometry, LineMaterial, LineSegments2, AmbientLight,
+                           DirectionalLight, Scene, OrbitControls, Renderer,
+                           Picker, Group, GridHelper, Line,
+                           ShaderMaterial, ShaderLib, LineBasicMaterial,
+                           PointsMaterial, Points, LineSegments, make_text)
+except ImportError:
+    print("pythreejs is not installed")
+    sys.exit(0)
 
 class MultiSelectJupyterRenderer(JupyterRenderer):
     """
@@ -52,6 +67,54 @@ class MultiSelectJupyterRenderer(JupyterRenderer):
         except Exception as e:
             self.html.value = f"{str(e)}"
 
+    def add_points(self, points_array, vertex_color="red", vertex_width=5, update=False):
+        """ 
+        Args:
+            points_array (np.array): A numpy array of points [ num_points x 3 ]
+            vertex_color (str): color for the points
+            vertex_width (int): vertex width in pixels
+            update (bool): Update the display
+        """
+        point_cloud_id = "%s" % uuid.uuid4().hex
+        points_array = np.array(points_array, dtype=np.float32)
+        attributes = {"position": BufferAttribute(points_array, normalized=False)}
+        mat = PointsMaterial(color=vertex_color, sizeAttenuation=True, size=vertex_width)
+        geom = BufferGeometry(attributes=attributes)
+        points = Points(geometry=geom, material=mat, name=point_cloud_id)
+        self._displayed_pickable_objects.add(points)
+
+        if update:
+            self.Display()
+
+    def add_lines(self, start_arr, end_arr, line_color="blue", line_width=2, update=False):
+        """ 
+        Args:
+            start_arr (np.array): A numpy array of points [ num_points x 3 ]
+            end_arr (np.array): A numpy array of points [ num_points x 3 ]
+            line_color (str): color for the points
+            vertex_width (int): vertex width in pixels
+            update (bool): Update the display
+        """
+        line_cloud_id = "%s" % uuid.uuid4().hex
+        #attributes = {"position": BufferAttribute(points_array, normalized=False)}
+
+        points = np.concatenate([start_arr, end_arr], axis=1)
+        print(points)
+        points = np.reshape(-1, 3)
+        print(points)
+
+        lines = LineSegmentsGeometry(positions=points)
+        mat = LineMaterial(linewidth=line_width, color=edge_color)
+        edge_lines = LineSegments2(lines, mat)
+
+
+        mat = PointsMaterial(color=vertex_color, sizeAttenuation=True, size=vertex_width)
+        geom = BufferGeometry(attributes=attributes)
+        lines = Points(geometry=geom, material=mat, name=line_cloud_id)
+        self._displayed_pickable_objects.add(lines)
+
+        if update:
+            self.Display()
 
 class JupyterViewer:
     """
@@ -174,6 +237,44 @@ class JupyterViewer:
 
         if update:
             self.show()
+
+    def display_points(
+        self, 
+        points, 
+        normals=None, 
+        vertex_color="red", 
+        vertex_width=5,
+        line_color="blue", 
+        line_width=2,
+        update=False
+    ):
+        """
+        Display points and optionally normal vectors.
+
+        Args:
+            points (np.array): Array of points size [ num_points x 3 ] 
+        """
+        self._renderer.add_points(
+                points, 
+                vertex_color=vertex_color, 
+                vertex_width=vertex_width, 
+                update=update
+            )
+        if normals is not None:
+            mins = np.min(points, axis=0)
+            maxs = np.max(points, axis=0)
+            diag = maxs - mins
+            longest = np.max(diag)
+            line_length = longest/100
+            end_points = points + longest*normals
+
+            self._renderer.add_lines(
+                points,
+                end_points,
+                line_color=line_color, 
+                line_width=line_width, 
+                update=update
+            )
 
 
     def _select_callback(self, topo_ds_shape):
