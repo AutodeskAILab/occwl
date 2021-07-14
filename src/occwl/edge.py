@@ -4,6 +4,7 @@ from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d, gp_Ax2, gp_Circ
 from OCC.Core.BRep import BRep_Tool, BRep_Tool_Curve, BRep_Tool_Continuity
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.BRepGProp import brepgprop_LinearProperties
+from OCC.Core.GC import GC_MakeArcOfCircle
 from OCC.Core.GProp import GProp_GProps
 from OCC.Core.GeomAbs import (
     GeomAbs_Line,
@@ -92,6 +93,22 @@ class Edge(Shape):
             radius,
         )
         return Edge(BRepBuilderAPI_MakeEdge(circle).Edge())
+
+    @staticmethod
+    def make_arc_of_circle(pt1, pt2, pt3):
+        """
+        Make an arc edge
+
+        Args:
+            pt1 (np.ndarray or list or tuple with 3D point): Start point
+            pt2 (np.ndarray or list or tuple with 3D point): Mid (not necessarily at the middle) point
+            pt3 (np.ndarray or list or tuple with 3D point): End point
+
+        Returns:
+            occwl.edge.Edge: Edge
+        """
+        arc = GC_MakeArcOfCircle(geom_utils.to_gp_pnt(pt1), geom_utils.to_gp_pnt(pt2), geom_utils.to_gp_pnt(pt3))
+        return Edge(BRepBuilderAPI_MakeEdge(arc).Edge())
 
     @deprecated(
         target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
