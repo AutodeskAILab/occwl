@@ -42,7 +42,7 @@ class Edge(Shape):
         super().__init__(topods_edge)
 
     @staticmethod
-    def make_from_points(start_point, end_point):
+    def make_line_from_points(start_point, end_point):
         """
         Make an edge from two given points
 
@@ -60,7 +60,7 @@ class Edge(Shape):
         return Edge(edge_builder.Edge())
 
     @staticmethod
-    def make_from_vertices(start_vertex, end_vertex):
+    def make_line_from_vertices(start_vertex, end_vertex):
         """
         Make an edge from two given vertices
 
