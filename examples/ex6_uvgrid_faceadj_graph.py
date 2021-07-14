@@ -1,13 +1,5 @@
-import os
 import pathlib
-import sys
-
 import numpy as np
-
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
-)
-
 from occwl.graph import face_adjacency
 from occwl.io import load_step
 from occwl.solid import Solid

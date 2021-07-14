@@ -1,15 +1,8 @@
-import os
-import sys
 import numpy as np
-
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
-)
-
 from occwl.solid import Solid
 from occwl.viewer import Viewer
 from occwl.graph import face_adjacency
-import math
+
 
 example = Solid.make_box(10, 10, 10)
 # example = Solid.make_sphere(10, (0, 0, 0))
