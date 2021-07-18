@@ -91,7 +91,7 @@ class Edge(Shape):
         """
         circle = gp_Circ(
             gp_Ax2(geom_utils.to_gp_pnt(center), geom_utils.to_gp_dir(direction)),
-            radius,
+            float(radius),
         )
         edge_builder = BRepBuilderAPI_MakeEdge(circle)
         if not edge_builder.IsDone():
@@ -112,7 +112,7 @@ class Edge(Shape):
             occwl.edge.Edge: Edge
             or None: if error
         """
-        arc = GC_MakeArcOfCircle(geom_utils.to_gp_pnt(pt1), geom_utils.to_gp_pnt(pt2), geom_utils.to_gp_pnt(pt3))
+        arc = GC_MakeArcOfCircle(geom_utils.to_gp_pnt(pt1), geom_utils.to_gp_pnt(pt2), geom_utils.to_gp_pnt(pt3)).Value()
         edge_builder = BRepBuilderAPI_MakeEdge(arc)
         if not edge_builder.IsDone():
             return None
