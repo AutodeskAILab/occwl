@@ -33,6 +33,15 @@ def load_step(step_filename):
 
 
 def save_step(list_of_solids, filename):
+    """Save solids into a STEP file
+
+    Args:
+        list_of_solids (List[occwl.solid.Solid]): List of solids
+        filename (pathlib.Path or str): Output STEP file name
+
+    Returns:
+        bool: Whether successful
+    """
     step_writer = STEPControl_Writer()
     Interface_Static_SetCVal("write.step.schema", "AP203")
     for solid in list_of_solids:
