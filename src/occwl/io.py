@@ -6,6 +6,9 @@ from occwl.geometry import geom_utils
 from OCC.Extend.DataExchange import export_shape_to_svg
 from OCC.Extend import TopologyUtils
 from OCC.Core.gp import gp_Pnt, gp_Dir
+from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
+from OCC.Core.Interface import Interface_Static_SetCVal
+from OCC.Core.IFSelect import IFSelect_RetDone
 
 
 def load_step(step_filename):
@@ -27,6 +30,16 @@ def load_step(step_filename):
     for body in exp.solids():
         bodies.append(Solid(body))
     return bodies
+
+
+def save_step(list_of_solids, filename):
+    step_writer = STEPControl_Writer()
+    Interface_Static_SetCVal("write.step.schema", "AP203")
+    for solid in list_of_solids:
+        assert isinstance(solid, Solid)
+        step_writer.Transfer(solid.topods_shape(), STEPControl_AsIs)
+    status = step_writer.Write(str(filename))
+    return status == IFSelect_RetDone
 
 
 def save_svg(
