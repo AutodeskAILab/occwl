@@ -18,9 +18,7 @@ from occwl.geometry.arc_length_param_finder import ArcLengthParamFinder
 from tests.test_base import TestBase
 
 
-
 class ArcLengthParamFinderTester(TestBase):
-
     def test_arc_length_param_finder(self):
         # Create an edge with a non-linear parametrization
         array = []
@@ -32,7 +30,7 @@ class ArcLengthParamFinderTester(TestBase):
 
         pt_list1 = point_list_to_TColgp_Array1OfPnt(array)
         bspline = GeomAPI_PointsToBSpline(pt_list1).Curve()
-        edge = Edge(BRepBuilderAPI_MakeEdge(bspline).Edge())        
+        edge = Edge(BRepBuilderAPI_MakeEdge(bspline).Edge())
 
         arc_length_finder = ArcLengthParamFinder(edge=edge, num_arc_length_samples=100)
         us = arc_length_finder.find_arc_length_parameters(10)
@@ -48,24 +46,22 @@ class ArcLengthParamFinderTester(TestBase):
         lengths = np.array(lengths)
         min_lengths = lengths.min()
         max_lengths = lengths.max()
-        length_deviation = max_lengths-min_lengths
+        length_deviation = max_lengths - min_lengths
         eps = 5e-2
         self.assertLess(length_deviation, eps)
-                
-        
 
     def find_arc_length(self, edge, umin, umax):
         num_samples = 1000
         interval = Interval(umin, umax)
         points = []
         for i in range(num_samples):
-            t = i/(num_samples-1)
+            t = i / (num_samples - 1)
             u = interval.interpolate(t)
             points.append(edge.point(u))
         length = 0
         last_point = None
         for point in points:
             if last_point is not None:
-                length += np.linalg.norm(point-last_point)
+                length += np.linalg.norm(point - last_point)
             last_point = point
         return length

@@ -1,4 +1,3 @@
-
 # System
 import numpy as np
 
@@ -13,8 +12,8 @@ from occwl.edge import Edge
 # Test
 from tests.test_base import TestBase
 
-class EdgeTester(TestBase):
 
+class EdgeTester(TestBase):
     def test_edge(self):
         data_folder = self.test_folder() / "test_data"
         self.run_test_on_all_files_in_folder(data_folder)
@@ -29,13 +28,13 @@ class EdgeTester(TestBase):
 
         length = edge.length()
         self.assertGreaterEqual(length, 0)
-        
+
         bound = edge.u_bounds()
         self.assertTrue(isinstance(bound, Interval))
 
         num_samples = 10
         for i in range(num_samples):
-            t = i/(num_samples-1)
+            t = i / (num_samples - 1)
             pt = edge.point(t)
             self.assertTrue(isinstance(pt, np.ndarray))
             tangent = edge.tangent(t)
@@ -53,16 +52,18 @@ class EdgeTester(TestBase):
 
     def test_closed(self):
         block_hole = self.load_single_solid_from_test_data("Block_hole.step")
-        closed_edge = block_hole.find_closest_edge_slow(np.array([16.893010, 26.381480, 20.000000]))
+        closed_edge = block_hole.find_closest_edge_slow(
+            np.array([16.893010, 26.381480, 20.000000])
+        )
         self.assertTrue(closed_edge.closed_edge())
         self.assertTrue(closed_edge.closed_curve())
 
         fillet1 = self.load_single_solid_from_test_data("block_fillet1.step")
-        closed_curve_edge = fillet1.find_closest_edge_slow(np.array([0.000000, 4.393398, 35.606602]))
+        closed_curve_edge = fillet1.find_closest_edge_slow(
+            np.array([0.000000, 4.393398, 35.606602])
+        )
         self.assertFalse(closed_curve_edge.closed_edge())
         self.assertTrue(closed_curve_edge.closed_curve())
-
-        
 
     def _test_closed_periodic(self):
         # Circle
@@ -75,7 +76,9 @@ class EdgeTester(TestBase):
         self.assertTrue(is_closed)
         self.assertTrue(is_periodic)
         # Line segment
-        line = BRepBuilderAPI_MakeEdge(GC_MakeSegment(gp_Pnt(0, 0, 0), gp_Pnt(1, 1, 1)).Value()).Edge()
+        line = BRepBuilderAPI_MakeEdge(
+            GC_MakeSegment(gp_Pnt(0, 0, 0), gp_Pnt(1, 1, 1)).Value()
+        ).Edge()
         line = Edge(line)
         is_closed = line.closed_curve()
         is_periodic = line.periodic()
@@ -88,7 +91,7 @@ class EdgeTester(TestBase):
         curve_type = circle.curve_type()
         self.assertTrue(isinstance(curve_type, str))
         self.assertTrue(curve_type == "circle")
-    
+
     def _test_specific_curve(self, edge):
         if edge.has_curve():
             crv = edge.specific_curve()

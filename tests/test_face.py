@@ -1,12 +1,11 @@
-
 # System
 import numpy as np
 
 # Test
 from tests.test_base import TestBase
 
+
 class FaceTester(TestBase):
-        
     def test_face(self):
         data_folder = self.test_folder() / "test_data"
         self.run_test_on_all_files_in_folder(data_folder)

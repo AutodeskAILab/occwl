@@ -1,14 +1,15 @@
 import sys
 
+
 class Interval:
     def __init__(self, a=sys.float_info.max, b=-sys.float_info.max):
-        if a==sys.float_info.max  or a < b:
+        if a == sys.float_info.max or a < b:
             self.a = a
             self.b = b
         else:
             self.a = b
             self.b = a
-            
+
     def invalid(self):
         """
         An invalid interval is uninitialized.
@@ -39,17 +40,16 @@ class Interval:
         assert interval.a <= interval.b
         return self.a <= interval.a and interval.b <= self.b
 
-
     def length(self):
         assert not self.invalid()
-        l = self.b-self.a
+        l = self.b - self.a
         if l < 0.0:
             return 0.0
         return l
 
     def middle(self):
         assert not self.invalid()
-        return (self.a+self.b)/2.0
+        return (self.a + self.b) / 2.0
 
     def interpolate(self, t):
         """Return a position inside the interval 
@@ -59,7 +59,7 @@ class Interval:
            If 0<t<1 then return a value inside the interval
         """
         assert not self.invalid()
-        return (1.0-t)*self.a + t*self.b
+        return (1.0 - t) * self.a + t * self.b
 
     def offset(self, dist):
         assert not self.invalid()

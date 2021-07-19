@@ -1,29 +1,53 @@
 from OCC.Core.TopoDS import TopoDS_Wire
+from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeWire
 from OCC.Extend import TopologyUtils
 from occwl.edge import Edge
 from occwl.vertex import Vertex
 
 from occwl.shape import Shape
+from deprecate import deprecated
+import logging
+
 
 class Wire(Shape):
     """
     A topological wire in a solid model
     Represents a closed loop of edges
     """
+
     def __init__(self, topods_wire):
-        assert isinstance(topods_wire, TopoDS_Wire)
-        self._wire = topods_wire
-        self._wire_exp = TopologyUtils.WireExplorer(self._wire)
-        
-    def topods_shape(self):
         """
-        Get the underlying OCC wire as a shape
+        Construct a Wire
+
+        Args:
+            topods_wire (OCC.Core.TopoDS_Wire): OCC wire type
+        """
+        assert isinstance(topods_wire, TopoDS_Wire)
+        super().__init__(topods_wire)
+        self._wire_exp = TopologyUtils.WireExplorer(self.topods_shape())
+
+    @staticmethod
+    def make_from_edges(edges):
+        """
+        Make a wire from connected edges
+
+        Args:
+            edges (List[occwl.edge.Edge]): List of edges
 
         Returns:
-            OCC.Core.TopoDS.TopoDS_Wire: Wire
+            occwl.wire.Wire or None: Returns a Wire or None if the operation failed
         """
-        return self._wire
+        wire_builder = BRepBuilderAPI_MakeWire()
+        for edge in edges:
+            wire_builder.Add(edge.topods_shape())
+        wire_builder.Build()
+        if not wire_builder.IsDone():
+            return None
+        return Wire(wire_builder.Wire())
 
+    @deprecated(
+        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
+    )
     def topods_wire(self):
         """
         Get the underlying OCC wire type
@@ -31,22 +55,7 @@ class Wire(Shape):
         Returns:
             OCC.Core.TopoDS.TopoDS_Wire: Wire
         """
-        return self._wire
-
-    def __hash__(self):
-        """
-        Hash for the wire
-
-        Returns:
-            int: Hash value
-        """
-        return self.topods_wire().__hash__()
-    
-    def __eq__(self, other):
-        """
-        Equality check for the wire
-        """
-        return self.topods_wire().__hash__() == other.topods_wire().__hash__()
+        return self.topods_shape()
 
     def ordered_edges(self):
         """

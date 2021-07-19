@@ -1,15 +1,14 @@
-
 # System
 import numpy as np
 from pathlib import Path
 
-from occwl.geometry.tri_utils import write_obj 
+from occwl.geometry.tri_utils import write_obj
 
 # Test
 from tests.test_base import TestBase
 
+
 class TriangleTester(TestBase):
-        
     def test_triangles(self):
         data_folder = self.test_folder() / "test_data"
         self.run_test_on_all_files_in_folder(data_folder)
@@ -18,7 +17,7 @@ class TriangleTester(TestBase):
         self.assertTrue(verts.shape[1] == 3)
         self.assertTrue(verts.dtype == np.float32)
         self.assertTrue(tris.shape[1] == 3)
-        self.assertTrue(tris.dtype == np.int)
+        self.assertTrue(tris.dtype == np.int32)
         self.assertTrue(np.all(tris < len(verts)))
 
     def run_test_with_pathname(self, file, solid):

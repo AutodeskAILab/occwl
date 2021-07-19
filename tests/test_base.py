@@ -8,21 +8,21 @@ import numpy as np
 # OCC
 from occwl.io import load_step
 
-class TestBase(unittest.TestCase):
 
+class TestBase(unittest.TestCase):
     def test_folder(self):
         return Path(os.path.dirname(__file__))
 
     def load_single_solid_from_test_data(self, filename):
-        solid_pathname = self.test_folder() / "test_data" /filename
+        solid_pathname = self.test_folder() / "test_data" / filename
         self.assertTrue(solid_pathname.exists())
         solids = load_step(solid_pathname)
         self.assertEqual(len(solids), 1)
         return solids[0]
 
     def run_test_on_all_files_in_folder(self, folder):
-        step_files = [ f for f in folder.glob("**/*.step")]
-        stp_files = [ f for f in folder.glob("**/*.stp")]
+        step_files = [f for f in folder.glob("**/*.step")]
+        stp_files = [f for f in folder.glob("**/*.stp")]
         step_files.extend(stp_files)
 
         if len(step_files) == 0:
@@ -31,13 +31,13 @@ class TestBase(unittest.TestCase):
         for file in step_files:
             print(f"Running tests for {file.stem}{file.suffix}")
             solids = load_step(file)
-            for solid in solids: 
+            for solid in solids:
                 self.run_test_with_pathname(file, solid)
 
     def run_test_on_solid_from_filename(self, filename):
         solid = self.load_single_solid_from_test_data(filename)
         self.run_test(solid)
-        
+
     def run_test_with_pathname(self, file, solid):
         self.run_test(solid)
 
@@ -48,7 +48,6 @@ class TestBase(unittest.TestCase):
             return None
 
         return vec / length
-
 
     def angle_between_vectors(self, v1, v2):
         """

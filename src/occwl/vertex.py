@@ -1,14 +1,20 @@
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d
 from OCC.Core.TopoDS import TopoDS_Vertex
 from OCC.Core.BRep import BRep_Tool
+from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeVertex
+import logging
 
+from occwl.geometry import geom_utils
 from occwl.shape import Shape
+from deprecate import deprecated
+
 
 class Vertex(Shape):
     """
     A topological vertex in a solid model
     Represents a 3D geometric point
     """
+
     def __init__(self, topods_vertex):
         """
         Constructor to initialize a vertex from a TodoDS_Vertex
@@ -17,31 +23,23 @@ class Vertex(Shape):
             topods_vertex (OCC.Core.TopoDS.TopoDS_Vertex): OCC Vertex
         """
         assert isinstance(topods_vertex, TopoDS_Vertex)
-        self._vertex = topods_vertex
+        super().__init__(topods_vertex)
 
-    def topods_shape(self):
+    @staticmethod
+    def make_vertex(point):
         """
-        Get the underlying OCC vertex as a shape
-
+        Create a vertex from a 3D point
+        
+        Args:
+            point (np.ndarray): 3D Point
+        
         Returns:
-            OCC.Core.TopoDS.TopoDS_Vertex: Vertex
+            occwl.Vertex: Vertex representing the 3D point
         """
-        return self._vertex
-
-    def __hash__(self):
-        """
-        Hash for the vertex
-
-        Returns:
-            int: Hash value
-        """
-        return self.topods_vertex().__hash__()
-    
-    def __eq__(self, other):
-        """
-        Equality check for the vertex
-        """
-        return self.topods_vertex().__hash__() == other.topods_vertex().__hash__()
+        occ_point = geom_utils.numpy_to_gp(point)
+        vertex_maker = BRepBuilderAPI_MakeVertex(occ_point)
+        vertex = vertex_maker.Shape()
+        return Vertex(vertex)
 
     def point(self):
         """
@@ -50,14 +48,17 @@ class Vertex(Shape):
         Returns:
             np.ndarray: 3D Point
         """
-        pt = BRep_Tool.Pnt(self.topods_vertex())
-        return (pt.X(), pt.Y(), pt.Z())
+        pt = BRep_Tool.Pnt(self.topods_shape())
+        return geom_utils.gp_to_numpy(pt)
 
+    @deprecated(
+        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
+    )
     def topods_vertex(self):
         """
-        Get the underlying OCC vertex type
+        Get the underlying OCC type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Vertex: Vertex
         """
-        return self._vertex
+        return self.topods_shape()

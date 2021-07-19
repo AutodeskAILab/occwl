@@ -1,5 +1,5 @@
 def write_obj(pathname, verts, tris):
-    
+
     # Write the mesh to OBJ
     with open(pathname, "w") as fh:
         fh.write("# WaveFront *.obj file\n")

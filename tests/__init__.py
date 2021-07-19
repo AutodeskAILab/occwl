@@ -11,4 +11,3 @@ from tests.test_edge import EdgeTester
 from tests.test_face import FaceTester
 from tests.test_get_triangles import TriangleTester
 from tests.test_graph import GraphTester
-

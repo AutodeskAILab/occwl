@@ -1,8 +1,7 @@
 from occwl.solid import Solid
-from occwl.face import Face
-from occwl.edge import Edge
-#from occwl.vertex import Vertex
 import itertools
+import networkx as nx
+from occwl.entity_mapper import EntityMapper
 
 
 def face_adjacency(solid, self_loops=False):
@@ -14,36 +13,35 @@ def face_adjacency(solid, self_loops=False):
         self_loops (bool, optional): Whether to add self loops in the graph. Defaults to False.
         
     Returns:
-        List[occwl.face.Face]: list of faces
-        Dict[(int, int), occwl.edge.Edge]: mapping from face pairs to edge that lies in-between them
-        List[(int, int)]: Indices into the face list; can be used as keys in the edge dict.
+        nx.Graph: Each B-rep face is mapped to a node with its index and each B-rep edge is mapped to an edge in the graph
+                  Node attributes:
+                  - "face": contains the B-rep face
+                  Edge attributes:
+                  - "edge": contains the B-rep edge
+                  - "edge_idx": index of the edge in the solid
     """
     assert isinstance(solid, Solid)
-    face2ind = {}
-    nodes = []
-    edges = {}
-    connectivity = []
-    for i, face in enumerate(solid.faces()):
-        face2ind[face] = i
-        nodes.append(face)
+    mapper = EntityMapper(solid)
+    graph = nx.Graph()
+    for face in solid.faces():
+        face_idx = mapper.face_index(face)
+        graph.add_node(face_idx, face=face)
 
-    for ei in solid.edges():
-        connected_faces = list(solid.faces_from_edge(ei))
+    for edge in solid.edges():
+        connected_faces = list(solid.faces_from_edge(edge))
         if len(connected_faces) < 2:
-            if ei.seam(connected_faces[0]) and self_loops:
-                connectivity.append((connected_faces[0], connected_faces[0]))
-                edges[(connected_faces[0], connected_faces[0])] = ei
+            if edge.seam(connected_faces[0]) and self_loops:
+                face_idx = mapper.face_index(connected_faces[0])
+                graph.add_edge(face_idx, face_idx)
         else:
-            for (fi, fj) in itertools.permutations(connected_faces):
-                ind1 = face2ind[fi]
-                ind2 = face2ind[fj]
-                if not self_loops:
-                    if ind1 == ind2:
-                        continue
-                connectivity.append((min(ind1, ind2), max(ind1, ind2)))
-                edges[(ind1, ind2)] = ei
-    connectivity = list(set(connectivity))
-    return nodes, edges, connectivity
+            for (face_i, face_j) in itertools.permutations(connected_faces):
+                face_i_index = mapper.face_index(face_i)
+                face_j_index = mapper.face_index(face_j)
+                edge_idx = mapper.edge_index(edge)
+                graph.add_edge(
+                    face_i_index, face_j_index, edge=edge, edge_index=edge_idx
+                )
+    return graph
 
 
 def vertex_adjacency(solid, self_loops=False):
@@ -55,35 +53,34 @@ def vertex_adjacency(solid, self_loops=False):
         self_loops (bool, optional): Whether to add self loops in the graph. Defaults to False.
     
     Returns:
-        List[occwl.vertex.Vertex]: list of vertices
-        Dict[(int, int), occwl.edge.Edge]: mapping from vertex pairs to edge that lies in-between them
-        List[(int, int)]: Indices into the vertex list; can be used as keys in the edge dict.
+        nx.Graph: Each B-rep vertex is mapped to a node with its index and each B-rep edge is mapped to an edge in the graph
+                  Node attributes:
+                  - "vertex": contains the B-rep vertex
+                  Edge attributes:
+                  - "edge": contains the B-rep edge
+                  - "edge_idx": index of the edge in the solid
     """
     assert isinstance(solid, Solid)
-    vert2ind = {}
-    nodes = []
-    edges = {}
-    connectivity = []
-    for i, vert in enumerate(solid.vertices()):
-        vert2ind[vert] = i
-        nodes.append(vert)
+    mapper = EntityMapper(solid)
+    graph = nx.Graph()
+    for vert in solid.vertices():
+        vert_idx = mapper.vertex_index(vert)
+        graph.add_node(vert_idx, vertex=vert)
 
-    for ei in solid.edges():
-        connected_verts = list(solid.vertices_from_edge(ei))
-        if not ei.has_curve():
+    for edge in solid.edges():
+        connected_verts = list(solid.vertices_from_edge(edge))
+        if not edge.has_curve():
             continue
         if len(connected_verts) < 2:
-            if ei.closed_edge():
-                connected_verts.append(connected_verts[-1])
-            else:
-                continue
-        for (vi, vj) in itertools.permutations(connected_verts):
-            ind1 = vert2ind[vi]
-            ind2 = vert2ind[vj]
-            if not self_loops:
-                if ind1 == ind2:
-                    continue
-            connectivity.append((min(ind1, ind2), max(ind1, ind2)))
-            edges[(ind1, ind2)] = ei
-    connectivity = list(set(connectivity))
-    return nodes, edges, connectivity
+            if edge.closed_edge() and self_loops:
+                vert_idx = mapper.vertex_index(connected_verts[0])
+                graph.add_edge(vert_idx, vert_idx)
+        else:
+            for (vert_i, vert_j) in itertools.permutations(connected_verts):
+                edge_idx = mapper.edge_index(edge)
+                vert_i_index = mapper.vertex_index(vert_i)
+                vert_j_index = mapper.vertex_index(vert_j)
+                graph.add_edge(
+                    vert_i_index, vert_j_index, edge=edge, edge_index=edge_idx
+                )
+    return graph

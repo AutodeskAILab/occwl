@@ -1,17 +1,30 @@
 import numpy as np
 from typing import Any, Iterable, Iterator, List, Optional, Tuple
 
-from OCC.Core.TopoDS import (topods, TopoDS_Wire, TopoDS_Vertex, TopoDS_Edge,
-                             TopoDS_Face, TopoDS_Shell, TopoDS_Solid, TopoDS_Shape,
-                             TopoDS_Compound, TopoDS_CompSolid, topods_Edge,
-                             topods_Vertex, TopoDS_Iterator)
+from OCC.Core.TopoDS import (
+    topods,
+    TopoDS_Wire,
+    TopoDS_Vertex,
+    TopoDS_Edge,
+    TopoDS_Face,
+    TopoDS_Shell,
+    TopoDS_Solid,
+    TopoDS_Shape,
+    TopoDS_Compound,
+    TopoDS_CompSolid,
+    topods_Edge,
+    topods_Vertex,
+    TopoDS_Iterator,
+)
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
 from OCC.Core.Bnd import Bnd_Box
 from OCC.Core.BRepBndLib import brepbndlib_Add
 from OCC.Extend import TopologyUtils
-from OCC.Core.BRepGProp import (brepgprop_LinearProperties,
-                                brepgprop_SurfaceProperties,
-                                brepgprop_VolumeProperties)
+from OCC.Core.BRepGProp import (
+    brepgprop_LinearProperties,
+    brepgprop_SurfaceProperties,
+    brepgprop_VolumeProperties,
+)
 from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
 from OCC.Core.GProp import GProp_GProps
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1
@@ -25,49 +38,93 @@ from occwl.vertex import Vertex
 import occwl.geometry.geom_utils as geom_utils
 from occwl.geometry.box import Box
 from occwl.shape import Shape
+from deprecate import deprecated
+import logging
+
 
 class Solid(Shape):
     """
     A solid model
     """
+
     def __init__(self, shape):
         assert isinstance(shape, TopoDS_Solid)
-        self._solid = shape
-        self._top_exp = TopologyUtils.TopologyExplorer(self._solid, True)
+        super().__init__(shape)
+        self._top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), True)
 
     @staticmethod
     def make_box(width, height, depth):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
-        return Solid(BRepPrimAPI_MakeBox(width, height, depth).Shape())
+
+        return Solid(
+            BRepPrimAPI_MakeBox(float(width), float(height), float(depth)).Shape()
+        )
 
     @staticmethod
     def make_sphere(radius, center=(0, 0, 0)):
         from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
-        return Solid(BRepPrimAPI_MakeSphere(gp_Pnt(*center), radius).Shape())
-    
-    @staticmethod
-    def make_spherical_wedge(radius, center=(0, 0, 0), longitudinal_angle=2*math.pi):
-        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
-        return Solid(BRepPrimAPI_MakeSphere(gp_Pnt(*center), radius, longitudinal_angle).Shape())
-    
-    @staticmethod
-    def make_cone(radius_bottom, radius_top, height, apex_angle=2*math.pi, base_point=(0, 0, 0), up_dir=(0, 0, 1)):
-        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCone
-        return Solid(BRepPrimAPI_MakeCone(gp_Ax2(gp_Pnt(*base_point), gp_Dir(*up_dir)), radius_bottom, radius_top, height, apex_angle).Shape())
-    
-    @staticmethod
-    def make_cylinder(radius, height, angle=2*math.pi, base_point=(0, 0, 0), up_dir=(0, 0, 1)):
-        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCylinder
-        return Solid(BRepPrimAPI_MakeCylinder(gp_Ax2(gp_Pnt(*base_point), gp_Dir(*up_dir)), radius, height, angle).Shape())
 
+        return Solid(
+            BRepPrimAPI_MakeSphere(geom_utils.to_gp_pnt(center), float(radius)).Shape()
+        )
+
+    @staticmethod
+    def make_spherical_wedge(radius, center=(0, 0, 0), longitudinal_angle=2 * math.pi):
+        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeSphere
+
+        return Solid(
+            BRepPrimAPI_MakeSphere(
+                geom_utils.to_gp_pnt(center), float(radius), float(longitudinal_angle)
+            ).Shape()
+        )
+
+    @staticmethod
+    def make_cone(
+        radius_bottom,
+        radius_top,
+        height,
+        apex_angle=2 * math.pi,
+        base_point=(0, 0, 0),
+        up_dir=(0, 0, 1),
+    ):
+        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCone
+
+        return Solid(
+            BRepPrimAPI_MakeCone(
+                gp_Ax2(geom_utils.to_gp_pnt(base_point), geom_utils.to_gp_dir(up_dir)),
+                float(radius_bottom),
+                float(radius_top),
+                float(height),
+                float(apex_angle),
+            ).Shape()
+        )
+
+    @staticmethod
+    def make_cylinder(
+        radius, height, angle=2 * math.pi, base_point=(0, 0, 0), up_dir=(0, 0, 1)
+    ):
+        from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeCylinder
+
+        return Solid(
+            BRepPrimAPI_MakeCylinder(
+                gp_Ax2(geom_utils.to_gp_pnt(base_point), geom_utils.to_gp_dir(up_dir)),
+                float(radius),
+                float(height),
+                float(angle),
+            ).Shape()
+        )
+
+    @deprecated(
+        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
+    )
     def topods_solid(self):
         """
-        Get the underlying OCC solid type
+        Get the underlying OCC type
 
         Returns:
             OCC.Core.TopoDS.TopoDS_Solid: Solid
         """
-        return self._solid
+        return self.topods_shape()
 
     def vertices(self):
         """
@@ -95,7 +152,7 @@ class Solid(Shape):
             Iterator[occwl.face.Face]: Face iterator
         """
         return map(Face, self._top_exp.faces())
-    
+
     def wires(self) -> Iterator[TopoDS_Wire]:
         """
         Get an iterator to go over all wires in the solid
@@ -109,31 +166,53 @@ class Solid(Shape):
         """
         Get an iterator to go over the edges in a face
 
+        Args:
+            face (occwl.face.Face): Input face
+
         Returns:
             Iterator[occwl.edge.Edge]: Edge iterator
         """
         assert isinstance(face, Face)
-        return map(Edge, self._top_exp.edges_from_face(face.topods_face()))
-    
+        return map(Edge, self._top_exp.edges_from_face(face.topods_shape()))
+
     def faces_from_edge(self, edge):
         """
         Get an iterator to go over the faces adjacent to an edge
+
+        Args:
+            edge (occwl.edge.Edge): Input edge
 
         Returns:
             Iterator[occwl.face.Face]: Face iterator
         """
         assert isinstance(edge, Edge)
-        return map(Face, self._top_exp.faces_from_edge(edge.topods_edge()))
-    
+        return map(Face, self._top_exp.faces_from_edge(edge.topods_shape()))
+
     def vertices_from_edge(self, edge):
         """
         Get an iterator to go over the vertices bounding an edge
+
+        Args:
+            edge (occwl.edge.Edge): Input edge
 
         Returns:
             Iterator[occwl.vertex.Vertex]: Vertex iterator
         """
         assert isinstance(edge, Edge)
-        return map(Vertex, self._top_exp.vertices_from_edge(edge.topods_edge()))
+        return map(Vertex, self._top_exp.vertices_from_edge(edge.topods_shape()))
+
+    def wires_from_face(self, face) -> Iterator[TopoDS_Wire]:
+        """
+        Get an iterator to go over the wires bounding a face
+
+        Args:
+            face (occwl.face.Face): Input face
+
+        Returns:
+            Iterator[occwl.wire.Wire]: Wire iterator
+        """
+        assert isinstance(face, Face)
+        return map(Wire, self._top_exp.wires_from_face(face.topods_shape()))
 
     def num_faces(self):
         """
@@ -143,8 +222,8 @@ class Solid(Shape):
             int: Number of faces
         """
         return self._top_exp.number_of_faces()
-    
-    def num_of_wires(self):
+
+    def num_wires(self):
         """
         Number of wires in the solid
 
@@ -215,8 +294,7 @@ class Solid(Shape):
         props = GProp_GProps()
         brepgprop_VolumeProperties(self.topods_solid(), props, tolerance)
         axis = gp_Ax1(
-            geom_utils.numpy_to_gp(point), 
-            geom_utils.numpy_to_gp_dir(direction)
+            geom_utils.numpy_to_gp(point), geom_utils.numpy_to_gp_dir(direction)
         )
         return props.MomentOfInertia(axis)
 
@@ -228,20 +306,20 @@ class Solid(Shape):
             Box: Bounding box
         """
         b = Bnd_Box()
-        brepbndlib_Add(self._solid, b)
+        brepbndlib_Add(self.topods_shape(), b)
         max_corner = b.CornerMax()
         min_corner = b.CornerMin()
 
         bb = Box(geom_utils.gp_to_numpy(min_corner))
         bb.encompass_point(geom_utils.gp_to_numpy(max_corner))
         return bb
-        
+
     def triangulate_all_faces(
-        self, 
-        triangle_face_tol = 0.01,     # Tolerance between triangle and surface
-        tol_relative_to_face = True,  # The tolerance value is relative to the face size
-        angle_tol_rads = 0.1          # Angle between normals/tangents at triangle vertices
-        ):
+        self,
+        triangle_face_tol=0.01,  # Tolerance between triangle and surface
+        tol_relative_to_face=True,  # The tolerance value is relative to the face size
+        angle_tol_rads=0.1,  # Angle between normals/tangents at triangle vertices
+    ):
         """
         Triangulate all the faces in the solid. You can then get the triangles 
         from each face separately using face.get_triangles().
@@ -259,21 +337,21 @@ class Solid(Shape):
             bool: Is successful
         """
         mesh = BRepMesh_IncrementalMesh(
-            self._solid, 
-            triangle_face_tol, 
-            tol_relative_to_face, 
-            angle_tol_rads, 
-            True
+            self.topods_shape(),
+            triangle_face_tol,
+            tol_relative_to_face,
+            angle_tol_rads,
+            True,
         )
         mesh.Perform()
         return mesh.IsDone()
 
     def get_triangles(
         self,
-        triangle_face_tol = 0.01,     # Tolerance between triangle and surface
-        tol_relative_to_face = True,  # The tolerance value is relative to the face size
-        angle_tol_rads = 0.1          # Angle between normals/tangents at triangle vertices
-        ):
+        triangle_face_tol=0.01,  # Tolerance between triangle and surface
+        tol_relative_to_face=True,  # The tolerance value is relative to the face size
+        angle_tol_rads=0.1,  # Angle between normals/tangents at triangle vertices
+    ):
         """
         Compute and get the tessellation of the entire solid
 
@@ -286,7 +364,9 @@ class Solid(Shape):
             2D np.ndarray (float): Vertices or None if triangulation failed
             2D np.ndarray (int): Faces or None if triangulation failed
         """
-        ok  = self.triangulate_all_faces(triangle_face_tol, tol_relative_to_face, angle_tol_rads)
+        ok = self.triangulate_all_faces(
+            triangle_face_tol, tol_relative_to_face, angle_tol_rads
+        )
         if not ok:
             # Failed to triangulate
             return None, None
@@ -298,10 +378,10 @@ class Solid(Shape):
             fverts, ftris = face.get_triangles()
             verts.extend(fverts)
             for tri in ftris:
-                new_indices = [index+last_vert_index for index in tri]
+                new_indices = [index + last_vert_index for index in tri]
                 tris.append(new_indices)
             last_vert_index = len(verts)
-        return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int)
+        return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int32)
 
     def edge_continuity(self, edge):
         """
@@ -316,9 +396,8 @@ class Solid(Shape):
         faces = list(self.faces_from_edge(edge))
         # Handle seam edges which only have one face around them
         if len(faces) == 1:
-           faces.append(faces[-1])
+            faces.append(faces[-1])
         return edge.continuity(faces[0], faces[1])
-
 
     def find_closest_face_slow(self, datum):
         """
