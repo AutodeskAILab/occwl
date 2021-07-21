@@ -10,7 +10,7 @@ class FaceTester(TestBase):
         data_folder = self.test_folder() / "test_data"
         self.run_test_on_all_files_in_folder(data_folder)
 
-    def test_is_left_of(self, solid):
+    def perform_is_left_of_test(self, solid):
         for face in solid.faces():
             for wire in face.wires():
                 for edge in wire.ordered_edges():
@@ -74,7 +74,7 @@ class FaceTester(TestBase):
         self.assertTrue(face.reversed() != reversed_face.reversed())
 
     def run_test(self, solid):
-        self.test_is_left_of(solid)
+        self.perform_is_left_of_test(solid)
         faces = solid.faces()
         for face in faces:
             self.perform_tests_on_face(face)
