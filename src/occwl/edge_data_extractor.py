@@ -8,7 +8,7 @@ import numpy as np
 
 # OCC
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve2d, BRepAdaptor_Surface
-from OCC.Core.gp import gp_Pnt2d
+from OCC.Core.gp import gp_Pnt2d, gp_Identity
 
 # occwl
 from occwl.geometry.interval import Interval
@@ -41,6 +41,7 @@ class EdgeDataExtractor:
         assert num_samples > 0
         assert edge is not None
         assert len(faces) > 0
+        assert edge.topods_shape().Location().Transformation().Form() == gp_Identity
 
         self.num_samples = num_samples
         self.good = True

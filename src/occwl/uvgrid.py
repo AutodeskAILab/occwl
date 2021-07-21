@@ -1,4 +1,6 @@
 import numpy as np
+from OCC.Core.gp import gp_Identity
+
 from occwl.face import Face
 from occwl.edge import Edge
 
@@ -30,6 +32,7 @@ def uvgrid(face, num_u=10, num_v=10, uvs=False, method="point"):
     """
     assert num_u >= 2
     assert num_v >= 2
+    assert face.topods_face().Location().Transformation().Form() == gp_Identity
     uv_box = face.uv_bounds()
 
     fn = getattr(face, method)
