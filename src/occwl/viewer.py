@@ -84,13 +84,18 @@ class Viewer:
         Args:
             shape (Solid, Face, or Edge): Shape to display
             update (bool, optional): Whether to update and repaint. Defaults to False.
-            color ([type], optional): Color of the shape.
-                                      Can be 'WHITE', 'BLUE', 'RED', 'GREEN', 'YELLOW',
-                                      'CYAN', 'BLACK', 'ORANGE'. Defaults to None.
+            color (str or tuple, optional): Color of the shape.
+                                            Can be 'WHITE', 'BLUE', 'RED', 'GREEN', 'YELLOW',
+                                           'CYAN', 'BLACK', 'ORANGE'. Defaults to None.
             transparency (float, optional): How transparent the shape is. Defaults to 0.0.
         """
         if isinstance(shape, (Solid, Face, Edge, Vertex)):
             shape = shape.topods_shape()
+        if color and not isinstance(color, (str, tuple)):
+            color = "BLACK"
+        if isinstance(color, tuple):
+            assert len(color) == 3, "Expected a 3-tuple when color is specified as RGB"
+            color = Quantity_Color(float(color[0]), float(color[1]), float(color[2]), Quantity_TOC_RGB)
         return self._display.DisplayShape(
             shape, update=update, color=color, transparency=transparency
         )
@@ -125,7 +130,7 @@ class Viewer:
         elif marker == "o":
             marker_type = Aspect_TOM_O
         elif marker == "star":
-            marker_type = (Aspect_TOM_STAR,)
+            marker_type = Aspect_TOM_STAR
         elif marker == "x":
             marker_type = Aspect_TOM_X
         elif marker == "ball":
