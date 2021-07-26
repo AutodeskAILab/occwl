@@ -85,8 +85,8 @@ class Viewer:
             shape (Solid, Face, or Edge): Shape to display
             update (bool, optional): Whether to update and repaint. Defaults to False.
             color (str or tuple, optional): Color of the shape.
-                                            Can be 'WHITE', 'BLUE', 'RED', 'GREEN', 'YELLOW',
-                                           'CYAN', 'BLACK', 'ORANGE'. Defaults to None.
+                                            If str, can be 'WHITE', 'BLUE', 'RED', 'GREEN', 'YELLOW',
+                                           'CYAN', 'BLACK', or 'ORANGE'. Defaults to None.
             transparency (float, optional): How transparent the shape is. Defaults to 0.0.
         """
         if isinstance(shape, (Solid, Face, Edge, Vertex)):
@@ -95,7 +95,9 @@ class Viewer:
             color = "BLACK"
         if isinstance(color, tuple):
             assert len(color) == 3, "Expected a 3-tuple when color is specified as RGB"
-            color = Quantity_Color(float(color[0]), float(color[1]), float(color[2]), Quantity_TOC_RGB)
+            color = Quantity_Color(
+                float(color[0]), float(color[1]), float(color[2]), Quantity_TOC_RGB
+            )
         return self._display.DisplayShape(
             shape, update=update, color=color, transparency=transparency
         )
@@ -105,7 +107,7 @@ class Viewer:
         Display a text
 
         Args:
-            xyz (tuple of floats or 3D np.ndarray): Coordinate in model space where text would appear
+            xyz (tuple of floats or 1D np.ndarray of 2 or 3): Coordinate in model space where text would appear
             text (str): Text to display
             height (float, optional): Height of the text font. Defaults to None.
             color (tuple of 3 floats, optional): RGB color. Defaults to None.
@@ -120,7 +122,8 @@ class Viewer:
 
         Args:
             points (np.ndarray #points x 3): Points to display
-            color (tuple of 3 floats or np.ndarray, optional): RGB color (can be a single color or per-point colors). Defaults to None.
+            color (tuple of 3 floats or np.ndarray of size #points x 3, optional): RGB color (can be a single color or per-point colors). Defaults to None.
+            scale (float, optional): Scale of the points
             marker (str, optional): Marker type for the point. Must be one of ('point', 'star', 'ball', 'x', 'o'). Defaults to 'ball'.
         """
         if color is None:
@@ -168,8 +171,10 @@ class Viewer:
         Display a set of lines
 
         Args:
-            origins (np.ndarray #points x 3): Origin points of the arrows
-            directions (np.ndarray #points x 3): Unit vectors for directions of the arrows
+            origins (2D np.ndarray of size #points x 3): Origin points of the arrows
+            directions (2D np.ndarray of size #points x 3): Unit vectors for directions of the arrows
+            color (tuple of 3 floats or 2D np.ndarray of size #points x 3, optional): RGB color (can be a single color or per-point colors). Defaults to None.
+            thickness (float, optional): Thickness of the lines
             style (str, optional): Style for the lines. Must be one of ('solid', 'dash', 'dot', 'dotdash'). Defaults to 'solid'.
         """
         assert (
