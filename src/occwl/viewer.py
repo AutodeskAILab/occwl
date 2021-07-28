@@ -1,33 +1,44 @@
 from datetime import datetime
 from typing import Any, Callable, List, Optional, Tuple
 
-from OCC.Core.AIS import (
-    AIS_Shaded,
-    AIS_Shape,
-    AIS_Shape_SelectionMode,
-    AIS_TexturedShape,
-    AIS_WireFrame,
+import numpy as np
+from OCC.Core.AIS import AIS_Line, AIS_Point, AIS_Shaded, AIS_WireFrame, AIS_Axis
+from OCC.Core.Aspect import (
+    Aspect_TOL_DASH,
+    Aspect_TOL_DOT,
+    Aspect_TOL_DOTDASH,
+    Aspect_TOL_SOLID,
+    Aspect_TOM_BALL,
+    Aspect_TOM_O,
+    Aspect_TOM_POINT,
+    Aspect_TOM_STAR,
+    Aspect_TOM_X,
 )
-from OCC.Core.gp import gp_Pnt, gp_Pnt2d
-from OCC.Display.SimpleGui import init_display
+from OCC.Core.gp import gp_Ax1
+from OCC.Core.Geom import Geom_CartesianPoint, Geom_Line
+from OCC.Core.Prs3d import Prs3d_LineAspect, Prs3d_PointAspect
+from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
 from OCC.Core.TopAbs import (
-    TopAbs_VERTEX,
     TopAbs_EDGE,
     TopAbs_FACE,
     TopAbs_SHELL,
     TopAbs_SOLID,
+    TopAbs_VERTEX,
 )
 from OCC.Core.TopoDS import (
-    TopoDS_Vertex,
     TopoDS_Edge,
     TopoDS_Face,
     TopoDS_Shell,
     TopoDS_Solid,
+    TopoDS_Vertex,
 )
-from occwl.vertex import Vertex
+from OCC.Display.SimpleGui import init_display
+
 from occwl.edge import Edge
 from occwl.face import Face
+from occwl.geometry import geom_utils
 from occwl.solid import Solid
+from occwl.vertex import Vertex
 
 
 class Viewer:
@@ -73,13 +84,20 @@ class Viewer:
         Args:
             shape (Solid, Face, or Edge): Shape to display
             update (bool, optional): Whether to update and repaint. Defaults to False.
-            color ([type], optional): Color of the shape.
-                                      Can be 'WHITE', 'BLUE', 'RED', 'GREEN', 'YELLOW',
-                                      'CYAN', 'BLACK', 'ORANGE'. Defaults to None.
+            color (str or tuple, optional): Color of the shape.
+                                            If str, can be 'WHITE', 'BLUE', 'RED', 'GREEN', 'YELLOW',
+                                           'CYAN', 'BLACK', or 'ORANGE'. Defaults to None.
             transparency (float, optional): How transparent the shape is. Defaults to 0.0.
         """
         if isinstance(shape, (Solid, Face, Edge, Vertex)):
             shape = shape.topods_shape()
+        if color and not isinstance(color, (str, tuple)):
+            color = "BLACK"
+        if isinstance(color, tuple):
+            assert len(color) == 3, "Expected a 3-tuple when color is specified as RGB"
+            color = Quantity_Color(
+                float(color[0]), float(color[1]), float(color[2]), Quantity_TOC_RGB
+            )
         return self._display.DisplayShape(
             shape, update=update, color=color, transparency=transparency
         )
@@ -89,14 +107,119 @@ class Viewer:
         Display a text
 
         Args:
-            xyz (tuple of floats or 3D np.ndarray): Coordinate in model space where text would appear
+            xyz (tuple of floats or 1D np.ndarray of 2 or 3): Coordinate in model space where text would appear
             text (str): Text to display
             height (float, optional): Height of the text font. Defaults to None.
             color (tuple of 3 floats, optional): RGB color. Defaults to None.
         """
         return self._display.DisplayMessage(
-            gp_Pnt(xyz[0], xyz[1], xyz[2]), text, height=height, message_color=color
+            geom_utils.to_gp_pnt(xyz), text, height=height, message_color=color
         )
+
+    def display_points(self, pts, color=None, scale=10, marker="ball"):
+        """
+        Display a set of points
+
+        Args:
+            points (np.ndarray #points x 3): Points to display
+            color (tuple of 3 floats or np.ndarray of size #points x 3, optional): RGB color (can be a single color or per-point colors). Defaults to None.
+            scale (float, optional): Scale of the points
+            marker (str, optional): Marker type for the point. Must be one of ('point', 'star', 'ball', 'x', 'o'). Defaults to 'ball'.
+        """
+        if color is None:
+            color = (0, 0, 0)
+        if marker == "point":
+            marker_type = Aspect_TOM_POINT
+        elif marker == "o":
+            marker_type = Aspect_TOM_O
+        elif marker == "star":
+            marker_type = Aspect_TOM_STAR
+        elif marker == "x":
+            marker_type = Aspect_TOM_X
+        elif marker == "ball":
+            marker_type = Aspect_TOM_BALL
+        else:
+            marker_type = Aspect_TOM_POINT
+            print(
+                "Unknown marker type {}. Expected one of ('point', 'star', 'ball', 'o', 'x'). Setting to 'point'."
+            )
+        point_entities = []
+        for idx in range(pts.shape[0]):
+            if isinstance(color, tuple):
+                color = Quantity_Color(color[0], color[1], color[2], Quantity_TOC_RGB)
+            elif isinstance(color, np.ndarray):
+                assert (
+                    pts.shape[0] == color.shape[0]
+                ), "pts and color must match in size (#points x 3)"
+                color = Quantity_Color(
+                    color[idx, 0], color[idx, 1], color[idx, 2], Quantity_TOC_RGB
+                )
+            p = Geom_CartesianPoint(geom_utils.to_gp_pnt(pts[idx, :]))
+            ais_point = AIS_Point(p)
+            attr = ais_point.Attributes()
+            asp = Prs3d_PointAspect(marker_type, color, scale)
+            attr.SetPointAspect(asp)
+            ais_point.SetAttributes(attr)
+            self._display.Context.Display(ais_point, False)
+            point_entities.append(ais_point)
+        return point_entities
+
+    def display_lines(
+        self, origins, directions, color=None, thickness=1, style="solid",
+    ):
+        """
+        Display a set of lines
+
+        Args:
+            origins (2D np.ndarray of size #points x 3): Origin points of the arrows
+            directions (2D np.ndarray of size #points x 3): Unit vectors for directions of the arrows
+            color (tuple of 3 floats or 2D np.ndarray of size #points x 3, optional): RGB color (can be a single color or per-point colors). Defaults to None.
+            thickness (float, optional): Thickness of the lines
+            style (str, optional): Style for the lines. Must be one of ('solid', 'dash', 'dot', 'dotdash'). Defaults to 'solid'.
+        """
+        assert (
+            origins.shape[0] == directions.shape[0]
+        ), "origins and directions must match in size (#points x 3)"
+        if color is None:
+            color = (0, 0, 0)
+
+        if style == "solid":
+            type_of_line = Aspect_TOL_SOLID
+        elif style == "dash":
+            type_of_line = Aspect_TOL_DASH
+        elif style == "dot":
+            type_of_line = Aspect_TOL_DOT
+        elif style == "dotdash":
+            type_of_line = Aspect_TOL_DOTDASH
+        else:
+            type_of_line = Aspect_TOL_SOLID
+            print(
+                f"Unknown style {style}. Expected one of ('solid', 'dash', 'dot', 'dotdash'). Setting to 'solid'."
+            )
+
+        line_entities = []
+        for idx in range(origins.shape[0]):
+            if isinstance(color, tuple):
+                color = Quantity_Color(color[0], color[1], color[2], Quantity_TOC_RGB)
+            elif isinstance(color, np.ndarray):
+                assert (
+                    origins.shape[0] == color.shape[0]
+                ), "pts and color must match in size (#points x 3)"
+                color = Quantity_Color(
+                    color[idx, 0], color[idx, 1], color[idx, 2], Quantity_TOC_RGB
+                )
+            line = Geom_Line(
+                geom_utils.to_gp_pnt(origins[idx, :]),
+                geom_utils.to_gp_dir(directions[idx, :]),
+            )
+            ais_line = AIS_Line(line)
+            attr = ais_line.Attributes()
+            asp = Prs3d_LineAspect(color, type_of_line, thickness)
+            attr.SetLineAspect(asp)
+            ais_line.SetAttributes(attr)
+            self._display.Context.Display(ais_line, False)
+            line_entities.append(ais_line)
+        return line_entities
 
     def on_select(self, callback):
         """
