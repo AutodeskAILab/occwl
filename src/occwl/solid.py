@@ -188,6 +188,20 @@ class Solid(Shape):
         assert isinstance(edge, Edge)
         return map(Face, self._top_exp.faces_from_edge(edge.topods_shape()))
 
+
+    def faces_from_vertex(self, vertex):
+        """
+        Get an iterator to go over the faces adjacent to a vertex
+
+        Args:
+            edge (occwl.vertex.Vertex): Input vertex
+
+        Returns:
+            Iterator[occwl.face.Face]: Face iterator
+        """
+        assert isinstance(vertex, Vertex)
+        return map(Face, self._top_exp.faces_from_vertex(vertex.topods_shape()))
+
     def vertices_from_edge(self, edge):
         """
         Get an iterator to go over the vertices bounding an edge
@@ -250,6 +264,17 @@ class Solid(Shape):
         """
         return self._top_exp.number_of_vertices()
 
+    def area(self):
+        """
+        Compute the area of the face
+
+        Returns:
+            float: Area
+        """
+        geometry_properties = GProp_GProps()
+        brepgprop_SurfaceProperties(self.topods_shape(), geometry_properties)
+        return geometry_properties.Mass()
+        
     def volume(self, tolerance=1e-9):
         """
         Compute the volume of the solid
