@@ -33,6 +33,7 @@ from OCC.Core.TopoDS import (
     TopoDS_Vertex,
 )
 from OCC.Display.SimpleGui import init_display
+from OCC.Display.OCCViewer import get_color_from_name
 
 from occwl.edge import Edge
 from occwl.face import Face
@@ -122,7 +123,7 @@ class Viewer:
 
         Args:
             points (np.ndarray #points x 3): Points to display
-            color (tuple of 3 floats or np.ndarray of size #points x 3, optional): RGB color (can be a single color or per-point colors). Defaults to None.
+            color (tuple of 3 floats or np.ndarray of size #points x 3 or str, optional): RGB color (can be a single color or per-point colors). Defaults to None.
             scale (float, optional): Scale of the points
             marker (str, optional): Marker type for the point. Must be one of ('point', 'star', 'ball', 'x', 'o'). Defaults to 'ball'.
         """
@@ -154,6 +155,8 @@ class Viewer:
                 color = Quantity_Color(
                     color[idx, 0], color[idx, 1], color[idx, 2], Quantity_TOC_RGB
                 )
+            elif isinstance(color, str):
+                color = get_color_from_name(color)
             p = Geom_CartesianPoint(geom_utils.to_gp_pnt(pts[idx, :]))
             ais_point = AIS_Point(p)
             attr = ais_point.Attributes()
@@ -173,7 +176,7 @@ class Viewer:
         Args:
             origins (2D np.ndarray of size #points x 3): Origin points of the arrows
             directions (2D np.ndarray of size #points x 3): Unit vectors for directions of the arrows
-            color (tuple of 3 floats or 2D np.ndarray of size #points x 3, optional): RGB color (can be a single color or per-point colors). Defaults to None.
+            color (tuple of 3 floats or 2D np.ndarray of size #points x 3 or str, optional): RGB color (can be a single color or per-point colors). Defaults to None.
             thickness (float, optional): Thickness of the lines
             style (str, optional): Style for the lines. Must be one of ('solid', 'dash', 'dot', 'dotdash'). Defaults to 'solid'.
         """
@@ -208,6 +211,9 @@ class Viewer:
                 color = Quantity_Color(
                     color[idx, 0], color[idx, 1], color[idx, 2], Quantity_TOC_RGB
                 )
+            elif isinstance(color, str):
+                color = get_color_from_name(color)
+
             line = Geom_Line(
                 geom_utils.to_gp_pnt(origins[idx, :]),
                 geom_utils.to_gp_dir(directions[idx, :]),
