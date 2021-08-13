@@ -156,6 +156,9 @@ class Face(Shape):
         top_exp = TopologyUtils.TopologyExplorer(self.topods_face(), ignore_orientation=False)
         return map(Wire, top_exp.wires())
 
+    @deprecated(
+        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
+    )
     def inside(self, uv):
         """
         Check if the uv-coordinate in on the visible region of the face
