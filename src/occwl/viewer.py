@@ -157,7 +157,7 @@ class Viewer:
             p = Geom_CartesianPoint(geom_utils.to_gp_pnt(pts[idx, :]))
             ais_point = AIS_Point(p)
             attr = ais_point.Attributes()
-            asp = Prs3d_PointAspect(marker_type, color, scale)
+            asp = Prs3d_PointAspect(marker_type, color, float(scale))
             attr.SetPointAspect(asp)
             ais_point.SetAttributes(attr)
             self._display.Context.Display(ais_point, False)
