@@ -216,6 +216,8 @@ class Face(Shape):
             return srf.Plane()
         if surf_type == "cylinder":
             return srf.Cylinder()
+        if surf_type == "cone":
+            return srf.Cone()
         if surf_type == "sphere":
             return srf.Sphere()
         if surf_type == "torus":
