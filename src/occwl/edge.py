@@ -149,6 +149,24 @@ class Edge(Shape):
         # vertex
         return np.array([0, 0, 0])
 
+    def start_vertex(self):
+        """
+        Returns the starting vertex of the edge
+
+        Returns:
+            occwl.vertex.Vertex: Start vertex
+        """
+        return Vertex(ShapeAnalysis_Edge().FirstVertex(self.topods_shape()))
+    
+    def end_vertex(self):
+        """
+        Returns the ending vertex of the edge
+
+        Returns:
+            occwl.vertex.Vertex: End vertex
+        """
+        return Vertex(ShapeAnalysis_Edge().LastVertex(self.topods_shape()))
+
     def tangent(self, u):
         """
         Compute the tangent of the edge geometry at given parameter
