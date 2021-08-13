@@ -153,7 +153,7 @@ class Face(Shape):
         Returns:
             Iterator[occwl.wire.Wire]: Wire iterator
         """
-        top_exp = TopologyUtils.TopologyExplorer(self.topods_face(), ignore_orientation=False)
+        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=False)
         return map(Wire, top_exp.wires())
 
     @deprecated(
@@ -216,6 +216,8 @@ class Face(Shape):
             return srf.Plane()
         if surf_type == "cylinder":
             return srf.Cylinder()
+        if surf_type == "sphere":
+            return srf.Sphere()
         if surf_type == "torus":
             return srf.Torus()
         if surf_type == "bezier":
