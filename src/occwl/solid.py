@@ -266,7 +266,7 @@ class Solid(Shape):
 
     def area(self):
         """
-        Compute the area of the face
+        Compute the area of the solid
 
         Returns:
             float: Area
