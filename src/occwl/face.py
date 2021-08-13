@@ -168,6 +168,19 @@ class Face(Shape):
         """
         result = self._trimmed.Perform(gp_Pnt2d(uv[0], uv[1]))
         return result == TopAbs_IN
+    
+    def trimmed(self, uv):
+        """
+        Check if the uv-coordinate in on the visible region of the face
+
+        Args:
+            uv (np.ndarray or tuple): Surface parameter
+        
+        Returns:
+            int (TopAbs_STATE enum): 0: TopAbs_IN, 1: TopAbs_OUT, 2: TopAbs_ON, 3: TopAbs_UNKNOWN
+        """
+        result = self._trimmed.Perform(gp_Pnt2d(uv[0], uv[1]))
+        return int(result)
 
     def surface(self):
         """
