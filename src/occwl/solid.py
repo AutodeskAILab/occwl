@@ -449,3 +449,21 @@ class Solid(Shape):
                 closest_shape = s
                 closest_dist_yet = closest_point_data.distance
         return closest_shape
+    
+    def is_closed(self):
+        """
+        Checks and returns if the solid is closed (has no holes)
+
+        Returns:
+            bool: If closed
+        """
+        # In Open Cascade, unlinked (open) edges can be identified
+        # as they appear in the edges iterator when ignore_orientation=False
+        # but are not present in any wire
+        ordered_edges = set()
+        for wire in self.wires():
+            for edge in wire.ordered_edges():
+                ordered_edges.add(edge.topods_shape())
+        unordered_edges = set(self.edges())
+        missing_edges = unordered_edges - ordered_edges
+        return len(missing_edges) == 0
