@@ -26,6 +26,7 @@ from OCC.Core.ShapeAnalysis import ShapeAnalysis_Edge
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 
 import occwl.geometry.geom_utils as geom_utils
+from occwl.vertex import Vertex
 from occwl.geometry.interval import Interval
 from occwl.shape import Shape
 from deprecate import deprecated
@@ -355,6 +356,7 @@ class Edge(Shape):
         """
         return BRep_Tool_Continuity(
             self.topods_shape(), face1.topods_face(), face2.topods_face()
+            self.topods_shape(), face1.topods_shape(), face2.topods_shape()
         )
 
     def reversed(self):
