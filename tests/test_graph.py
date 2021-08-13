@@ -23,10 +23,11 @@ class GraphTester(TestBase):
         print(
             f"\tVertex Adjacency Graph has {len(vag.nodes)} vertices, {len(vag.edges)} edges"
         )
-        fag = face_adjacency(solid)
-        print(
-            f"\tFace Adjacency Graph has {len(fag.nodes)} vertices, {len(fag.edges)} edges"
-        )
+        fag = face_adjacency(solid, self_loops=True)
+        if fag is not None:
+            print(
+                f"\tFace Adjacency Graph has {len(fag.nodes)} vertices, {len(fag.edges)} edges"
+            )
 
     def run_test(self, solid):
         self.perform_tests_on_solid(solid)
