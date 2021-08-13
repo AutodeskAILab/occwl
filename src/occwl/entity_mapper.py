@@ -152,7 +152,6 @@ class EntityMapper:
 
     def _append_oriented_edge(self, oriented_edge):
         h = self._get_hash(oriented_edge)
-        orientation = oriented_edge.topods_edge().Orientation()
         is_reversed = oriented_edge.reversed()
         tup = (h, is_reversed)
         index = len(self.oriented_edge_map)
