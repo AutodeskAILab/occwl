@@ -355,7 +355,6 @@ class Edge(Shape):
             GeomAbs_Shape: enum describing the continuity order
         """
         return BRep_Tool_Continuity(
-            self.topods_shape(), face1.topods_face(), face2.topods_face()
             self.topods_shape(), face1.topods_shape(), face2.topods_shape()
         )
 
