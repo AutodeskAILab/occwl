@@ -464,6 +464,6 @@ class Solid(Shape):
         for wire in self.wires():
             for edge in wire.ordered_edges():
                 ordered_edges.add(edge.topods_shape())
-        unordered_edges = set(self.edges())
+        unordered_edges = set([edge.topods_shape() for edge  in self.edges()])
         missing_edges = unordered_edges - ordered_edges
         return len(missing_edges) == 0
