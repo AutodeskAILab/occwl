@@ -18,7 +18,7 @@ from OCC.Core.TopoDS import (
 )
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
 from OCC.Core.Bnd import Bnd_Box
-from OCC.Core.BRepBndLib import brepbndlib_Add
+from OCC.Core.BRepBndLib import brepbndlib_Add, brepbndlib_AddOptimal
 from OCC.Extend import TopologyUtils
 from OCC.Core.BRepGProp import (
     brepgprop_LinearProperties,
@@ -325,19 +325,31 @@ class Solid(Shape):
 
     def box(self):
         """
-        Get the bounding box of the solid
+        Get a quick bounding box of the solid
 
         Returns:
             Box: Bounding box
         """
         b = Bnd_Box()
         brepbndlib_Add(self.topods_shape(), b)
-        max_corner = b.CornerMax()
-        min_corner = b.CornerMin()
+        return geom_utils.box_to_geometry(b)
 
-        bb = Box(geom_utils.gp_to_numpy(min_corner))
-        bb.encompass_point(geom_utils.gp_to_numpy(max_corner))
-        return bb
+    def exact_box(self, use_shapetolerance=False):
+        """
+        Get a slow, but accurate box for the solid.
+
+        Args:
+            use_shapetolerance (bool, optional) Include the tolerance of edges
+                                                and vertices in the box.
+
+        Returns:
+            Box: Bounding box
+        """
+        b = Bnd_Box()
+        use_triangulation = True
+        brepbndlib_AddOptimal(self.topods_shape(), b, use_triangulation, use_shapetolerance)
+        return geom_utils.box_to_geometry(b)
+
 
     def triangulate_all_faces(
         self,

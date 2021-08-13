@@ -18,7 +18,7 @@ or you can add the full path to the `src/occwl` folder to the `PYTHONPATH` envir
 
 - Linux:
 ```
- export PYTHONPATH=$PYTHONPATH:/path/to/occwl/src/occwl/
+ export PYTHONPATH=$PYTHONPATH:/path/to/occwl/src/
 ```
 - Windows:
 ```
