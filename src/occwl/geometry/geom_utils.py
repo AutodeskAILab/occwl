@@ -1,6 +1,7 @@
 import numpy as np
 from OCC.Core.gp import gp_Pnt, gp_Pnt2d, gp_Vec, gp_Dir, gp_Ax1
 
+from occwl.geometry.box import Box
 
 def tuple_to_numpy(tup):
     l = list(tup)
@@ -14,6 +15,12 @@ def gp_to_numpy(gp):
         return np.array([gp.X(), gp.Y(), gp.Z()])
     raise NotImplementedError
 
+def box_to_geometry(bnd_box):
+    max_corner = bnd_box.CornerMax()
+    min_corner = bnd_box.CornerMin()
+    bb = Box(gp_to_numpy(min_corner))
+    bb.encompass_point(gp_to_numpy(max_corner))
+    return bb
 
 def numpy_to_gp(np_point):
     assert np_point.size == 3
