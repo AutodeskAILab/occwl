@@ -18,7 +18,7 @@ from OCC.Core.GeomAbs import (GeomAbs_BezierSurface, GeomAbs_BSplineSurface,
                               GeomAbs_Sphere, GeomAbs_SurfaceOfExtrusion,
                               GeomAbs_SurfaceOfRevolution, GeomAbs_Torus)
 from OCC.Core.GeomLProp import GeomLProp_SLProps
-from OCC.Core.gp import gp_Dir, gp_Pnt, gp_Pnt2d
+from OCC.Core.gp import gp_Dir, gp_Pnt, gp_Pnt2d, gp_TrsfForm
 from OCC.Core.GProp import GProp_GProps
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
 from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
@@ -315,7 +315,7 @@ class Face(Shape):
         # the user
         assert found_edge, "Edge doesn't belong to face"
 
-        # We found an edge on the for which this face was on the right hand side,
+        # We found an edge for which this face was on the right hand side,
         # but not one of the left hand side
         return False
 
@@ -544,7 +544,8 @@ class Face(Shape):
         tri = facing.Triangles()
         verts = []
         for i in range(1, facing.NbNodes() + 1):
-            verts.append(np.array(list(tab.Value(i).Coord())))
+            p = tab.Value(i).Transformed(location.Transformation())
+            verts.append(np.array(list(p.Coord())))
 
         tris = []
         reversed = self.reversed()

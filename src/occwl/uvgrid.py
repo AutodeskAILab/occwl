@@ -1,4 +1,6 @@
 import numpy as np
+from OCC.Core.gp import gp_Identity
+
 from occwl.face import Face
 from occwl.edge import Edge
 
@@ -12,7 +14,7 @@ def _ugrid_reverse_u(grid):
     return grid[::-1, :]
 
 
-def uvgrid(face, num_u=10, num_v=10, uvs=False, method="point"):
+def uvgrid(face, num_u=10, num_v=10, uvs=False, method="point", reverse_order_with_face=True):
     """ 
     Creates a 2D UV-grid of samples from the given face
 
@@ -30,6 +32,7 @@ def uvgrid(face, num_u=10, num_v=10, uvs=False, method="point"):
     """
     assert num_u >= 2
     assert num_v >= 2
+    assert face.topods_face().Location().Transformation().Form() == gp_Identity
     uv_box = face.uv_bounds()
 
     fn = getattr(face, method)
@@ -53,16 +56,17 @@ def uvgrid(face, num_u=10, num_v=10, uvs=False, method="point"):
             uvgrid.append(val)
     uvgrid = np.asarray(uvgrid).reshape((num_u, num_v, -1))
 
-    if face.reversed():
-        uvgrid = _uvgrid_reverse_u(uvgrid)
-        uv_values = _uvgrid_reverse_u(uv_values)
+    if reverse_order_with_face:
+        if face.reversed():
+            uvgrid = _uvgrid_reverse_u(uvgrid)
+            uv_values = _uvgrid_reverse_u(uv_values)
 
     if uvs:
         return uvgrid, uv_values
     return uvgrid
 
 
-def ugrid(edge, num_u: int = 10, us=False, method="point"):
+def ugrid(edge, num_u: int = 10, us=False, method="point", reverse_order_with_edge=True):
     """ 
     Creates a 1D UV-grid of samples from the given edge
         edge (occwl.edge.Edge): A B-rep edge
@@ -94,9 +98,10 @@ def ugrid(edge, num_u: int = 10, us=False, method="point"):
         ugrid.append(val)
 
     ugrid = np.asarray(ugrid).reshape((num_u, -1))
-    if edge.reversed():
-        ugrid = _ugrid_reverse_u(ugrid)
-        u_values = u_values[::-1]
+    if reverse_order_with_edge:
+        if edge.reversed():
+            ugrid = _ugrid_reverse_u(ugrid)
+            u_values = u_values[::-1]
     if us:
         return ugrid, u_values
     return ugrid

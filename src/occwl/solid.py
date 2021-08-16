@@ -18,7 +18,7 @@ from OCC.Core.TopoDS import (
 )
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
 from OCC.Core.Bnd import Bnd_Box
-from OCC.Core.BRepBndLib import brepbndlib_Add
+from OCC.Core.BRepBndLib import brepbndlib_Add, brepbndlib_AddOptimal
 from OCC.Extend import TopologyUtils
 from OCC.Core.BRepGProp import (
     brepgprop_LinearProperties,
@@ -188,6 +188,20 @@ class Solid(Shape):
         assert isinstance(edge, Edge)
         return map(Face, self._top_exp.faces_from_edge(edge.topods_shape()))
 
+
+    def faces_from_vertex(self, vertex):
+        """
+        Get an iterator to go over the faces adjacent to a vertex
+
+        Args:
+            edge (occwl.vertex.Vertex): Input vertex
+
+        Returns:
+            Iterator[occwl.face.Face]: Face iterator
+        """
+        assert isinstance(vertex, Vertex)
+        return map(Face, self._top_exp.faces_from_vertex(vertex.topods_shape()))
+
     def vertices_from_edge(self, edge):
         """
         Get an iterator to go over the vertices bounding an edge
@@ -250,6 +264,17 @@ class Solid(Shape):
         """
         return self._top_exp.number_of_vertices()
 
+    def area(self):
+        """
+        Compute the area of the solid
+
+        Returns:
+            float: Area
+        """
+        geometry_properties = GProp_GProps()
+        brepgprop_SurfaceProperties(self.topods_shape(), geometry_properties)
+        return geometry_properties.Mass()
+        
     def volume(self, tolerance=1e-9):
         """
         Compute the volume of the solid
@@ -300,19 +325,31 @@ class Solid(Shape):
 
     def box(self):
         """
-        Get the bounding box of the solid
+        Get a quick bounding box of the solid
 
         Returns:
             Box: Bounding box
         """
         b = Bnd_Box()
         brepbndlib_Add(self.topods_shape(), b)
-        max_corner = b.CornerMax()
-        min_corner = b.CornerMin()
+        return geom_utils.box_to_geometry(b)
 
-        bb = Box(geom_utils.gp_to_numpy(min_corner))
-        bb.encompass_point(geom_utils.gp_to_numpy(max_corner))
-        return bb
+    def exact_box(self, use_shapetolerance=False):
+        """
+        Get a slow, but accurate box for the solid.
+
+        Args:
+            use_shapetolerance (bool, optional) Include the tolerance of edges
+                                                and vertices in the box.
+
+        Returns:
+            Box: Bounding box
+        """
+        b = Bnd_Box()
+        use_triangulation = True
+        brepbndlib_AddOptimal(self.topods_shape(), b, use_triangulation, use_shapetolerance)
+        return geom_utils.box_to_geometry(b)
+
 
     def triangulate_all_faces(
         self,
