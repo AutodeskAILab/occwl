@@ -73,7 +73,10 @@ class Edge(Shape):
             occwl.Edge: Edge joining the two given vertices
             or None: if error
         """
-        return Edge.make_from_points(start_vertex.point(), end_vertex.point())
+        edge_builder = BRepBuilderAPI_MakeEdge(start_vertex.topods_shape(), end_vertex.topods_shape())
+        if not edge_builder.IsDone():
+            return None
+        return Edge(edge_builder.Edge())
 
     @staticmethod
     def make_circle(center, radius, direction=(0, 0, 1)):
