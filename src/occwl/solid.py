@@ -578,3 +578,22 @@ class Solid(Shape):
         if not ok:
             return None
         return Solid(divider.Result())
+
+    def check_unique_oriented_edges(self):
+        ordered_edges = set()
+        for wire in self.wires():
+            for oriented_edge in wire.ordered_edges():
+                is_reversed = oriented_edge.reversed()
+                tup = (oriented_edge, is_reversed)
+               
+                # We want to detect the case where the oriented
+                # edges are not unique
+                if tup in ordered_edges:
+                    # Here we see the same oriented edges
+                    # appears twice in the solid.  This is the 
+                    # failure case we need to flag 
+                    return False
+
+                ordered_edges.add(tup)
+
+        return True
