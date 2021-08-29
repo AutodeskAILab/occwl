@@ -551,11 +551,14 @@ class Solid(Shape):
         """
         divider = ShapeUpgrade_ShapeDivideClosed(self.topods_shape())
         divider.SetPrecision(precision)
+        divider.SetMinTolerance(0.1 * max_tol)
         divider.SetMaxTolerance(max_tol)
         divider.SetNbSplitPoints(num_splits)
         ok = divider.Perform()
         if not ok:
-            return None
+            # Splitting failed or there were no closed faces to split
+            # Return the original solid
+            return self
         return Solid(divider.Result())
 
     def split_all_closed_edges(self, max_tol=0.01, precision=0.01, num_splits=1):
@@ -572,11 +575,14 @@ class Solid(Shape):
         """
         divider = ShapeUpgrade_ShapeDivideClosedEdges(self.topods_shape())
         divider.SetPrecision(precision)
+        divider.SetMinTolerance(0.1 * max_tol)
         divider.SetMaxTolerance(max_tol)
         divider.SetNbSplitPoints(num_splits)
         ok = divider.Perform()
         if not ok:
-            return None
+            # Splitting failed or there were no closed edges to split
+            # Return the original solid
+            return self
         return Solid(divider.Result())
 
     def check_unique_oriented_edges(self):
