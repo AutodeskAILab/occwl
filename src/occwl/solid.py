@@ -27,8 +27,9 @@ from OCC.Core.BRepGProp import (
 )
 from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
 from OCC.Core.GProp import GProp_GProps
-from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1, gp_Vec, gp_Trsf
+from OCC.Core.ShapeUpgrade import ShapeUpgrade_ShapeDivideClosed
+from OCC.Core.ShapeUpgrade import ShapeUpgrade_ShapeDivideClosedEdges
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
 
 import math
@@ -535,3 +536,45 @@ class Solid(Shape):
         transformed_solid = apply_transform.ModifiedShape(self.topods_shape())
 
         return Solid(transformed_solid)
+
+    def split_all_closed_faces(self, max_tol=0.01, precision=0.01, num_splits=1):
+        """
+        Split all the closed faces in this solid
+
+        Args:
+            max_tol (float, optional): Maximum tolerance allowed. Defaults to 0.01.
+            precision (float, optional): Precision of the tool when splitting. Defaults to 0.01.
+            num_splits (int, optional): Number of splits to perform. Each split face will result in num_splits + 1 faces. Defaults to 1.
+
+        Returns:
+            occwl.solid.Solid: Solid with closed faces split
+        """
+        divider = ShapeUpgrade_ShapeDivideClosed(self.topods_shape())
+        divider.SetPrecision(precision)
+        divider.SetMaxTolerance(max_tol)
+        divider.SetNbSplitPoints(num_splits)
+        ok = divider.Perform()
+        if not ok:
+            return None
+        return Solid(divider.Result())
+
+    def split_all_closed_edges(self, max_tol=0.01, precision=0.01, num_splits=1):
+        """
+        Split all the closed edges in this solid
+
+        Args:
+            max_tol (float, optional): Maximum tolerance allowed. Defaults to 0.01.
+            precision (float, optional): Precision of the tool when splitting. Defaults to 0.01.
+            num_splits (int, optional): Number of splits to perform. Each split edge will result in num_splits + 1 edges. Defaults to 1.
+
+        Returns:
+            occwl.solid.Solid: Solid with closed edges split
+        """
+        divider = ShapeUpgrade_ShapeDivideClosedEdges(self.topods_shape())
+        divider.SetPrecision(precision)
+        divider.SetMaxTolerance(max_tol)
+        divider.SetNbSplitPoints(num_splits)
+        ok = divider.Perform()
+        if not ok:
+            return None
+        return Solid(divider.Result())
