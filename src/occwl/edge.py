@@ -447,3 +447,13 @@ class Edge(Shape):
             right_face = face1
 
         return left_face, right_face
+
+    def vertices(self):
+        """
+        Get an iterator to go over all vertices on this face
+
+        Returns:
+            Iterator[occwl.vertex.Vertex]: Vertex iterator
+        """
+        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=True)
+        return map(Vertex, top_exp.vertices())
