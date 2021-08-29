@@ -5,12 +5,16 @@ Utility function to scale a solid body into a box
 from OCC.Core.Bnd import Bnd_Box
 from OCC.Core.gp import gp_Pnt, gp_Vec, gp_Trsf
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
+from deprecate import deprecated
+import logging
 
 # occwl
 from occwl.solid import Solid
 from occwl.geometry import geom_utils
 
-
+@deprecated(
+    target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
+)
 def scale_solid_to_unit_box(solid):
     """
     Translate and scale the given solid so it fits exactly 

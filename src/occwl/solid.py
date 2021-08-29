@@ -28,6 +28,8 @@ from OCC.Core.BRepGProp import (
 from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
 from OCC.Core.GProp import GProp_GProps
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1
+from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1, gp_Vec, gp_Trsf
+from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
 
 import math
 from occwl.edge import Edge
@@ -504,3 +506,32 @@ class Solid(Shape):
         unordered_edges = set([edge.topods_shape() for edge  in self.edges()])
         missing_edges = unordered_edges - ordered_edges
         return len(missing_edges) == 0
+
+    def scale_to_unit_box(self):
+        """
+        Translate and scale the solid so it fits exactly 
+        into the [-1, 1]^3 box
+
+        Returns:
+            occwl.Solid: The scaled version of this solid
+        """
+        # Get an exact box for the solid
+        box = self.exact_box()
+        center = box.center()
+        longest_length = box.max_box_length()
+
+        orig = gp_Pnt(0.0, 0.0, 0.0)
+        center = geom_utils.numpy_to_gp(center)
+        vec_center_to_orig = gp_Vec(center, orig)
+        move_to_center = gp_Trsf()
+        move_to_center.SetTranslation(vec_center_to_orig)
+
+        scale_trsf = gp_Trsf()
+        scale_trsf.SetScale(orig, 2.0/longest_length)
+        trsf_to_apply = scale_trsf.Multiplied(move_to_center)
+        
+        apply_transform = BRepBuilderAPI_Transform(trsf_to_apply)
+        apply_transform.Perform(self.topods_shape())
+        transformed_solid = apply_transform.ModifiedShape(self.topods_shape())
+
+        return Solid(transformed_solid)
