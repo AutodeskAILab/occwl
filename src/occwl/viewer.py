@@ -37,6 +37,7 @@ from OCC.Display.OCCViewer import get_color_from_name
 
 from occwl.edge import Edge
 from occwl.face import Face
+from occwl.wire import Wire
 from occwl.geometry import geom_utils
 from occwl.solid import Solid
 from occwl.vertex import Vertex
@@ -90,7 +91,7 @@ class Viewer:
                                            'CYAN', 'BLACK', or 'ORANGE'. Defaults to None.
             transparency (float, optional): How transparent the shape is. Defaults to 0.0.
         """
-        if isinstance(shape, (Solid, Face, Edge, Vertex)):
+        if isinstance(shape, (Solid, Face, Edge, Wire, Vertex)):
             shape = shape.topods_shape()
         if color and not isinstance(color, (str, tuple)):
             color = "BLACK"
