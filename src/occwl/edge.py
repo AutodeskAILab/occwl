@@ -327,6 +327,18 @@ class Edge(Shape):
             bool: If seam
         """
         return ShapeAnalysis_Edge().IsSeam(self.topods_shape(), face.topods_shape())
+    
+    def has_pcurve(self, face):
+        """
+        Whether this edge has a pcurve associated to the given face
+
+        Args:
+            face (occwl.face.Face): Face
+
+        Returns:
+            bool: If pcurve exists
+        """
+        return ShapeAnalysis_Edge().HasPCurve(self.topods_shape(), face.topods_shape())
 
     def periodic(self):
         """
