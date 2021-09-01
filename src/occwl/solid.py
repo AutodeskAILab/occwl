@@ -27,7 +27,10 @@ from OCC.Core.BRepGProp import (
 )
 from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
 from OCC.Core.GProp import GProp_GProps
-from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1
+from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1, gp_Vec, gp_Trsf
+from OCC.Core.ShapeUpgrade import ShapeUpgrade_ShapeDivideClosed
+from OCC.Core.ShapeUpgrade import ShapeUpgrade_ShapeDivideClosedEdges
+from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
 
 import math
 from occwl.edge import Edge
@@ -504,6 +507,83 @@ class Solid(Shape):
         unordered_edges = set([edge.topods_shape() for edge  in self.edges()])
         missing_edges = unordered_edges - ordered_edges
         return len(missing_edges) == 0
+
+    def scale_to_unit_box(self):
+        """
+        Translate and scale the solid so it fits exactly 
+        into the [-1, 1]^3 box
+
+        Returns:
+            occwl.Solid: The scaled version of this solid
+        """
+        # Get an exact box for the solid
+        box = self.exact_box()
+        center = box.center()
+        longest_length = box.max_box_length()
+
+        orig = gp_Pnt(0.0, 0.0, 0.0)
+        center = geom_utils.numpy_to_gp(center)
+        vec_center_to_orig = gp_Vec(center, orig)
+        move_to_center = gp_Trsf()
+        move_to_center.SetTranslation(vec_center_to_orig)
+
+        scale_trsf = gp_Trsf()
+        scale_trsf.SetScale(orig, 2.0/longest_length)
+        trsf_to_apply = scale_trsf.Multiplied(move_to_center)
+        
+        apply_transform = BRepBuilderAPI_Transform(trsf_to_apply)
+        apply_transform.Perform(self.topods_shape())
+        transformed_solid = apply_transform.ModifiedShape(self.topods_shape())
+
+        return Solid(transformed_solid)
+
+    def split_all_closed_faces(self, max_tol=0.01, precision=0.01, num_splits=1):
+        """
+        Split all the closed faces in this solid
+
+        Args:
+            max_tol (float, optional): Maximum tolerance allowed. Defaults to 0.01.
+            precision (float, optional): Precision of the tool when splitting. Defaults to 0.01.
+            num_splits (int, optional): Number of splits to perform. Each split face will result in num_splits + 1 faces. Defaults to 1.
+
+        Returns:
+            occwl.solid.Solid: Solid with closed faces split
+        """
+        divider = ShapeUpgrade_ShapeDivideClosed(self.topods_shape())
+        divider.SetPrecision(precision)
+        divider.SetMinTolerance(0.1 * max_tol)
+        divider.SetMaxTolerance(max_tol)
+        divider.SetNbSplitPoints(num_splits)
+        ok = divider.Perform()
+        if not ok:
+            # Splitting failed or there were no closed faces to split
+            # Return the original solid
+            return self
+        return Solid(divider.Result())
+
+    def split_all_closed_edges(self, max_tol=0.01, precision=0.01, num_splits=1):
+        """
+        Split all the closed edges in this solid
+
+        Args:
+            max_tol (float, optional): Maximum tolerance allowed. Defaults to 0.01.
+            precision (float, optional): Precision of the tool when splitting. Defaults to 0.01.
+            num_splits (int, optional): Number of splits to perform. Each split edge will result in num_splits + 1 edges. Defaults to 1.
+
+        Returns:
+            occwl.solid.Solid: Solid with closed edges split
+        """
+        divider = ShapeUpgrade_ShapeDivideClosedEdges(self.topods_shape())
+        divider.SetPrecision(precision)
+        divider.SetMinTolerance(0.1 * max_tol)
+        divider.SetMaxTolerance(max_tol)
+        divider.SetNbSplitPoints(num_splits)
+        ok = divider.Perform()
+        if not ok:
+            # Splitting failed or there were no closed edges to split
+            # Return the original solid
+            return self
+        return Solid(divider.Result())
 
     def check_unique_oriented_edges(self):
         ordered_edges = set()

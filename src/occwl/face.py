@@ -26,6 +26,7 @@ from OCC.Core.TopLoc import TopLoc_Location
 from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Extend import TopologyUtils
 
+from occwl.vertex import Vertex
 from occwl.edge import Edge
 from occwl.shape import Shape
 from occwl.wire import Wire
@@ -155,6 +156,26 @@ class Face(Shape):
         """
         top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=False)
         return map(Wire, top_exp.wires())
+    
+    def edges(self):
+        """
+        Get an iterator to go over all edges on this face
+
+        Returns:
+            Iterator[occwl.edge.Edge]: Edge iterator
+        """
+        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=True)
+        return map(Edge, top_exp.edges())
+    
+    def vertices(self):
+        """
+        Get an iterator to go over all vertices on this face
+
+        Returns:
+            Iterator[occwl.vertex.Vertex]: Vertex iterator
+        """
+        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=True)
+        return map(Vertex, top_exp.vertices())
 
     @deprecated(
         target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
