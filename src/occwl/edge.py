@@ -465,7 +465,7 @@ class Edge(Shape):
 
     def vertices(self):
         """
-        Get an iterator to go over all vertices on this face
+        Get an iterator to go over all vertices on this edge
 
         Returns:
             Iterator[occwl.vertex.Vertex]: Vertex iterator
