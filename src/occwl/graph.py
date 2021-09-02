@@ -45,11 +45,9 @@ def face_adjacency(solid, self_loops=False):
                 continue
             edge_idx = mapper.oriented_edge_index(edge)
             edge_reversed = edge.reversed_edge()
-            try:
-                edge_reversed_idx = mapper.oriented_edge_index(edge_reversed)
-            except:
-                edge_reversed = None
-                edge_reversed_idx = None
+            if not mapper.oriented_edge_exists(edge_reversed):
+                continue
+            edge_reversed_idx = mapper.oriented_edge_index(edge_reversed)
             left_index = mapper.face_index(left_face)
             right_index = mapper.face_index(right_face)
             graph.add_edge(left_index, right_index, edge=edge, edge_index=edge_idx) 
@@ -92,16 +90,13 @@ def vertex_adjacency(solid, self_loops=False):
                 graph.add_edge(vert_idx, vert_idx)
         elif len(connected_verts) == 2:
             # Don't add an edge if the edge doesn't exist in the model
-            try:
-                edge_idx = mapper.oriented_edge_index(edge)
-            except:
+            if not mapper.oriented_edge_exists(edge):
                 continue
+            edge_idx = mapper.oriented_edge_index(edge)
             edge_reversed = edge.reversed_edge()
-            try:
-                edge_reversed_idx = mapper.oriented_edge_index(edge_reversed)
-            except:
-                edge_reversed = None
-                edge_reversed_idx = None
+            if not mapper.oriented_edge_exists(edge_reversed):
+                continue
+            edge_reversed_idx = mapper.oriented_edge_index(edge_reversed)
             vert_i_index = mapper.vertex_index(edge.start_vertex())
             vert_j_index = mapper.vertex_index(edge.end_vertex())
             graph.add_edge(
