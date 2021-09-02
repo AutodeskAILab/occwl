@@ -177,9 +177,6 @@ class Face(Shape):
         top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=True)
         return map(Vertex, top_exp.vertices())
 
-    @deprecated(
-        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
-    )
     def inside(self, uv):
         """
         Check if the uv-coordinate in on the visible region of the face
