@@ -24,6 +24,7 @@ from OCC.Core.GCPnts import GCPnts_AbscissaPoint
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Edge
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
+from OCC.Core.TopExp import topexp
 
 import occwl.geometry.geom_utils as geom_utils
 from occwl.vertex import Vertex
@@ -160,7 +161,7 @@ class Edge(Shape):
         Returns:
             occwl.vertex.Vertex: Start vertex
         """
-        return Vertex(ShapeAnalysis_Edge().FirstVertex(self.topods_shape()))
+        return Vertex(topexp.FirstVertex(self.topods_shape(), True))
     
     def end_vertex(self):
         """
@@ -169,7 +170,7 @@ class Edge(Shape):
         Returns:
             occwl.vertex.Vertex: End vertex
         """
-        return Vertex(ShapeAnalysis_Edge().LastVertex(self.topods_shape()))
+        return Vertex(topexp.LastVertex(self.topods_shape(), True))
 
     def tangent(self, u):
         """
