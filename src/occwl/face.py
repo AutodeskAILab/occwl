@@ -241,7 +241,7 @@ class Face(Shape):
         if surf_type == "torus":
             return srf.Torus()
         if surf_type == "bezier":
-            return srf.BezierSurface()
+            return srf.Bezier()
         if surf_type == "bspline":
             return srf.BSpline()
         raise ValueError("Unknown surface type: ", surf_type)
