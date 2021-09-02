@@ -15,7 +15,7 @@ g = face_adjacency(example, self_loops=True)
 assert g is not None
 
 bbox = example.box()
-point_radius = min(bbox.x_length(), bbox.y_length(), bbox.z_length()) * 0.03
+point_radius = bbox.max_box_length() * 0.03
 arrow_radius = point_radius * 0.85
 arrow_length = arrow_radius * 4
 
