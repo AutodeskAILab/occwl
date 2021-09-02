@@ -190,7 +190,7 @@ class Face(Shape):
         result = self._trimmed.Perform(gp_Pnt2d(uv[0], uv[1]))
         return result == TopAbs_IN
     
-    def trimmed(self, uv):
+    def visibility_status(self, uv):
         """
         Check if the uv-coordinate in on the visible region of the face
 
