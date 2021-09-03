@@ -19,14 +19,39 @@ class GraphTester(TestBase):
         self.run_test_on_all_files_in_folder(data_folder)
 
     def perform_tests_on_solid(self, solid):
+        if not solid.is_closed():
+            print(f"Solid is not closed.  Skipping this example")
+            return
+        if not solid.check_unique_oriented_edges():
+            print(f"Solid contains the same oriented edge twice.  Skipping this example")
+            return
+
+        # Vertex-adjacency graph
         vag = vertex_adjacency(solid)
         print(
             f"\tVertex Adjacency Graph has {len(vag.nodes)} vertices, {len(vag.edges)} edges"
         )
-        fag = face_adjacency(solid)
-        print(
-            f"\tFace Adjacency Graph has {len(fag.nodes)} vertices, {len(fag.edges)} edges"
-        )
+        # Test if the graph edges match with the B-rep edge orientations
+        for edge in vag.edges:
+            v1_idx, v2_idx = edge
+            self.assertTrue(vag.nodes[v1_idx]["vertex"].__hash__() == vag.edges[edge]["edge"].start_vertex().__hash__())
+            self.assertTrue(vag.nodes[v2_idx]["vertex"].__hash__() == vag.edges[edge]["edge"].start_vertex().__hash__())
+
+        # Face-adjacency graph
+        fag = face_adjacency(solid, self_loops=True)
+        if fag is not None:
+            print(
+                f"\tFace Adjacency Graph has {len(fag.nodes)} vertices, {len(fag.edges)} edges"
+            )
+        # Test if the graph edges match with the B-rep edge orientations
+        for edge in fag.edges:
+            f1_idx, f2_idx = edge
+            brep_face1 = fag.nodes[f1_idx]["face"]
+            brep_face2 = fag.nodes[f2_idx]["face"]
+            brep_edge = fag.edges[edge]["edge"]
+            left_face, right_face = brep_edge.find_left_and_right_faces([brep_face1, brep_face2])
+            self.assertTrue(brep_face1.__hash__() == left_face.__hash__())
+            self.assertTrue(brep_face2.__hash__() == right_face.__hash__())
 
     def run_test(self, solid):
         self.perform_tests_on_solid(solid)
