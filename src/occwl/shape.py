@@ -21,6 +21,7 @@ from OCC.Extend.ShapeFactory import (
     scale_shape,
     translate_shp,
 )
+from OCC.Core.BRepCheck import BRepCheck_Analyzer 
 
 import occwl.geometry.geom_utils as geom_utils
 

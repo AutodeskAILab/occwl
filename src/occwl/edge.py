@@ -24,6 +24,7 @@ from OCC.Core.GCPnts import GCPnts_AbscissaPoint
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Edge
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
+from OCC.Core.TopExp import topexp
 
 import occwl.geometry.geom_utils as geom_utils
 from occwl.vertex import Vertex
@@ -160,7 +161,7 @@ class Edge(Shape):
         Returns:
             occwl.vertex.Vertex: Start vertex
         """
-        return Vertex(ShapeAnalysis_Edge().FirstVertex(self.topods_shape()))
+        return Vertex(topexp.FirstVertex(self.topods_shape(), True))
     
     def end_vertex(self):
         """
@@ -169,7 +170,7 @@ class Edge(Shape):
         Returns:
             occwl.vertex.Vertex: End vertex
         """
-        return Vertex(ShapeAnalysis_Edge().LastVertex(self.topods_shape()))
+        return Vertex(topexp.LastVertex(self.topods_shape(), True))
 
     def tangent(self, u):
         """
@@ -338,6 +339,18 @@ class Edge(Shape):
             bool: If seam
         """
         return ShapeAnalysis_Edge().IsSeam(self.topods_shape(), face.topods_shape())
+    
+    def has_pcurve(self, face):
+        """
+        Whether this edge has a pcurve associated to the given face
+
+        Args:
+            face (occwl.face.Face): Face
+
+        Returns:
+            bool: If pcurve exists
+        """
+        return ShapeAnalysis_Edge().HasPCurve(self.topods_shape(), face.topods_shape())
 
     def periodic(self):
         """
@@ -464,7 +477,7 @@ class Edge(Shape):
 
     def vertices(self):
         """
-        Get an iterator to go over all vertices on this face
+        Get an iterator to go over all vertices on this edge
 
         Returns:
             Iterator[occwl.vertex.Vertex]: Vertex iterator

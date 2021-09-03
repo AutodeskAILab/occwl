@@ -177,9 +177,6 @@ class Face(Shape):
         top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=True)
         return map(Vertex, top_exp.vertices())
 
-    @deprecated(
-        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
-    )
     def inside(self, uv):
         """
         Check if the uv-coordinate in on the visible region of the face
@@ -193,7 +190,7 @@ class Face(Shape):
         result = self._trimmed.Perform(gp_Pnt2d(uv[0], uv[1]))
         return result == TopAbs_IN
     
-    def trimmed(self, uv):
+    def visibility_status(self, uv):
         """
         Check if the uv-coordinate in on the visible region of the face
 
@@ -244,7 +241,7 @@ class Face(Shape):
         if surf_type == "torus":
             return srf.Torus()
         if surf_type == "bezier":
-            return srf.BezierSurface()
+            return srf.Bezier()
         if surf_type == "bspline":
             return srf.BSpline()
         raise ValueError("Unknown surface type: ", surf_type)
