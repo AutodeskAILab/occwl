@@ -32,26 +32,22 @@ class GraphTester(TestBase):
             f"\tVertex Adjacency Graph has {len(vag.nodes)} vertices, {len(vag.edges)} edges"
         )
         # Test if the graph edges match with the B-rep edge orientations
-        for edge in vag.edges:
-            v1_idx, v2_idx = edge
-            self.assertTrue(vag.nodes[v1_idx]["vertex"].__hash__() == vag.edges[edge]["edge"].start_vertex().__hash__())
-            self.assertTrue(vag.nodes[v2_idx]["vertex"].__hash__() == vag.edges[edge]["edge"].start_vertex().__hash__())
+        for (v1_idx, v2_idx) in vag.edges:
+            self.assertTrue(vag.nodes[v1_idx]["vertex"].__hash__() == vag.edges[(v1_idx, v2_idx)]["edge"].start_vertex().__hash__())
 
         # Face-adjacency graph
-        fag = face_adjacency(solid, self_loops=True)
+        fag = face_adjacency(solid)
         if fag is not None:
             print(
                 f"\tFace Adjacency Graph has {len(fag.nodes)} vertices, {len(fag.edges)} edges"
             )
         # Test if the graph edges match with the B-rep edge orientations
-        for edge in fag.edges:
-            f1_idx, f2_idx = edge
+        for (f1_idx, f2_idx) in fag.edges:
             brep_face1 = fag.nodes[f1_idx]["face"]
             brep_face2 = fag.nodes[f2_idx]["face"]
-            brep_edge = fag.edges[edge]["edge"]
-            left_face, right_face = brep_edge.find_left_and_right_faces([brep_face1, brep_face2])
+            brep_edge = fag.edges[(f1_idx, f2_idx)]["edge"]
+            left_face, _ = brep_edge.find_left_and_right_faces([brep_face1, brep_face2])
             self.assertTrue(brep_face1.__hash__() == left_face.__hash__())
-            self.assertTrue(brep_face2.__hash__() == right_face.__hash__())
 
     def run_test(self, solid):
         self.perform_tests_on_solid(solid)
