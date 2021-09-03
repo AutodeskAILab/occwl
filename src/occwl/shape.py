@@ -20,6 +20,7 @@ from OCC.Extend.ShapeFactory import (
     scale_shape,
     translate_shp,
 )
+from OCC.Core.BRepCheck import BRepCheck_Analyzer 
 
 import occwl.geometry.geom_utils as geom_utils
 
@@ -176,3 +177,19 @@ class Shape:
         self._shape = scale_shape(
             self._shape, scale_vector[0], scale_vector[1], scale_vector[2]
         )
+
+    def valid(self, return_result=False):
+        """
+        Check if the shape is valid
+
+        Args:
+            return_result (bool): Return detailed results to analyze (defaults to False)
+
+        Returns:
+            bool: Whether the shape is valid
+            BRepCheck_Result [optional]: Details results if return_result was set to True
+        """
+        analyzer = BRepCheck_Analyzer(self.topods_shape())
+        if return_result:
+            return analyzer.IsValid(), analyzer.Result()
+        return analyzer.IsValid()

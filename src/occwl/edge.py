@@ -155,21 +155,21 @@ class Edge(Shape):
 
     def start_vertex(self):
         """
-        Returns the starting vertex of the edge
+        Returns the starting vertex of the edge while considering the edge orientation
 
         Returns:
             occwl.vertex.Vertex: Start vertex
         """
-        return Vertex(ShapeAnalysis_Edge().FirstVertex(self.topods_shape()))
+        return ShapeAnalysis_Edge().FirstVertex(self.topods_shape())
     
     def end_vertex(self):
         """
-        Returns the ending vertex of the edge
+        Returns the ending vertex of the edge while considering the edge orientation
 
         Returns:
             occwl.vertex.Vertex: End vertex
         """
-        return Vertex(ShapeAnalysis_Edge().LastVertex(self.topods_shape()))
+        return ShapeAnalysis_Edge().LastVertex(self.topods_shape())
 
     def tangent(self, u):
         """
@@ -327,6 +327,18 @@ class Edge(Shape):
             bool: If seam
         """
         return ShapeAnalysis_Edge().IsSeam(self.topods_shape(), face.topods_shape())
+    
+    def has_pcurve(self, face):
+        """
+        Whether this edge has a pcurve associated to the given face
+
+        Args:
+            face (occwl.face.Face): Face
+
+        Returns:
+            bool: If pcurve exists
+        """
+        return ShapeAnalysis_Edge().HasPCurve(self.topods_shape(), face.topods_shape())
 
     def periodic(self):
         """
@@ -453,7 +465,7 @@ class Edge(Shape):
 
     def vertices(self):
         """
-        Get an iterator to go over all vertices on this face
+        Get an iterator to go over all vertices on this edge
 
         Returns:
             Iterator[occwl.vertex.Vertex]: Vertex iterator
