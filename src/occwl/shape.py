@@ -4,7 +4,6 @@ Base class for faces, edges and vertices
 import numpy as np
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeVertex
 from OCC.Core.BRepExtrema import BRepExtrema_DistShapeShape
-from OCC.Core.BRepCheck import BRepCheck_Analyzer
 from OCC.Core.Extrema import Extrema_ExtFlag_MIN
 from OCC.Core.gp import gp_Ax1
 from OCC.Core.TopoDS import (
