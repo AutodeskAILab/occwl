@@ -274,17 +274,6 @@ class Edge(Shape):
         curve = BRepAdaptor_Curve(self.topods_shape())
         return curve.Is3DCurve()
 
-    
-    def has_pcurve(self, face):
-        """
-        Whether this edge has a pcurve associated to the given face
-        Args:
-            face (occwl.face.Face): Face
-        Returns:
-            bool: If pcurve exists
-        """
-        return ShapeAnalysis_Edge().HasPCurve(self.topods_shape(), face.topods_shape())
-
     def u_bounds(self):
         """
         Parameter domain of the curve
