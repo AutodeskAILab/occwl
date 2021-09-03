@@ -19,14 +19,22 @@ class GraphTester(TestBase):
         self.run_test_on_all_files_in_folder(data_folder)
 
     def perform_tests_on_solid(self, solid):
+        if not solid.is_closed():
+            print(f"Solid is not closed.  Skipping this example")
+            return
+        if not solid.check_unique_oriented_edges():
+            print(f"Solid contains the same oriented edge twice.  Skipping this example")
+            return
+
         vag = vertex_adjacency(solid)
         print(
             f"\tVertex Adjacency Graph has {len(vag.nodes)} vertices, {len(vag.edges)} edges"
         )
-        fag = face_adjacency(solid)
-        print(
-            f"\tFace Adjacency Graph has {len(fag.nodes)} vertices, {len(fag.edges)} edges"
-        )
+        fag = face_adjacency(solid, self_loops=True)
+        if fag is not None:
+            print(
+                f"\tFace Adjacency Graph has {len(fag.nodes)} vertices, {len(fag.edges)} edges"
+            )
 
     def run_test(self, solid):
         self.perform_tests_on_solid(solid)

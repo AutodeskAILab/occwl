@@ -26,6 +26,7 @@ from OCC.Core.TopLoc import TopLoc_Location
 from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Extend import TopologyUtils
 
+from occwl.vertex import Vertex
 from occwl.edge import Edge
 from occwl.shape import Shape
 from occwl.wire import Wire
@@ -153,9 +154,32 @@ class Face(Shape):
         Returns:
             Iterator[occwl.wire.Wire]: Wire iterator
         """
-        top_exp = TopologyUtils.TopologyExplorer(self.topods_face(), ignore_orientation=False)
+        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=False)
         return map(Wire, top_exp.wires())
+    
+    def edges(self):
+        """
+        Get an iterator to go over all edges on this face
 
+        Returns:
+            Iterator[occwl.edge.Edge]: Edge iterator
+        """
+        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=True)
+        return map(Edge, top_exp.edges())
+    
+    def vertices(self):
+        """
+        Get an iterator to go over all vertices on this face
+
+        Returns:
+            Iterator[occwl.vertex.Vertex]: Vertex iterator
+        """
+        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=True)
+        return map(Vertex, top_exp.vertices())
+
+    @deprecated(
+        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
+    )
     def inside(self, uv):
         """
         Check if the uv-coordinate in on the visible region of the face
@@ -168,6 +192,19 @@ class Face(Shape):
         """
         result = self._trimmed.Perform(gp_Pnt2d(uv[0], uv[1]))
         return result == TopAbs_IN
+    
+    def trimmed(self, uv):
+        """
+        Check if the uv-coordinate in on the visible region of the face
+
+        Args:
+            uv (np.ndarray or tuple): Surface parameter
+        
+        Returns:
+            int (TopAbs_STATE enum): 0: TopAbs_IN, 1: TopAbs_OUT, 2: TopAbs_ON, 3: TopAbs_UNKNOWN
+        """
+        result = self._trimmed.Perform(gp_Pnt2d(uv[0], uv[1]))
+        return int(result)
 
     def surface(self):
         """
@@ -200,6 +237,10 @@ class Face(Shape):
             return srf.Plane()
         if surf_type == "cylinder":
             return srf.Cylinder()
+        if surf_type == "cone":
+            return srf.Cone()
+        if surf_type == "sphere":
+            return srf.Sphere()
         if surf_type == "torus":
             return srf.Torus()
         if surf_type == "bezier":
