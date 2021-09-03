@@ -183,11 +183,11 @@ class Shape:
         Check if the shape is valid
 
         Args:
-            return_result (bool): Return detailed results to analyze (defaults to False)
+            return_result (bool): Whether to return detailed results
 
         Returns:
             bool: Whether the shape is valid
-            BRepCheck_Result [optional]: Details results if return_result was set to True
+            BRepCheck_Result [optional]: if return_result is True
         """
         analyzer = BRepCheck_Analyzer(self.topods_shape())
         if return_result:
