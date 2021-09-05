@@ -160,7 +160,7 @@ class Edge(Shape):
         Returns:
             occwl.vertex.Vertex: Start vertex
         """
-        return ShapeAnalysis_Edge().FirstVertex(self.topods_shape())
+        return Vertex(ShapeAnalysis_Edge().FirstVertex(self.topods_shape()))
     
     def end_vertex(self):
         """
@@ -169,7 +169,7 @@ class Edge(Shape):
         Returns:
             occwl.vertex.Vertex: End vertex
         """
-        return ShapeAnalysis_Edge().LastVertex(self.topods_shape())
+        return Vertex(ShapeAnalysis_Edge().LastVertex(self.topods_shape()))
 
     def tangent(self, u):
         """
