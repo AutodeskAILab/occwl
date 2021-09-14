@@ -178,18 +178,18 @@ class Shape:
             self._shape, scale_vector[0], scale_vector[1], scale_vector[2]
         )
 
-    def valid(self, return_result=False):
+    def valid(self, return_analyzer=False):
         """
         Check if the shape is valid
 
         Args:
-            return_result (bool): Whether to return detailed results
+            return_analyzer (bool): Whether to return the BRepCheck_Analyzer object for more inspection
 
         Returns:
             bool: Whether the shape is valid
-            BRepCheck_Result [optional]: if return_result is True
+            BRepCheck_Analyzer [optional]: if return_analyzer is True
         """
         analyzer = BRepCheck_Analyzer(self.topods_shape())
-        if return_result:
-            return analyzer.IsValid(), analyzer.Result()
+        if return_analyzer:
+            return analyzer.IsValid(), analyzer
         return analyzer.IsValid()
