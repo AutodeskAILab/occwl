@@ -40,7 +40,7 @@ test:
     - python -m unittest tests
 
 about:
-  home: https://git.autodesk.com/Research/occwl
+  home: https://github.com/AutodeskAILab/occwl
   license: BSD
   license_family: BSD
   summary: Lightweight Pythonic wrapper around pythonocc
