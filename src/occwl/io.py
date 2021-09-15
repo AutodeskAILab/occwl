@@ -10,6 +10,7 @@ from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Core.Interface import Interface_Static_SetCVal
 from OCC.Core.IFSelect import IFSelect_RetDone
 
+from pathlib import Path
 
 def load_step(step_filename):
     """Load solids from a STEP file
@@ -20,6 +21,11 @@ def load_step(step_filename):
     Returns:
         List of occwl.Solid: a list of solid models from the file
     """
+    # Check that the file exists.  OCC can crash if the file isn't there
+    step_filename_path = Path(step_filename)
+    if not step_filename_path.exists():
+        return []
+
     step_filename_str = str(step_filename)
     reader = STEPControl_Reader()
     reader.ReadFile(step_filename_str)

@@ -30,6 +30,7 @@ requirements:
     - matplotlib
     - jupyter
     - ipython
+    - pythreejs
 
 
 
