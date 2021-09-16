@@ -32,7 +32,7 @@ def uvgrid(face, num_u=10, num_v=10, uvs=False, method="point", reverse_order_wi
     """
     assert num_u >= 2
     assert num_v >= 2
-    assert face.topods_face().Location().Transformation().Form() == gp_Identity
+    assert face.topods_shape().Location().Transformation().Form() == gp_Identity
     uv_box = face.uv_bounds()
 
     fn = getattr(face, method)

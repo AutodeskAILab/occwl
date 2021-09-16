@@ -153,12 +153,7 @@ class JupyterViewer:
                                             Defaults to None.
             render_edges (bool): Whether to render edges
         """
-        if isinstance(shape, Solid):
-            shape = shape.topods_solid()
-        if isinstance(shape, Face):
-            shape = shape.topods_face()
-        if isinstance(shape, Edge):
-            shape = shape.topods_edge()
+        shape = shape.topods_shape()
         
         self._renderer.DisplayShape(
             shape, 

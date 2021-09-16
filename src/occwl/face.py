@@ -426,7 +426,7 @@ class Face(Shape):
             Interval: domain of the parametric curve
         """
         crv, umin, umax = BRep_Tool().CurveOnSurface(
-            edge.topods_edge(), self.topods_shape()
+            edge.topods_shape(), self.topods_shape()
         )
         return crv, Interval(umin, umax)
 

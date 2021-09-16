@@ -28,8 +28,10 @@ requirements:
     - pydeprecate
     - networkx
     - matplotlib
+    - ipykernel =6.3.1
     - jupyter
     - ipython
+    - pythreejs
 
 
 

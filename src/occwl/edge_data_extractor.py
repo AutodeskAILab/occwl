@@ -50,10 +50,10 @@ class EdgeDataExtractor:
         self.edge = edge
         self.curve3d = edge.curve()
         self.left_pcurve = BRepAdaptor_Curve2d(
-            edge.topods_edge(), self.left_face.topods_face()
+            edge.topods_shape(), self.left_face.topods_shape()
         )
         self.right_pcurve = BRepAdaptor_Curve2d(
-            edge.topods_edge(), self.right_face.topods_face()
+            edge.topods_shape(), self.right_face.topods_shape()
         )
 
         # Find the parameters to evaluate.   These will be
