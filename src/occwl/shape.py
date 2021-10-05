@@ -6,6 +6,7 @@ from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeVertex
 from OCC.Core.BRepExtrema import BRepExtrema_DistShapeShape
 from OCC.Core.Extrema import Extrema_ExtFlag_MIN
 from OCC.Core.gp import gp_Ax1
+from OCC.Core.TopAbs import TopAbs_REVERSED
 from OCC.Core.TopoDS import (
     TopoDS_Edge,
     TopoDS_Face,
@@ -13,6 +14,8 @@ from OCC.Core.TopoDS import (
     TopoDS_Solid,
     TopoDS_Vertex,
     TopoDS_Wire,
+    TopoDS_Compound,
+    TopoDS_CompSolid,
 )
 from OCC.Extend.ShapeFactory import (
     rotate_shape,
@@ -64,6 +67,8 @@ class Shape:
                 TopoDS_Wire,
                 TopoDS_Shell,
                 TopoDS_Solid,
+                TopoDS_Compound,
+                TopoDS_CompSolid,
             ),
         )
         self._shape = topods_shape

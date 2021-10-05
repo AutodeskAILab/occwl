@@ -52,7 +52,9 @@ class Solid(Shape):
 
     def __init__(self, shape, allow_compound=False):
         if allow_compound:
-            assert isinstance(shape, TopoDS_Compound) or isinstance(shape, TopoDS_CompSolid)
+            assert (isinstance(shape, TopoDS_Solid) or 
+                isinstance(shape, TopoDS_Compound) or 
+                isinstance(shape, TopoDS_CompSolid))
         else:
             assert isinstance(shape, TopoDS_Solid)
         super().__init__(shape)

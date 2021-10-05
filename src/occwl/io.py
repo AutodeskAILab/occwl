@@ -34,6 +34,7 @@ def load_single_compound_from_step(step_filename):
     reader.ReadFile(step_filename_str)
     reader.TransferRoots()
     shape = reader.OneShape()
+    return Compound(shape)
 
 def load_step(step_filename):
     """Load solids from a STEP file
