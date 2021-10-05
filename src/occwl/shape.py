@@ -101,6 +101,22 @@ class Shape:
         """
         return self.topods_shape().__hash__() == other.topods_shape().__hash__()
 
+
+    def reversed(self):
+        """
+        Whether this shape is reversed.
+        
+        - For an edge this is whether the edge is reversed with respect to the curve geometry
+        - For a face this is whether the face is reversed with respect to the surface geometry
+        - For a vertex this is whether the vertex is at the upper or lower parameter value on the
+          edges curve
+
+        Returns:
+            bool: If rational
+        """
+        return self.topods_shape().Orientation() == TopAbs_REVERSED
+
+
     def find_closest_point_data(self, datum):
         """
         Find the information about the closest point on this shape

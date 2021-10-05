@@ -246,11 +246,6 @@ class Face(Shape):
             return srf.BSpline()
         raise ValueError("Unknown surface type: ", surf_type)
 
-    def reversed(self):
-        """
-        Returns if the orientation of the face is reversed i.e. TopAbs_REVERSED
-        """
-        return self.topods_shape().Orientation() == TopAbs_REVERSED
 
     def point(self, uv):
         """
