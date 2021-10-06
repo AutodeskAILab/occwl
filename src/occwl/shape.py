@@ -6,6 +6,7 @@ from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeVertex
 from OCC.Core.BRepExtrema import BRepExtrema_DistShapeShape
 from OCC.Core.Extrema import Extrema_ExtFlag_MIN
 from OCC.Core.gp import gp_Ax1
+from OCC.Core.TopAbs import TopAbs_REVERSED
 from OCC.Core.TopoDS import (
     TopoDS_Edge,
     TopoDS_Face,
@@ -13,6 +14,8 @@ from OCC.Core.TopoDS import (
     TopoDS_Solid,
     TopoDS_Vertex,
     TopoDS_Wire,
+    TopoDS_Compound,
+    TopoDS_CompSolid,
 )
 from OCC.Extend.ShapeFactory import (
     rotate_shape,
@@ -64,6 +67,8 @@ class Shape:
                 TopoDS_Wire,
                 TopoDS_Shell,
                 TopoDS_Solid,
+                TopoDS_Compound,
+                TopoDS_CompSolid,
             ),
         )
         self._shape = topods_shape
@@ -100,6 +105,22 @@ class Shape:
         edge1.reversed() == edge2.reversed()
         """
         return self.topods_shape().__hash__() == other.topods_shape().__hash__()
+
+
+    def reversed(self):
+        """
+        Whether this shape is reversed.
+        
+        - For an edge this is whether the edge is reversed with respect to the curve geometry
+        - For a face this is whether the face is reversed with respect to the surface geometry
+        - For a vertex this is whether the vertex is at the upper or lower parameter value on the
+          edges curve
+
+        Returns:
+            bool: If rational
+        """
+        return self.topods_shape().Orientation() == TopAbs_REVERSED
+
 
     def find_closest_point_data(self, datum):
         """

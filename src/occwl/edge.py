@@ -373,14 +373,6 @@ class Edge(Shape):
             self.topods_shape(), face1.topods_shape(), face2.topods_shape()
         )
 
-    def reversed(self):
-        """
-        Whether this edge is reversed with respect to the curve geometry
-
-        Returns:
-            bool: If rational
-        """
-        return self.topods_shape().Orientation() == TopAbs_REVERSED
 
     def curve_type(self):
         """

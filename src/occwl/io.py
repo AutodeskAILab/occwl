@@ -1,4 +1,5 @@
 from OCC.Core.STEPControl import STEPControl_Reader
+from occwl.compound import Compound
 from occwl.solid import Solid
 from occwl.face import Face
 from occwl.edge import Edge
@@ -12,14 +13,16 @@ from OCC.Core.IFSelect import IFSelect_RetDone
 
 from pathlib import Path
 
-def load_step(step_filename):
-    """Load solids from a STEP file
+def load_single_compound_from_step(step_filename):
+    """
+    Load data from a STEP file as a single compound
 
     Args:
         step_filename (str): Path to STEP file
 
     Returns:
-        List of occwl.Solid: a list of solid models from the file
+        List of occwl.Compound: a single compound containing all shapes in
+                                the file
     """
     # Check that the file exists.  OCC can crash if the file isn't there
     step_filename_path = Path(step_filename)
@@ -31,11 +34,19 @@ def load_step(step_filename):
     reader.ReadFile(step_filename_str)
     reader.TransferRoots()
     shape = reader.OneShape()
-    exp = TopologyUtils.TopologyExplorer(shape, True)
-    bodies = []
-    for body in exp.solids():
-        bodies.append(Solid(body))
-    return bodies
+    return Compound(shape)
+
+def load_step(step_filename):
+    """Load solids from a STEP file
+
+    Args:
+        step_filename (str): Path to STEP file
+
+    Returns:
+        List of occwl.Solid: a list of solid models from the file
+    """
+    compound = load_single_compound_from_step(step_filename)
+    return list(compound.solids())
 
 
 def save_step(list_of_solids, filename):
