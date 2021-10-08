@@ -251,6 +251,8 @@ class Viewer:
                 shapes[i] = Edge(shapes[i])
             elif type(shapes[i]) == TopoDS_Face:
                 shapes[i] = Face(shapes[i])
+            elif type(shapes[i]) == TopoDS_Solid:
+                shapes[i] = Solid(shapes[i])
         return shapes
 
     def selected_shapes(self):
