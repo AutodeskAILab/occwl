@@ -122,18 +122,6 @@ class Edge(Shape):
             return None
         return Edge(edge_builder.Edge())
 
-    @deprecated(
-        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
-    )
-    def topods_edge(self):
-        """
-        Get the underlying OCC type
-
-        Returns:
-            OCC.Core.TopoDS.TopoDS_Edge: Edge
-        """
-        return self.topods_shape()
-
     def point(self, u):
         """
         Evaluate the edge geometry at given parameter

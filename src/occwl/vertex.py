@@ -51,14 +51,4 @@ class Vertex(Shape):
         pt = BRep_Tool.Pnt(self.topods_shape())
         return geom_utils.gp_to_numpy(pt)
 
-    @deprecated(
-        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
-    )
-    def topods_vertex(self):
-        """
-        Get the underlying OCC type
 
-        Returns:
-            OCC.Core.TopoDS.TopoDS_Vertex: Vertex
-        """
-        return self.topods_shape()

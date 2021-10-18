@@ -122,18 +122,6 @@ class Solid(Shape):
             ).Shape()
         )
 
-    @deprecated(
-        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
-    )
-    def topods_solid(self):
-        """
-        Get the underlying OCC type
-
-        Returns:
-            OCC.Core.TopoDS.TopoDS_Solid: Solid
-        """
-        return self.topods_shape()
-
     def vertices(self):
         """
         Get an iterator to go over all vertices in the solid

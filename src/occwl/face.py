@@ -484,18 +484,6 @@ class Face(Shape):
             return "other"
         return "unknown"
 
-    @deprecated(
-        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
-    )
-    def topods_face(self):
-        """
-        Get the underlying OCC type
-
-        Returns:
-            OCC.Core.TopoDS.TopoDS_Face: Face
-        """
-        return self.topods_shape()
-
     def closed_u(self):
         """
         Whether the surface is closed along the U-direction

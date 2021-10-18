@@ -45,18 +45,6 @@ class Wire(Shape):
             return None
         return Wire(wire_builder.Wire())
 
-    @deprecated(
-        target=None, deprecated_in="0.01", remove_in="0.03", stream=logging.warning
-    )
-    def topods_wire(self):
-        """
-        Get the underlying OCC wire type
-
-        Returns:
-            OCC.Core.TopoDS.TopoDS_Wire: Wire
-        """
-        return self.topods_shape()
-
     def ordered_edges(self):
         """
         Get an iterator to go over the edges while respecting the wire ordering
