@@ -23,7 +23,7 @@ class EntityMapperTester(TestBase):
         self.run_test_on_all_files_in_folder(data_folder)
 
     def check_face_order(self, entity_mapper, solid):
-        top_exp = TopologyExplorer(solid.topods_solid())
+        top_exp = TopologyExplorer(solid.topods_shape())
         faces = top_exp.faces()
         for index, face in enumerate(faces):
             f = Face(face)
@@ -31,7 +31,7 @@ class EntityMapperTester(TestBase):
             self.assertEqual(mapped_index, index)
 
     def check_wire_order(self, entity_mapper, solid):
-        top_exp = TopologyExplorer(solid.topods_solid(), ignore_orientation=False)
+        top_exp = TopologyExplorer(solid.topods_shape(), ignore_orientation=False)
         wires = top_exp.wires()
         for index, wire in enumerate(wires):
             w = Wire(wire)
@@ -39,7 +39,7 @@ class EntityMapperTester(TestBase):
             self.assertEqual(mapped_index, index)
 
     def check_edge_order(self, entity_mapper, solid):
-        top_exp = TopologyExplorer(solid.topods_solid())
+        top_exp = TopologyExplorer(solid.topods_shape())
         edges = top_exp.edges()
         for index, edge in enumerate(edges):
             e = Edge(edge)
@@ -48,7 +48,7 @@ class EntityMapperTester(TestBase):
 
     def check_oriented_edge_order(self, entity_mapper, solid):
         oriented_top_exp = TopologyExplorer(
-            solid.topods_solid(), ignore_orientation=False
+            solid.topods_shape(), ignore_orientation=False
         )
         index = 0
         for wire in oriented_top_exp.wires():
@@ -60,7 +60,7 @@ class EntityMapperTester(TestBase):
                 index += 1
 
     def check_vertex_order(self, entity_mapper, solid):
-        top_exp = TopologyExplorer(solid.topods_solid())
+        top_exp = TopologyExplorer(solid.topods_shape())
         vertices = top_exp.vertices()
         for index, vertex in enumerate(vertices):
             v = Vertex(vertex)

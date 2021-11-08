@@ -6,11 +6,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="occwl",  # package name
-    version="0.0.2",
+    version="0.0.3",
     author="Pradeep Kumar Jayaraman, Joseph G. Lambourne",
     author_email="pradeep.kumar.jayaraman@autodesk.com, joseph.lambourne@autodesk.com",
     description="Lightweight Pythonic wrapper around pythonocc",
-    url="git.autodesk.com/Research/occwl",
+    url="https://github.com/AutodeskAILab/occwl",
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
