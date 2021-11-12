@@ -152,6 +152,7 @@ class JupyterViewer:
                                             'CYAN', 'BLACK', 'ORANGE' or [r,g,b] 
                                             Defaults to None.
             render_edges (bool): Whether to render edges
+            transparency (float, optional): Defaults to 0. (opaque). 0. is fully opaque, 1. is fully transparent.
         """
         shape = shape.topods_shape()
         
@@ -160,7 +161,9 @@ class JupyterViewer:
             update=update, 
             shape_color=shape_color,
             render_edges=render_edges,
-            edge_color=edge_color
+            edge_color=edge_color,
+            transparency=transparency != 0.,
+            opacity=1. - transparency
         )
 
     def display_face_colormap(
@@ -170,7 +173,8 @@ class JupyterViewer:
         color_map = "rainbow",
         update=False, 
         render_edges=False,
-        edge_color=None, 
+        edge_color=None,
+        transparency=0.
     ):
         """
         Display a solid with the faces colored according to
@@ -182,6 +186,7 @@ class JupyterViewer:
             color_map (str): Choose from https://matplotlib.org/stable/tutorials/colors/colormaps.html
             values_for_faces (list, np.array): Array of values, one for each face 
             render_edges (bool): Whether to render edges
+            transparency (float, optional): Defaults to 0. (opaque). 0. is fully opaque, 1. is fully transparent.
         """
         if not isinstance(values_for_faces, np.ndarray):
             values_for_faces = np.array(values_for_faces)
@@ -201,7 +206,8 @@ class JupyterViewer:
                 update=False, 
                 shape_color=shape_color, 
                 render_edges=render_edges,
-                edge_color=edge_color
+                edge_color=edge_color,
+                transparency=transparency
             )
 
         # Plot the color scale
