@@ -24,7 +24,7 @@ from OCC.Extend.ShapeFactory import (
     translate_shp,
 )
 from OCC.Core.BRepCheck import BRepCheck_Analyzer 
-
+from OCC.Extend import TopologyUtils
 import occwl.geometry.geom_utils as geom_utils
 
 
@@ -72,6 +72,7 @@ class Shape:
             ),
         )
         self._shape = topods_shape
+        self._top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), True)
 
     def topods_shape(self):
         """
