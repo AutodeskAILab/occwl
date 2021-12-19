@@ -13,6 +13,7 @@ from OCC.Core.IFSelect import IFSelect_RetDone
 
 from pathlib import Path
 
+
 def load_single_compound_from_step(step_filename):
     """
     Load data from a STEP file as a single compound
@@ -24,17 +25,7 @@ def load_single_compound_from_step(step_filename):
         List of occwl.Compound: a single compound containing all shapes in
                                 the file
     """
-    # Check that the file exists.  OCC can crash if the file isn't there
-    step_filename_path = Path(step_filename)
-    if not step_filename_path.exists():
-        return []
-
-    step_filename_str = str(step_filename)
-    reader = STEPControl_Reader()
-    reader.ReadFile(step_filename_str)
-    reader.TransferRoots()
-    shape = reader.OneShape()
-    return Compound(shape)
+    return Compound.load_from_step(step_filename)
 
 def load_step(step_filename):
     """Load solids from a STEP file
