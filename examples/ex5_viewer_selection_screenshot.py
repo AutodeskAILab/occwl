@@ -4,7 +4,7 @@ from occwl.face import Face
 from occwl.solid import Solid
 from occwl.vertex import Vertex
 from occwl.viewer import Viewer
-from occwl.io import load_step
+from occwl.compound import Compound
 
 v = Viewer(backend="wx")
 
@@ -39,7 +39,8 @@ v.add_menu("screenshot")
 v.add_submenu("screenshot", dump)
 
 # Display a solid
-solid = load_step(pathlib.Path(__file__).resolve().parent.joinpath("example.stp"))[0]
+compound = Compound.load_from_step(pathlib.Path(__file__).resolve().parent.joinpath("example.stp"))
+solid = next(compound.solids())
 v.display(solid, transparency=0.5)
 # Set the selection mode to face
 v.selection_mode_face()
