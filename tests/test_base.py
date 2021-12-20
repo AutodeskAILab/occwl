@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 
 # OCC
-from occwl.io import load_step
+from occwl.compound import Compound
 
 
 class TestBase(unittest.TestCase):
@@ -16,7 +16,8 @@ class TestBase(unittest.TestCase):
     def load_single_solid_from_test_data(self, filename):
         solid_pathname = self.test_folder() / "test_data" / filename
         self.assertTrue(solid_pathname.exists())
-        solids = load_step(solid_pathname)
+        comp = Compound.load_from_step(solid_pathname)
+        solids = list(comp.solids())
         self.assertEqual(len(solids), 1)
         return solids[0]
 
@@ -30,7 +31,7 @@ class TestBase(unittest.TestCase):
 
         for file in step_files:
             print(f"Running tests for {file.stem}{file.suffix}")
-            solids = load_step(file)
+            solids = list(Compound.load_from_step(file).solids())
             for solid in solids:
                 self.run_test_with_pathname(file, solid)
 

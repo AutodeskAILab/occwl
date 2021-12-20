@@ -1,19 +1,13 @@
-from OCC.Core.STEPControl import STEPControl_Reader
 from occwl.compound import Compound
 from occwl.solid import Solid
 from occwl.face import Face
 from occwl.edge import Edge
-from occwl.geometry import geom_utils
 from OCC.Extend.DataExchange import export_shape_to_svg
-from OCC.Extend import TopologyUtils
 from OCC.Core.gp import gp_Pnt, gp_Dir
-from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
-from OCC.Core.Interface import Interface_Static_SetCVal
-from OCC.Core.IFSelect import IFSelect_RetDone
-
-from pathlib import Path
+from deprecate import deprecated
 
 
+@deprecated(target=None, deprecated_in="0.0.3", remove_in="0.0.5")
 def load_single_compound_from_step(step_filename):
     """
     Load data from a STEP file as a single compound
@@ -27,6 +21,8 @@ def load_single_compound_from_step(step_filename):
     """
     return Compound.load_from_step(step_filename)
 
+
+@deprecated(target=None, deprecated_in="0.0.3", remove_in="0.0.5")
 def load_step(step_filename):
     """Load solids from a STEP file
 

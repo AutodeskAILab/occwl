@@ -19,7 +19,7 @@ from OCC.Core.Quantity import (
 
 # occwl
 from occwl.edge_data_extractor import EdgeDataExtractor, EdgeConvexity
-from occwl.io import load_step
+from occwl.compound import Compound
 from occwl.viewer import Viewer
 
 # Test
@@ -31,7 +31,7 @@ class EdgeDataExtractorTester(TestBase):
         # Load the solid
         solid_pathname = self.test_folder() / "test_data" / filename
         self.assertTrue(solid_pathname.exists())
-        solids = load_step(solid_pathname)
+        solids = list(Compound.load_from_step(solid_pathname).solids())
         self.assertEqual(len(solids), 1)
         solid = solids[0]
 
