@@ -10,8 +10,8 @@ class CompoundTester(TestBase):
         data_folder = self.test_folder() / "test_data"
         compound_file = data_folder / "ManyBodies.stp"
 
-        compound = load_single_compound_from_step(compound_file)
-        num_solids = 0
+        compound = Compound.load_from_step(compound_file)
+        num_solids = compound.num_solids()
         solids = list(compound.solids())
 
         # We have 4 bodies.  Two are single shell solids
@@ -22,4 +22,4 @@ class CompoundTester(TestBase):
         #435=BREP_WITH_VOIDS('',#429,(#25));
         #436=BREP_WITH_VOIDS('',#431,(#26));
         self.assertEqual(len(solids), 4)
-        
+        self.assertEqual(num_solids, 4)

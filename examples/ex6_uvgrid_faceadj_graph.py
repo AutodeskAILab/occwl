@@ -1,7 +1,6 @@
 import pathlib
 import numpy as np
 from occwl.graph import face_adjacency
-from occwl.io import load_step
 from occwl.solid import Solid
 from occwl.edge import Edge
 from occwl.uvgrid import uvgrid
@@ -10,7 +9,8 @@ from occwl.viewer import Viewer
 # example = Solid.make_box(10, 10, 10)
 # example = Solid.make_sphere(10, (0, 0, 0))
 example = Solid.make_cylinder(5, 10)
-# example = load_step(pathlib.Path(__file__).resolve().parent.joinpath("example.stp"))[0]
+# compound = Compound.load_from_step(pathlib.Path(__file__).resolve().parent.joinpath("example.stp"))
+# example = next(compound.solids())
 g = face_adjacency(example, self_loops=True)
 assert g is not None
 

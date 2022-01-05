@@ -58,7 +58,6 @@ class Solid(Shape):
         else:
             assert isinstance(shape, TopoDS_Solid)
         super().__init__(shape)
-        self._top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), True)
 
     @staticmethod
     def make_box(width, height, depth):
