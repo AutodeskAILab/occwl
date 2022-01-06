@@ -34,6 +34,7 @@ from OCC.Core.TopoDS import (
 )
 from OCC.Display.SimpleGui import init_display
 from OCC.Display.OCCViewer import get_color_from_name
+from OCC.Display.OCCViewer import Viewer3d
 
 from occwl.edge import Edge
 from occwl.face import Face
@@ -43,42 +44,7 @@ from occwl.solid import Solid
 from occwl.vertex import Vertex
 
 
-class Viewer:
-    """
-    A Viewer for solid models
-    """
-
-    def __init__(
-        self,
-        backend: str = None,
-        size: Optional[Tuple[int, int]] = (1024, 768),
-        axes: Optional[bool] = True,
-        background_gradient_color1: Optional[List[int]] = [206, 215, 222],
-        background_gradient_color2: Optional[List[int]] = [128, 128, 128],
-    ):
-        """
-        Construct the Viewer
-
-        Args:
-            backend (str, optional): Backend use to create the viewer. Must be one of wx, pyqt4, pyqt5 or pyside. Defaults to None.
-            size (Optional[Tuple[int, int]], optional): Size of the viewer window. Defaults to (1024, 768).
-            axes (Optional[bool], optional): Show arrows for coordinate axes. Defaults to True.
-            background_gradient_color1 (Optional[List[int]], optional): Background color at the top. Defaults to [206, 215, 222].
-            background_gradient_color2 (Optional[List[int]], optional): Background color at the bottom. Defaults to [128, 128, 128].
-        """
-        (
-            self._display,
-            self._start_display,
-            self._add_menu,
-            self._add_function_to_menu,
-        ) = init_display(
-            backend_str=backend,
-            size=size,
-            display_triedron=axes,
-            background_gradient_color1=background_gradient_color1,
-            background_gradient_color2=background_gradient_color2,
-        )
-
+class _BaseViewer:
     def display(self, shape, update=False, color=None, transparency=0.0):
         """
         Display a shape (must be a Solid, Face, or Edge)
@@ -228,6 +194,192 @@ class Viewer:
             line_entities.append(ais_line)
         return line_entities
 
+    def _convert_to_occwl_types(self, shapes):
+        for i in range(len(shapes)):
+            if type(shapes[i]) == TopoDS_Vertex:
+                shapes[i] = Vertex(shapes[i])
+            elif type(shapes[i]) == TopoDS_Edge:
+                shapes[i] = Edge(shapes[i])
+            elif type(shapes[i]) == TopoDS_Face:
+                shapes[i] = Face(shapes[i])
+            elif type(shapes[i]) == TopoDS_Solid:
+                shapes[i] = Solid(shapes[i])
+        return shapes
+
+    def selected_shapes(self):
+        """
+        Get the selected shapes
+
+        Returns:
+            List[TopoDS_Shape]: List of selected shapes
+        """
+        shapes = self._display.GetSelectedShapes()
+        shapes = self._convert_to_occwl_types(shapes)
+        return shapes
+    
+    def clear(self):
+        """
+        Clear all shapes from the viewer
+        """
+        self._display.EraseAll()
+
+    def fit(self):
+        """
+        Fit the camera to the scene
+        """
+        self._display.FitAll()
+
+    def perspective(self):
+        """
+        Set perspective camera projection
+        """
+        self._display.SetPerspectiveProjection()
+        self._display.FitAll()
+
+    def orthographic(self):
+        """
+        Set orthographic camera projection
+        """
+        self._display.SetOrthographicProjection()
+        self._display.FitAll()
+
+    def wireframe(self):
+        """
+        Set all shapes to appear as wireframes
+        """
+        self._display.View.SetComputedMode(False)
+        self._display.Context.SetDisplayMode(AIS_WireFrame, True)
+
+    def shaded(self):
+        """
+        Shade all shapes
+        """
+        self._display.View.SetComputedMode(False)
+        self._display.Context.SetDisplayMode(AIS_Shaded, True)
+
+    def save_image(self, filename=None):
+        """
+        Save a screenshot of the viewer
+
+        Args:
+            filename (str or pathlib.Path, optional): Image file to save the screenshot. Defaults to None.
+                                                      If None, writes a PNG file named with the current timestamp
+        """
+        if filename is None:
+            now = datetime.now()
+            current_time = str(now)
+            filename = current_time + ".png"
+        self._display.View.Dump(str(filename))
+
+    def use_rasterization(self):
+        """
+        Render using rasterization
+        """
+        self._display.SetRasterizationMode()
+
+    def use_raytracing(self, depth=3):
+        """
+        Render using raytracing
+
+        Args:
+            depth (int, optional): Number of bounces for rays Defaults to 3.
+        """
+        self._display.SetRaytracingMode(depth=depth)
+    
+    def show_axes(self):
+        """
+        Show the XYZ-axes widget
+        """
+        self._display.show_triedron()
+
+    def hide_axes(self):
+        """
+        Hide the XYZ-axes widget
+        """
+        self._display.hide_triedron()
+    
+    def enable_antialiasing(self):
+        """
+        Enable antialiasing
+        """
+        self._display.EnableAntiAliasing()
+    
+    def disable_antialiasing(self):
+        """
+        Disable antialiasing
+        """
+        self._display.DisableAntiAliasing()
+    
+    def set_background_color(self, top_color, bottom_color):
+        """
+        Set the background gradient color
+
+        Args:
+            top_color (List/Tuple[int, int, int]): Top color
+            bottom_color (List/Tuple[int, int, int]): Bottom color
+        """
+        assert isinstance(top_color, (tuple, list))
+        assert isinstance(bottom_color, (tuple, list))
+        self._display.set_bg_gradient_color(top_color, bottom_color)
+    
+    def show_face_boundary(self):
+        """
+        Show the edges bounding each face
+        """
+        self._display.default_drawer.SetFaceBoundaryDraw(True)
+
+    def hide_face_boundary(self):
+        """
+        Hide the edges bounding each face
+        """
+        self._display.default_drawer.SetFaceBoundaryDraw(False)
+    
+    def set_size(self, tuple_of_width_and_height):
+        """
+        Set the size of the framebuffer
+
+        Args:
+            tuple_of_width_and_height (Tuple[int, int]): Width and height
+        """
+        self._display.SetSize(tuple_of_width_and_height)
+
+
+class Viewer(_BaseViewer):
+    """
+    A Viewer for topological entities
+    """
+
+    def __init__(
+        self,
+        backend: str = None,
+        size: Optional[Tuple[int, int]] = (1024, 768),
+        axes: Optional[bool] = True,
+        background_gradient_color1: Optional[List[int]] = [206, 215, 222],
+        background_gradient_color2: Optional[List[int]] = [128, 128, 128],
+    ):
+        """
+        Construct the Viewer
+
+        Args:
+            backend (str, optional): Backend use to create the viewer. Must be one of wx, pyqt4, pyqt5 or pyside. Defaults to None.
+            size (Optional[Tuple[int, int]], optional): Size of the viewer window. Defaults to (1024, 768).
+            axes (Optional[bool], optional): Show arrows for coordinate axes. Defaults to True.
+            background_gradient_color1 (Optional[List[int]], optional): Background color at the top. Defaults to [206, 215, 222].
+            background_gradient_color2 (Optional[List[int]], optional): Background color at the bottom. Defaults to [128, 128, 128].
+        """
+        (
+            self._display,
+            self._start_display,
+            self._add_menu,
+            self._add_function_to_menu,
+        ) = init_display(
+            backend_str=backend,
+            size=size,
+            display_triedron=axes,
+            background_gradient_color1=background_gradient_color1,
+            background_gradient_color2=background_gradient_color2,
+        )
+
     def on_select(self, callback):
         """
         Callback to execute when a selection is made
@@ -272,18 +424,6 @@ class Viewer:
         """
         self._start_display()
 
-    def clear(self):
-        """
-        Clear all shapes from the viewer
-        """
-        self._display.EraseAll()
-
-    def fit(self):
-        """
-        Fit the camera to the scene
-        """
-        self._display.FitAll()
-
     def add_menu(self, name):
         """
         Add a custom menu to the viewer
@@ -310,34 +450,6 @@ class Viewer:
         import sys
 
         sys.exit()
-
-    def perspective(self):
-        """
-        Set perspective camera projection
-        """
-        self._display.SetPerspectiveProjection()
-        self._display.FitAll()
-
-    def orthographic(self):
-        """
-        Set orthographic camera projection
-        """
-        self._display.SetOrthographicProjection()
-        self._display.FitAll()
-
-    def wireframe(self):
-        """
-        Set all shapes to appear as wireframes
-        """
-        self._display.View.SetComputedMode(False)
-        self._display.Context.SetDisplayMode(AIS_WireFrame, True)
-
-    def shaded(self):
-        """
-        Shade all shapes
-        """
-        self._display.View.SetComputedMode(False)
-        self._display.Context.SetDisplayMode(AIS_Shaded, True)
 
     def selection_mode_vertex(self):
         """
@@ -375,31 +487,31 @@ class Viewer:
         """
         self._display.SetSelectionModeShape()
 
-    def save_image(self, filename=None):
-        """
-        Save a screenshot of the viewer
+
+class OffscreenRenderer(_BaseViewer):
+    """
+    Offscreen renderer that doesn't create a window. Useful for batch rendering.
+    """
+    def __init__(self, size: Optional[Tuple[int, int]] = (1024, 768),
+        axes: Optional[bool] = True,
+        background_top_color: Optional[List[int]] = [206, 215, 222],
+        background_bottom_color: Optional[List[int]] = [128, 128, 128]
+    ):
+        """        
+        Construct the OffscreenRenderer
 
         Args:
-            filename (str or pathlib.Path, optional): Image file to save the screenshot. Defaults to None.
-                                                      If None, writes a PNG file named with the current timestamp
+            size (Optional[Tuple[int, int]], optional): Size of the viewer window. Defaults to (1024, 768).
+            axes (Optional[bool], optional): Show arrows for coordinate axes. Defaults to True.
+            background_top_color (Optional[List[int]], optional): Background color at the top. Defaults to [206, 215, 222].
+            background_bottom_color (Optional[List[int]], optional): Background color at the bottom. Defaults to [128, 128, 128].
         """
-        if filename is None:
-            now = datetime.now()
-            current_time = str(now)
-            filename = current_time + ".png"
-        self._display.View.Dump(str(filename))
-
-    def use_rasterization(self):
-        """
-        Render using rasterization
-        """
-        self._display.SetRasterizationMode()
-
-    def use_raytracing(self, depth=3):
-        """
-        Render using raytracing
-
-        Args:
-            depth (int, optional): Number of bounces for rays Defaults to 3.
-        """
-        self._display.SetRaytracingMode(depth=depth)
+        super().__init__()
+        self._display = Viewer3d()
+        self._display.Create()
+        if axes:
+            self.show_axes()
+        else:
+            self.hide_axes()
+        self.set_size(size)
+        self.set_background_color(background_top_color, background_bottom_color)
