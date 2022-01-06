@@ -14,6 +14,11 @@ from OCC.Core.Aspect import (
     Aspect_TOM_STAR,
     Aspect_TOM_X,
 )
+from OCC.Core.Graphic3d import (
+    Graphic3d_TOSM_VERTEX,
+    Graphic3d_TOSM_FACET,
+    Graphic3d_TOSM_FRAGMENT
+)
 from OCC.Core.gp import gp_Ax1
 from OCC.Core.Geom import Geom_CartesianPoint, Geom_Line
 from OCC.Core.Prs3d import Prs3d_LineAspect, Prs3d_PointAspect
@@ -342,6 +347,24 @@ class _BaseViewer:
             tuple_of_width_and_height (Tuple[int, int]): Width and height
         """
         self._display.SetSize(tuple_of_width_and_height)
+    
+    def use_gouraud_shading(self):
+        """
+        Compute colors per vertex and interpolate
+        """
+        self.SetShadingModel(Graphic3d_TOSM_VERTEX)
+    
+    def use_flat_shading(self):
+        """
+        Use no interpolation when computing color for fragments in a triangle
+        """
+        self.SetShadingModel(Graphic3d_TOSM_FACET)
+
+    def use_phong_shading(self):
+        """
+        Compute colors per fragment
+        """
+        self.SetShadingModel(Graphic3d_TOSM_FRAGMENT)
 
 
 class Viewer(_BaseViewer):
