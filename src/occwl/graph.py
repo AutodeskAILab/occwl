@@ -1,14 +1,17 @@
-from occwl.solid import Solid
 import networkx as nx
+from occwl.compound import Compound
+from occwl.solid import Solid
+from occwl.face import Face
+from occwl.wire import Wire
 from occwl.entity_mapper import EntityMapper
 
 
-def face_adjacency(solid, self_loops=False):
+def face_adjacency(shape, self_loops=False):
     """
-    Creates a face adjacency graph from the given solid
+    Creates a face adjacency graph from the given shape (Solid or Compound)
 
     Args:
-        solid (occwl.solid.Solid): Solid model
+        solid (Solid, or Compound): Shape
         self_loops (bool, optional): Whether to add self loops in the graph. Defaults to False.
         
     Returns:
@@ -18,18 +21,20 @@ def face_adjacency(solid, self_loops=False):
                     Edge attributes:
                     - "edge": contains the B-rep (ordered) edge
                     - "edge_idx": index of the (ordered) edge in the solid
-        None: if the solid is non-manifold or open
+        None: if the shape is non-manifold or open
     """
-    mapper = EntityMapper(solid)
+    # TODO(pradeep): also allow Shell in future
+    assert isinstance(shape, (Solid, Compound))
+    mapper = EntityMapper(shape)
     graph = nx.DiGraph()
-    for face in solid.faces():
+    for face in shape.faces():
         face_idx = mapper.face_index(face)
         graph.add_node(face_idx, face=face)
 
-    for edge in solid.edges():
+    for edge in shape.edges():
         if not edge.has_curve():
             continue
-        connected_faces = list(solid.faces_from_edge(edge))
+        connected_faces = list(shape.faces_from_edge(edge))
         if len(connected_faces) < 2:
             if edge.seam(connected_faces[0]) and self_loops:
                 face_idx = mapper.face_index(connected_faces[0])
@@ -52,12 +57,12 @@ def face_adjacency(solid, self_loops=False):
     return graph
 
 
-def vertex_adjacency(solid, self_loops=False):
+def vertex_adjacency(shape, self_loops=False):
     """ 
-    Creates a vertex adjacency graph from the given solid
+    Creates a vertex adjacency graph from the given shape (Wire, Solid or Compound)
 
     Args:
-        solid (occwl.solid.Solid): Solid model
+        shape (Wire, Face, Solid, or Compound): Shape
         self_loops (bool, optional): Whether to add self loops in the graph. Defaults to False.
     
     Returns:
@@ -68,14 +73,16 @@ def vertex_adjacency(solid, self_loops=False):
                     - "edge": contains the B-rep (ordered) edge
                     - "edge_idx": index of the (ordered) edge in the solid
     """
-    mapper = EntityMapper(solid)
+    # TODO(pradeep): also allow Shell in future
+    assert isinstance(shape, (Wire, Face, Solid, Compound))
+    mapper = EntityMapper(shape)
     graph = nx.DiGraph()
-    for vert in solid.vertices():
+    for vert in shape.vertices():
         vert_idx = mapper.vertex_index(vert)
         graph.add_node(vert_idx, vertex=vert)
 
-    for edge in solid.edges():
-        connected_verts = list(solid.vertices_from_edge(edge))
+    for edge in shape.edges():
+        connected_verts = list(shape.vertices_from_edge(edge))
         if not edge.has_curve():
             continue
         if len(connected_verts) == 1:
