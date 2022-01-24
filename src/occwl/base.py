@@ -18,6 +18,10 @@ from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
 
 
 class VertexContainerMixin:
+    """
+    A mixin class that adds the ability to perform operations on the vertices
+    in the shape
+    """
     def num_vertices(self):
         """
         Number of vertices in the Shape
@@ -39,6 +43,10 @@ class VertexContainerMixin:
 
 
 class EdgeContainerMixin:
+    """
+    A mixin class that adds the ability to perform operations on the edges
+    in the shape
+    """
     def num_edges(self):
         """
         Number of edges in the Shape
@@ -91,7 +99,11 @@ class EdgeContainerMixin:
         return _find_closest_shape_in_list(self.edges(), datum)
 
 
-class WireContainerMixin:    
+class WireContainerMixin:
+    """
+    A mixin class that adds the ability to perform operations on the wires
+    in the shape
+    """
     def num_wires(self):
         """
         Number of wires in the Shape
@@ -113,6 +125,10 @@ class WireContainerMixin:
 
 
 class FaceContainerMixin:
+    """
+    A mixin class that adds the ability to perform operations on the faces
+    in the shape
+    """
     def num_faces(self):
         """
         Number of faces in the Shape
@@ -196,6 +212,10 @@ class FaceContainerMixin:
 
 
 class SolidContainerMixin:
+    """
+    A mixin class that adds the ability to perform operations on the solids
+    in the shape
+    """
     def num_solids(self):
         """
         Number of solids in the Compound
@@ -217,6 +237,10 @@ class SolidContainerMixin:
 
 
 class BottomUpFaceIterator:
+    """
+    A mixin class that adds the ability to iterate over faces from lower-level entities
+    (vertices and edges).
+    """
     def faces_from_edge(self, edge):
         """
         Get an iterator to go over the faces adjacent to an edge
@@ -266,6 +290,10 @@ class BottomUpFaceIterator:
 
 
 class BottomUpEdgeIterator:
+    """
+    A mixin class that adds the ability to iterate over edges from lower-level entities
+    (vertices).
+    """
     def edge_continuity(self, edge):
         """
         Get the neighboring faces' continuity at given edge
@@ -299,6 +327,10 @@ class BottomUpEdgeIterator:
 
 
 class TriangulatorMixin:
+    """
+    A mixin class that adds the ability to triangulate the faces that are present
+    in the shape.
+    """
     def triangulate_all_faces(
         self,
         triangle_face_tol=0.01,  # Tolerance between triangle and surface
@@ -382,7 +414,9 @@ class TriangulatorMixin:
 
 
 class ClosedEntitySplitterMixin:
-    
+    """
+    A mixin class that adds the ability to spit closed faces and edges in the Shape.
+    """
     def split_all_closed_faces(self, max_tol=0.01, precision=0.01, num_splits=1):
         """
         Split all the closed faces in this solid
@@ -433,6 +467,9 @@ class ClosedEntitySplitterMixin:
 
 
 class SurfacePropertiesMixin:
+    """
+    A mixin class that adds the ability to query surface properties (e.g. area).
+    """
     def area(self):
         """
         Compute the area of the Shape
@@ -446,6 +483,9 @@ class SurfacePropertiesMixin:
 
 
 class VolumePropertiesMixin:
+    """
+    A mixin class that adds the ability to query volumetric properties (e.g. volume, center of mass, etc.).
+    """
     def volume(self, tolerance=1e-9):
         """
         Compute the volume of the Shape
@@ -498,6 +538,10 @@ class VolumePropertiesMixin:
 
 
 class BoundingBoxMixin:
+    """
+    A mixin class that adds the ability to compute approximate and exact bounding box
+    of the Shape.
+    """
     def box(self):
         """
         Get a quick bounding box of the Shape
