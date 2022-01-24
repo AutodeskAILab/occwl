@@ -97,6 +97,30 @@ class EdgeContainerMixin:
             Face: The closest face in the Shape
         """
         return _find_closest_shape_in_list(self.edges(), datum)
+    
+    def split_all_closed_edges(self, max_tol=0.01, precision=0.01, num_splits=1):
+        """
+        Split all the closed edges in this solid
+
+        Args:
+            max_tol (float, optional): Maximum tolerance allowed. Defaults to 0.01.
+            precision (float, optional): Precision of the tool when splitting. Defaults to 0.01.
+            num_splits (int, optional): Number of splits to perform. Each split edge will result in num_splits + 1 edges. Defaults to 1.
+
+        Returns:
+            occwl.*.*: Shape with closed edges split
+        """
+        divider = ShapeUpgrade_ShapeDivideClosedEdges(self.topods_shape())
+        divider.SetPrecision(precision)
+        divider.SetMinTolerance(0.1 * max_tol)
+        divider.SetMaxTolerance(max_tol)
+        divider.SetNbSplitPoints(num_splits)
+        ok = divider.Perform()
+        if not ok:
+            # Splitting failed or there were no closed edges to split
+            # Return the original solid
+            return self
+        return type(self)(divider.Result())
 
 
 class WireContainerMixin:
@@ -209,6 +233,30 @@ class FaceContainerMixin:
             Face: The closest face in the Shape
         """
         return _find_closest_shape_in_list(self.faces(), datum)
+    
+    def split_all_closed_faces(self, max_tol=0.01, precision=0.01, num_splits=1):
+        """
+        Split all the closed faces in this solid
+
+        Args:
+            max_tol (float, optional): Maximum tolerance allowed. Defaults to 0.01.
+            precision (float, optional): Precision of the tool when splitting. Defaults to 0.01.
+            num_splits (int, optional): Number of splits to perform. Each split face will result in num_splits + 1 faces. Defaults to 1.
+
+        Returns:
+            occwl.*.*: Shape with closed faces split
+        """
+        divider = ShapeUpgrade_ShapeDivideClosed(self.topods_shape())
+        divider.SetPrecision(precision)
+        divider.SetMinTolerance(0.1 * max_tol)
+        divider.SetMaxTolerance(max_tol)
+        divider.SetNbSplitPoints(num_splits)
+        ok = divider.Perform()
+        if not ok:
+            # Splitting failed or there were no closed faces to split
+            # Return the original solid
+            return self
+        return type(self)(divider.Result())
 
 
 class SolidContainerMixin:
@@ -411,59 +459,6 @@ class TriangulatorMixin:
                 tris.append(new_indices)
             last_vert_index = len(verts)
         return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int32)
-
-
-class ClosedEntitySplitterMixin:
-    """
-    A mixin class that adds the ability to spit closed faces and edges in the Shape.
-    """
-    def split_all_closed_faces(self, max_tol=0.01, precision=0.01, num_splits=1):
-        """
-        Split all the closed faces in this solid
-
-        Args:
-            max_tol (float, optional): Maximum tolerance allowed. Defaults to 0.01.
-            precision (float, optional): Precision of the tool when splitting. Defaults to 0.01.
-            num_splits (int, optional): Number of splits to perform. Each split face will result in num_splits + 1 faces. Defaults to 1.
-
-        Returns:
-            occwl.*.*: Shape with closed faces split
-        """
-        divider = ShapeUpgrade_ShapeDivideClosed(self.topods_shape())
-        divider.SetPrecision(precision)
-        divider.SetMinTolerance(0.1 * max_tol)
-        divider.SetMaxTolerance(max_tol)
-        divider.SetNbSplitPoints(num_splits)
-        ok = divider.Perform()
-        if not ok:
-            # Splitting failed or there were no closed faces to split
-            # Return the original solid
-            return self
-        return type(self)(divider.Result())
-
-    def split_all_closed_edges(self, max_tol=0.01, precision=0.01, num_splits=1):
-        """
-        Split all the closed edges in this solid
-
-        Args:
-            max_tol (float, optional): Maximum tolerance allowed. Defaults to 0.01.
-            precision (float, optional): Precision of the tool when splitting. Defaults to 0.01.
-            num_splits (int, optional): Number of splits to perform. Each split edge will result in num_splits + 1 edges. Defaults to 1.
-
-        Returns:
-            occwl.*.*: Shape with closed edges split
-        """
-        divider = ShapeUpgrade_ShapeDivideClosedEdges(self.topods_shape())
-        divider.SetPrecision(precision)
-        divider.SetMinTolerance(0.1 * max_tol)
-        divider.SetMaxTolerance(max_tol)
-        divider.SetNbSplitPoints(num_splits)
-        ok = divider.Perform()
-        if not ok:
-            # Splitting failed or there were no closed edges to split
-            # Return the original solid
-            return self
-        return type(self)(divider.Result())
 
 
 class SurfacePropertiesMixin:
