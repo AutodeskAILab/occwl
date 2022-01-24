@@ -21,7 +21,7 @@ from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.gp import gp_Dir, gp_Pnt, gp_Pnt2d, gp_TrsfForm
 from OCC.Core.GProp import GProp_GProps
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
-from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED, TopAbs_ON
+from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
 from OCC.Core.TopLoc import TopLoc_Location
 from OCC.Core.TopoDS import TopoDS_Face
 from OCC.Extend import TopologyUtils
@@ -188,7 +188,7 @@ class Face(Shape):
             bool: Is inside
         """
         result = self._trimmed.Perform(gp_Pnt2d(uv[0], uv[1]))
-        return result == TopAbs_IN or result == TopAbs_ON
+        return result == TopAbs_IN
     
     def visibility_status(self, uv):
         """
