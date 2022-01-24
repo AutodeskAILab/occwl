@@ -17,7 +17,7 @@ from OCC.Core.ShapeUpgrade import ShapeUpgrade_ShapeDivideClosedEdges
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
 
 
-class VertexIterator:
+class VertexContainerMixin:
     def num_vertices(self):
         """
         Number of vertices in the Shape
@@ -38,7 +38,7 @@ class VertexIterator:
         return map(Vertex, self._top_exp.vertices())
 
 
-class EdgeIterator:
+class EdgeContainerMixin:
     def num_edges(self):
         """
         Number of edges in the Shape
@@ -91,7 +91,7 @@ class EdgeIterator:
         return _find_closest_shape_in_list(self.edges(), datum)
 
 
-class WireIterator:    
+class WireContainerMixin:    
     def num_wires(self):
         """
         Number of wires in the Shape
@@ -112,7 +112,7 @@ class WireIterator:
         return map(Wire, self._top_exp.wires())
 
 
-class FaceIterator:
+class FaceContainerMixin:
     def num_faces(self):
         """
         Number of faces in the Shape
@@ -195,7 +195,7 @@ class FaceIterator:
         return _find_closest_shape_in_list(self.faces(), datum)
 
 
-class SolidIterator:
+class SolidContainerMixin:
     def num_solids(self):
         """
         Number of solids in the Compound
@@ -298,7 +298,7 @@ class BottomUpEdgeIterator:
         return map(Edge, self._top_exp.edges_from_vertex(vertex.topods_shape()))
 
 
-class Triangulator:
+class TriangulatorMixin:
     def triangulate_all_faces(
         self,
         triangle_face_tol=0.01,  # Tolerance between triangle and surface
@@ -381,7 +381,7 @@ class Triangulator:
         return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int32)
 
 
-class ClosedEntitySplitter:
+class ClosedEntitySplitterMixin:
     
     def split_all_closed_faces(self, max_tol=0.01, precision=0.01, num_splits=1):
         """
@@ -432,7 +432,7 @@ class ClosedEntitySplitter:
         return type(self)(divider.Result())
 
 
-class SurfaceProperties:
+class SurfacePropertiesMixin:
     def area(self):
         """
         Compute the area of the Shape
@@ -445,7 +445,7 @@ class SurfaceProperties:
         return geometry_properties.Mass()
 
 
-class VolumeProperties:
+class VolumePropertiesMixin:
     def volume(self, tolerance=1e-9):
         """
         Compute the volume of the Shape
@@ -497,7 +497,7 @@ class VolumeProperties:
         return props.MomentOfInertia(axis)
 
 
-class BoundingBox:
+class BoundingBoxMixin:
     def box(self):
         """
         Get a quick bounding box of the Shape

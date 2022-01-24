@@ -1,10 +1,14 @@
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Extend.DataExchange import read_step_file, list_of_shapes_to_compound
-from occwl.base import BottomUpFaceIterator, BoundingBox, ClosedEntitySplitter, EdgeIterator, FaceIterator, SolidIterator, SurfaceProperties, Triangulator, VertexIterator, VolumeProperties, WireIterator
+from occwl.base import BottomUpFaceIterator, BoundingBoxMixin, ClosedEntitySplitterMixin, \
+    EdgeContainerMixin, FaceContainerMixin, SolidContainerMixin, SurfacePropertiesMixin, \
+        TriangulatorMixin, VertexContainerMixin, VolumePropertiesMixin, WireContainerMixin
 from occwl.shape import Shape
 
 
-class Compound(Shape, VertexIterator, EdgeIterator, WireIterator, FaceIterator, SolidIterator, BottomUpFaceIterator, ClosedEntitySplitter, SurfaceProperties, VolumeProperties, BoundingBox, Triangulator):
+class Compound(Shape, BottomUpFaceIterator, BoundingBoxMixin, ClosedEntitySplitterMixin,
+    EdgeContainerMixin, FaceContainerMixin, SolidContainerMixin, SurfacePropertiesMixin,
+    TriangulatorMixin, VertexContainerMixin, VolumePropertiesMixin, WireContainerMixin):
     """
     A compound which can be worked with as many shapes
     lumped together.

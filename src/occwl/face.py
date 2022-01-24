@@ -23,7 +23,8 @@ from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
 from OCC.Core.TopLoc import TopLoc_Location
 from OCC.Core.TopoDS import TopoDS_Face
 
-from occwl.base import BoundingBox, Triangulator, WireIterator, EdgeIterator, VertexIterator, SurfaceProperties
+from occwl.base import BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
+    EdgeContainerMixin, VertexContainerMixin, SurfacePropertiesMixin
 from occwl.edge import Edge
 from occwl.shape import Shape
 
@@ -32,7 +33,8 @@ import occwl.geometry.interval as Interval
 from occwl.geometry.box import Box
 
 
-class Face(Shape, WireIterator, EdgeIterator, VertexIterator, SurfaceProperties, Triangulator, BoundingBox):
+class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
+    EdgeContainerMixin, VertexContainerMixin, SurfacePropertiesMixin):
     """
     A topological face in a solid model
     Represents a 3D surface bounded by a Wire

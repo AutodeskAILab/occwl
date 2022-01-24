@@ -7,10 +7,10 @@ from OCC.Core.TopoDS import (
 )
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
 import math
-from occwl.base import VertexIterator, EdgeIterator, \
-            WireIterator, FaceIterator, BottomUpFaceIterator, \
-            ClosedEntitySplitter, SurfaceProperties,VolumeProperties, \
-            BoundingBox, Triangulator
+from occwl.base import VertexContainerMixin, EdgeContainerMixin, \
+            WireContainerMixin, FaceContainerMixin, BottomUpFaceIterator, \
+            ClosedEntitySplitterMixin, SurfacePropertiesMixin, VolumePropertiesMixin, \
+            BoundingBoxMixin, TriangulatorMixin
 
 from occwl.geometry import geom_utils
 from occwl.shape import Shape
@@ -18,10 +18,10 @@ from deprecate import deprecated
 import logging
 
 
-class Solid(Shape, VertexIterator, EdgeIterator,
-            WireIterator, FaceIterator, BottomUpFaceIterator,
-            ClosedEntitySplitter, SurfaceProperties,VolumeProperties,
-            BoundingBox, Triangulator):
+class Solid(Shape, VertexContainerMixin, EdgeContainerMixin, \
+            WireContainerMixin, FaceContainerMixin, BottomUpFaceIterator, \
+            ClosedEntitySplitterMixin, SurfacePropertiesMixin, VolumePropertiesMixin, \
+            BoundingBoxMixin, TriangulatorMixin):
     """
     A solid model
     """

@@ -29,12 +29,12 @@ import occwl.geometry.geom_utils as geom_utils
 import occwl.vertex
 from occwl.geometry.interval import Interval
 from occwl.shape import Shape
-from occwl.base import VertexIterator, BoundingBox
+from occwl.base import VertexContainerMixin, BoundingBoxMixin
 from deprecate import deprecated
 import logging
 
 
-class Edge(Shape, VertexIterator, BoundingBox):
+class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
     """
     A topological edge in a solid model
     Represents a 3D curve bounded by vertices
