@@ -20,11 +20,6 @@ def face_adjacency(solid, self_loops=False):
                     - "edge_idx": index of the (ordered) edge in the solid
         None: if the solid is non-manifold or open
     """
-    assert isinstance(solid, Solid)
-    # Return None if the solid is not closed i.e. has holes
-    # TODO(pradeep): this should be accommodated in future
-    if not solid.is_closed():
-        return None
     mapper = EntityMapper(solid)
     graph = nx.DiGraph()
     for face in solid.faces():
