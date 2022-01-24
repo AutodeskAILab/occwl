@@ -87,7 +87,7 @@ class EdgeContainerMixin:
         The function is for testing only.  It will be slow 
         as it loops over all edges in the Shape.
         A quick way to find the closest entity is to call
-        Solid.find_closest_point_data(), but then you
+        Shape.find_closest_point_data(), but then you
         may get a face, edge or vertex back.
         
         Args:
@@ -100,7 +100,7 @@ class EdgeContainerMixin:
     
     def split_all_closed_edges(self, max_tol=0.01, precision=0.01, num_splits=1):
         """
-        Split all the closed edges in this solid
+        Split all the closed edges in this shape
 
         Args:
             max_tol (float, optional): Maximum tolerance allowed. Defaults to 0.01.
@@ -118,7 +118,7 @@ class EdgeContainerMixin:
         ok = divider.Perform()
         if not ok:
             # Splitting failed or there were no closed edges to split
-            # Return the original solid
+            # Return the original shape
             return self
         return type(self)(divider.Result())
 
@@ -236,7 +236,7 @@ class FaceContainerMixin:
     
     def split_all_closed_faces(self, max_tol=0.01, precision=0.01, num_splits=1):
         """
-        Split all the closed faces in this solid
+        Split all the closed faces in this shape
 
         Args:
             max_tol (float, optional): Maximum tolerance allowed. Defaults to 0.01.
@@ -254,7 +254,7 @@ class FaceContainerMixin:
         ok = divider.Perform()
         if not ok:
             # Splitting failed or there were no closed faces to split
-            # Return the original solid
+            # Return the original shape
             return self
         return type(self)(divider.Result())
 
@@ -400,7 +400,7 @@ class TriangulatorMixin:
         """
         Triangulate all the faces in the shape. You can then get the triangles 
         from each face separately using face.get_triangles().
-        If you wanted triangles for the entire solid then call
+        If you wanted triangles for the entire shape then call
         shape.get_triangles() below.
         For more details see 
         https://old.opencascade.com/doc/occt-7.1.0/overview/html/occt_user_guides__modeling_algos.html#occt_modalg_11
@@ -587,14 +587,14 @@ class BoundingBoxMixin:
         move_to_center.SetTranslation(vec_center_to_orig)
 
         scale_trsf = gp_Trsf()
-        scale_trsf.SetScale(orig, (2.0 * box_side) /longest_length)
+        scale_trsf.SetScale(orig, (2.0 * box_side) / longest_length)
         trsf_to_apply = scale_trsf.Multiplied(move_to_center)
         
         apply_transform = BRepBuilderAPI_Transform(trsf_to_apply)
         apply_transform.Perform(self.topods_shape())
-        transformed_solid = apply_transform.ModifiedShape(self.topods_shape())
+        transformed_shape = apply_transform.ModifiedShape(self.topods_shape())
 
-        return type(self)(transformed_solid)
+        return type(self)(transformed_shape)
 
     def scale_to_unit_box(self):
         """
@@ -602,7 +602,7 @@ class BoundingBoxMixin:
         into the [-1, 1]^3 box
 
         Returns:
-            occwl.Solid: The scaled version of this solid
+            The scaled version of this shape
         """
         return self.scale_to_box(1.0)
 
@@ -613,7 +613,7 @@ def _find_closest_shape_in_list(shapes, datum):
     and return the closest one.   
     Typically you would want to find the closest entity 
     which may be a face, edge or vertex.  For this you can
-    use Solid.find_closest_point_data()
+    use Shape.find_closest_point_data()
     """
     closest_dist_yet = np.inf
     closest_shape = None
