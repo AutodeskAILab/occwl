@@ -41,6 +41,7 @@ from occwl.wire import Wire
 from occwl.geometry import geom_utils
 from occwl.solid import Solid
 from occwl.vertex import Vertex
+from occwl.compound import Compound
 
 
 class Viewer:
@@ -91,7 +92,7 @@ class Viewer:
                                            'CYAN', 'BLACK', or 'ORANGE'. Defaults to None.
             transparency (float, optional): How transparent the shape is. Defaults to 0.0.
         """
-        if isinstance(shape, (Solid, Face, Edge, Wire, Vertex)):
+        if isinstance(shape, (Compound, Solid, Face, Edge, Wire, Vertex)):
             shape = shape.topods_shape()
         if color and not isinstance(color, (str, tuple)):
             color = "BLACK"
