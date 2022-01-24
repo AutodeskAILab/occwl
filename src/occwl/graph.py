@@ -68,7 +68,6 @@ def vertex_adjacency(solid, self_loops=False):
                     - "edge": contains the B-rep (ordered) edge
                     - "edge_idx": index of the (ordered) edge in the solid
     """
-    assert isinstance(solid, Solid)
     mapper = EntityMapper(solid)
     graph = nx.DiGraph()
     for vert in solid.vertices():
