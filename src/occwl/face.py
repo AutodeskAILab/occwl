@@ -179,7 +179,7 @@ class Face(Shape):
 
     def inside(self, uv):
         """
-        Check if the uv-coordinate in on the visible region of the face
+        Check if the uv-coordinate is inside the visible region of the face (excludes points that lie on the boundary)
 
         Args:
             uv (np.ndarray or tuple): Surface parameter
