@@ -11,7 +11,7 @@ g = face_adjacency(example, self_loops=True)
 print(f"Number of nodes (faces): {len(g.nodes)}")
 print(f"Number of edges: {len(g.edges)}")
 
-v = Viewer(backend="wx")
+v = Viewer()  #backend="wx")
 v.display(example, transparency=0.8)
 
 # Get the points at each face's center
@@ -22,7 +22,7 @@ for face_idx in g.nodes():
     parbox = face.uv_bounds()
     umin, vmin = parbox.min_point()
     umax, vmax = parbox.max_point()
-    center_uv = (0.5 * (umax - umin), vmin + 0.5 * (vmax - vmin))
+    center_uv = (umin + 0.5 * (umax - umin), vmin + 0.5 * (vmax - vmin))
     center = face.point(center_uv)
     v.display(Solid.make_sphere(center=center, radius=0.25))
     face_centers[face_idx] = center
