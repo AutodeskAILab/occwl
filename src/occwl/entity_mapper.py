@@ -14,12 +14,6 @@ NOTE:
     to check if an oriented edge is used by a wire and known to the entity mapper.    
 """
 
-# PythonOCC
-from OCC.Extend.TopologyUtils import TopologyExplorer, WireExplorer
-
-# occwl
-from occwl.solid import Solid
-
 
 class EntityMapper:
     """
