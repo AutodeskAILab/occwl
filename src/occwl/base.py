@@ -1,12 +1,5 @@
 import numpy as np
 
-import occwl.vertex
-import occwl.edge
-import occwl.wire
-import occwl.face
-import occwl.solid
-from occwl.geometry import geom_utils
-
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
 from OCC.Core.Bnd import Bnd_Box
 from OCC.Core.BRepBndLib import brepbndlib_Add, brepbndlib_AddOptimal
@@ -41,7 +34,8 @@ class VertexIterator:
         Returns:
             Iterator[occwl.vertex.Vertex]: Vertex iterator
         """
-        return map(occwl.vertex.Vertex, self._top_exp.vertices())
+        from occwl.vertex import Vertex
+        return map(Vertex, self._top_exp.vertices())
 
 
 class EdgeIterator:
@@ -61,7 +55,8 @@ class EdgeIterator:
         Returns:
             Iterator[occwl.edge.Edge]: Edge iterator
         """
-        return map(occwl.edge.Edge, self._top_exp.edges())
+        from occwl.edge import Edge
+        return map(Edge, self._top_exp.edges())
     
     def vertices_from_edge(self, edge):
         """
@@ -73,8 +68,10 @@ class EdgeIterator:
         Returns:
             Iterator[occwl.vertex.Vertex]: Vertex iterator
         """
-        assert isinstance(edge, occwl.edge.Edge)
-        return map(occwl.vertex.Vertex, self._top_exp.vertices_from_edge(edge.topods_shape()))
+        from occwl.vertex import Vertex
+        from occwl.edge import Edge
+        assert isinstance(edge, Edge)
+        return map(Vertex, self._top_exp.vertices_from_edge(edge.topods_shape()))
     
     def find_closest_edge_slow(self, datum):
         """
@@ -111,7 +108,8 @@ class WireIterator:
         Returns:
             Iterator[occwl.wire.Wire]: Wire iterator
         """
-        return map(occwl.wire.Wire, self._top_exp.wires())
+        from occwl.wire import Wire
+        return map(Wire, self._top_exp.wires())
 
 
 class FaceIterator:
@@ -131,7 +129,8 @@ class FaceIterator:
         Returns:
             Iterator[occwl.face.Face]: Face iterator
         """
-        return map(occwl.face.Face, self._top_exp.faces())
+        from occwl.face import Face
+        return map(Face, self._top_exp.faces())
 
     def vertices_from_face(self, face):
         """
@@ -143,8 +142,10 @@ class FaceIterator:
         Returns:
             Iterator[occwl.vertex.Vertex]: Vertex iterator
         """
-        assert isinstance(face, occwl.face.Face)
-        return map(occwl.vertex.Vertex, self._top_exp.vertices_from_face(face.topods_shape()))
+        from occwl.vertex import Vertex
+        from occwl.face import Face
+        assert isinstance(face, Face)
+        return map(Vertex, self._top_exp.vertices_from_face(face.topods_shape()))
 
     def edges_from_face(self, face):
         """
@@ -156,8 +157,10 @@ class FaceIterator:
         Returns:
             Iterator[occwl.edge.Edge]: Edge iterator
         """
-        assert isinstance(face, occwl.face.Face)
-        return map(occwl.edge.Edge, self._top_exp.edges_from_face(face.topods_shape()))
+        from occwl.edge import Edge
+        from occwl.face import Face
+        assert isinstance(face, Face)
+        return map(Edge, self._top_exp.edges_from_face(face.topods_shape()))
     
     def wires_from_face(self, face):
         """
@@ -169,8 +172,10 @@ class FaceIterator:
         Returns:
             Iterator[occwl.wire.Wire]: Wire iterator
         """
-        assert isinstance(face, occwl.face.Face)
-        return map(occwl.wire.Wire, self._top_exp.wires_from_face(face.topods_shape()))
+        from occwl.wire import Wire
+        from occwl.face import Face
+        assert isinstance(face, Face)
+        return map(Wire, self._top_exp.wires_from_face(face.topods_shape()))
     
     def find_closest_face_slow(self, datum):
         """
@@ -207,7 +212,8 @@ class SolidIterator:
         Returns:
             Iterator[occwl.solid.Solid]: Solid iterator
         """
-        return map(occwl.solid.Solid, self._top_exp.solids())
+        from occwl.solid import Solid
+        return map(Solid, self._top_exp.solids())
 
 
 class BottomUpFaceIterator:
@@ -221,8 +227,10 @@ class BottomUpFaceIterator:
         Returns:
             Iterator[occwl.face.Face]: Face iterator
         """
-        assert isinstance(edge, occwl.edge.Edge)
-        return map(occwl.face.Face, self._top_exp.faces_from_edge(edge.topods_shape()))
+        from occwl.edge import Edge
+        from occwl.face import Face
+        assert isinstance(edge, Edge)
+        return map(Face, self._top_exp.faces_from_edge(edge.topods_shape()))
 
     def faces_from_vertex(self, vertex):
         """
@@ -234,8 +242,10 @@ class BottomUpFaceIterator:
         Returns:
             Iterator[occwl.face.Face]: Face iterator
         """
-        assert isinstance(vertex, occwl.vertex.Vertex)
-        return map(occwl.face.Face, self._top_exp.faces_from_vertex(vertex.topods_shape()))
+        from occwl.vertex import Vertex
+        from occwl.face import Face
+        assert isinstance(vertex, Vertex)
+        return map(Face, self._top_exp.faces_from_vertex(vertex.topods_shape()))
     
     def edge_continuity(self, edge):
         """
@@ -282,8 +292,10 @@ class BottomUpEdgeIterator:
         Returns:
             Iterator[occwl.edge.Edge]: Edge iterator
         """
-        assert isinstance(vertex, occwl.vertex.Vertex)
-        return map(occwl.edge.Edge, self._top_exp.edges_from_vertex(vertex.topods_shape()))
+        from occwl.vertex import Vertex
+        from occwl.edge import Edge
+        assert isinstance(vertex, Vertex)
+        return map(Edge, self._top_exp.edges_from_vertex(vertex.topods_shape()))
 
 
 class Triangulator:
@@ -381,7 +393,7 @@ class ClosedEntitySplitter:
             num_splits (int, optional): Number of splits to perform. Each split face will result in num_splits + 1 faces. Defaults to 1.
 
         Returns:
-            occwl.solid.Solid: Solid with closed faces split
+            occwl.*.*: Shape with closed faces split
         """
         divider = ShapeUpgrade_ShapeDivideClosed(self.topods_shape())
         divider.SetPrecision(precision)
@@ -405,7 +417,7 @@ class ClosedEntitySplitter:
             num_splits (int, optional): Number of splits to perform. Each split edge will result in num_splits + 1 edges. Defaults to 1.
 
         Returns:
-            occwl.solid.Solid: Solid with closed edges split
+            occwl.*.*: Shape with closed edges split
         """
         divider = ShapeUpgrade_ShapeDivideClosedEdges(self.topods_shape())
         divider.SetPrecision(precision)
@@ -458,6 +470,7 @@ class VolumeProperties:
         Returns:
             np.ndarray: 3D point
         """
+        from occwl.geometry import geom_utils
         props = GProp_GProps()
         brepgprop_VolumeProperties(self.topods_shape(), props, tolerance)
         com = props.CentreOfMass()
@@ -475,6 +488,7 @@ class VolumeProperties:
         Returns:
             float: Moment of inertia
         """
+        from occwl.geometry import geom_utils
         props = GProp_GProps()
         brepgprop_VolumeProperties(self.topods_shape(), props, tolerance)
         axis = gp_Ax1(
@@ -491,6 +505,7 @@ class BoundingBox:
         Returns:
             Box: Bounding box
         """
+        from occwl.geometry import geom_utils
         b = Bnd_Box()
         brepbndlib_Add(self.topods_shape(), b)
         return geom_utils.box_to_geometry(b)
@@ -506,6 +521,7 @@ class BoundingBox:
         Returns:
             Box: Bounding box
         """
+        from occwl.geometry import geom_utils
         b = Bnd_Box()
         use_triangulation = True
         brepbndlib_AddOptimal(self.topods_shape(), b, use_triangulation, use_shapetolerance)
@@ -519,6 +535,7 @@ class BoundingBox:
         Returns:
             occwl.*.*: The scaled version of this Shape
         """
+        from occwl.geometry import geom_utils
         # Get an exact box for the Shape
         box = self.exact_box()
         center = box.center()

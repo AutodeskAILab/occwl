@@ -6,7 +6,6 @@ from OCC.Core.BRep import BRep_Tool, BRep_Tool_Surface
 from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeFace
 from OCC.Core.BRepFill import BRepFill_Filling
-from OCC.Core.BRepGProp import brepgprop_SurfaceProperties
 from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakePrism
 from OCC.Core.BRepTools import breptools_UVBounds
 from OCC.Core.BRepTopAdaptor import BRepTopAdaptor_FClass2d
@@ -19,26 +18,21 @@ from OCC.Core.GeomAbs import (GeomAbs_BezierSurface, GeomAbs_BSplineSurface,
                               GeomAbs_SurfaceOfRevolution, GeomAbs_Torus)
 from OCC.Core.GeomLProp import GeomLProp_SLProps
 from OCC.Core.gp import gp_Dir, gp_Pnt, gp_Pnt2d, gp_TrsfForm
-from OCC.Core.GProp import GProp_GProps
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
 from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
 from OCC.Core.TopLoc import TopLoc_Location
 from OCC.Core.TopoDS import TopoDS_Face
-from OCC.Extend import TopologyUtils
 
-from occwl.vertex import Vertex
+from occwl.base import BoundingBox, Triangulator, WireIterator, EdgeIterator, VertexIterator, SurfaceProperties
 from occwl.edge import Edge
 from occwl.shape import Shape
-from occwl.wire import Wire
 
 import occwl.geometry.geom_utils as geom_utils
 import occwl.geometry.interval as Interval
-from occwl.edge import Edge
 from occwl.geometry.box import Box
-from occwl.shape import Shape
 
 
-class Face(Shape):
+class Face(Shape, WireIterator, EdgeIterator, VertexIterator, SurfaceProperties, Triangulator, BoundingBox):
     """
     A topological face in a solid model
     Represents a 3D surface bounded by a Wire
@@ -131,7 +125,7 @@ class Face(Shape):
     @staticmethod
     def make_from_wires(wires):
         """
-        Make a face from a PLANAR wires
+        Make a face from PLANAR wires
 
         Args:
             wires (List[occwl.wire.Wire]): List of wires
@@ -146,36 +140,6 @@ class Face(Shape):
         if not face_builder.IsDone():
             return None
         return Face(face_builder.Face())
-
-    def wires(self):
-        """
-        Get an iterator to go over all wires on this face
-
-        Returns:
-            Iterator[occwl.wire.Wire]: Wire iterator
-        """
-        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=False)
-        return map(Wire, top_exp.wires())
-    
-    def edges(self):
-        """
-        Get an iterator to go over all edges on this face
-
-        Returns:
-            Iterator[occwl.edge.Edge]: Edge iterator
-        """
-        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=True)
-        return map(Edge, top_exp.edges())
-    
-    def vertices(self):
-        """
-        Get an iterator to go over all vertices on this face
-
-        Returns:
-            Iterator[occwl.vertex.Vertex]: Vertex iterator
-        """
-        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=True)
-        return map(Vertex, top_exp.vertices())
 
     def inside(self, uv):
         """
@@ -397,17 +361,6 @@ class Face(Shape):
             max_curv *= -1
         return max_curv
 
-    def area(self):
-        """
-        Compute the area of the face
-
-        Returns:
-            float: Area
-        """
-        geometry_properties = GProp_GProps()
-        brepgprop_SurfaceProperties(self.topods_shape(), geometry_properties)
-        return geometry_properties.Mass()
-
     def pcurve(self, edge):
         """
         Get the given edge's curve geometry as a 2D parametric curve
@@ -527,7 +480,7 @@ class Face(Shape):
     def get_triangles(self):
         """
         Get the tessellation of this face as a triangle mesh
-        NOTE: First you must call solid.triangulate_all_faces()
+        NOTE: First you must call shape.triangulate_all_faces()
         Then call this method to get the triangles for the
         face.
 

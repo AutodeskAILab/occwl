@@ -1,31 +1,27 @@
 import numpy as np
 
 from OCC.Core.TopoDS import (
-    topods,
-    TopoDS_Wire,
-    TopoDS_Vertex,
-    TopoDS_Edge,
-    TopoDS_Face,
-    TopoDS_Shell,
     TopoDS_Solid,
-    TopoDS_Shape,
     TopoDS_Compound,
     TopoDS_CompSolid,
-    topods_Edge,
-    topods_Vertex,
-    TopoDS_Iterator,
 )
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
 import math
-from occwl.base import BottomUpFaceIterator, BoundingBox, ClosedEntitySplitter, EdgeIterator, FaceIterator, SurfaceProperties, VertexIterator, VolumeProperties, WireIterator, Triangulator
+from occwl.base import VertexIterator, EdgeIterator, \
+            WireIterator, FaceIterator, BottomUpFaceIterator, \
+            ClosedEntitySplitter, SurfaceProperties,VolumeProperties, \
+            BoundingBox, Triangulator
 
-import occwl.geometry.geom_utils as geom_utils
+from occwl.geometry import geom_utils
 from occwl.shape import Shape
 from deprecate import deprecated
 import logging
 
 
-class Solid(Shape, VertexIterator, EdgeIterator, WireIterator, FaceIterator, BottomUpFaceIterator, ClosedEntitySplitter, SurfaceProperties, VolumeProperties, BoundingBox, Triangulator):
+class Solid(Shape, VertexIterator, EdgeIterator,
+            WireIterator, FaceIterator, BottomUpFaceIterator,
+            ClosedEntitySplitter, SurfaceProperties,VolumeProperties,
+            BoundingBox, Triangulator):
     """
     A solid model
     """
