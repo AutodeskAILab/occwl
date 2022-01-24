@@ -11,7 +11,7 @@ g = face_adjacency(example, self_loops=True)
 print(f"Number of nodes (faces): {len(g.nodes)}")
 print(f"Number of edges: {len(g.edges)}")
 
-v = Viewer()  #backend="wx")
+v = Viewer(backend="wx")
 v.display(example, transparency=0.8)
 
 # Get the points at each face's center
