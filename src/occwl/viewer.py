@@ -295,7 +295,7 @@ class _BaseViewer:
         """
         Show the XYZ-axes widget
         """
-        self._display.show_triedron()
+        self._display.display_triedron()
 
     def hide_axes(self):
         """
@@ -339,32 +339,33 @@ class _BaseViewer:
         """
         self._display.default_drawer.SetFaceBoundaryDraw(False)
     
-    def set_size(self, tuple_of_width_and_height):
+    def set_size(self, width, height):
         """
         Set the size of the framebuffer
 
         Args:
-            tuple_of_width_and_height (Tuple[int, int]): Width and height
+            width (int): Width of the framebuffer
+            height (int): Height of the framebuffer
         """
-        self._display.SetSize(tuple_of_width_and_height)
+        self._display.SetSize(width, height)
     
     def use_gouraud_shading(self):
         """
         Compute colors per vertex and interpolate
         """
-        self.SetShadingModel(Graphic3d_TOSM_VERTEX)
+        self._display.View.SetShadingModel(Graphic3d_TOSM_VERTEX)
     
     def use_flat_shading(self):
         """
         Use no interpolation when computing color for fragments in a triangle
         """
-        self.SetShadingModel(Graphic3d_TOSM_FACET)
+        self._display.View.SetShadingModel(Graphic3d_TOSM_FACET)
 
     def use_phong_shading(self):
         """
         Compute colors per fragment
         """
-        self.SetShadingModel(Graphic3d_TOSM_FRAGMENT)
+        self._display.View.SetShadingModel(Graphic3d_TOSM_FRAGMENT)
 
 
 class Viewer(_BaseViewer):
@@ -536,5 +537,6 @@ class OffscreenRenderer(_BaseViewer):
             self.show_axes()
         else:
             self.hide_axes()
-        self.set_size(size)
+        self.set_size(*size)
         self.set_background_color(background_top_color, background_bottom_color)
+        self.shaded()
