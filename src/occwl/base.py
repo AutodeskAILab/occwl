@@ -259,6 +259,31 @@ class FaceContainerMixin:
         return type(self)(divider.Result())
 
 
+class ShellContainerMixin:
+    """
+    A mixin class that adds the ability to perform operations on the solids
+    in the shape
+    """
+    def num_shells(self):
+        """
+        Number of shells in the Shape
+
+        Returns:
+            int: Number of shells
+        """
+        return self._top_exp.number_of_solids()
+
+    def shells(self):
+        """
+        Get an iterator to go over all shells in the Shape
+
+        Returns:
+            Iterator[occwl.shell.Shell]: Shell iterator
+        """
+        from occwl.shell import Shell
+        return map(Shell, self._top_exp.shells())
+
+
 class SolidContainerMixin:
     """
     A mixin class that adds the ability to perform operations on the solids
@@ -269,7 +294,7 @@ class SolidContainerMixin:
         Number of solids in the Compound
 
         Returns:
-            int: Number of faces
+            int: Number of solids
         """
         return self._top_exp.number_of_solids()
 
