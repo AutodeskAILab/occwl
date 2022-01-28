@@ -10,7 +10,7 @@ import math
 from occwl.base import VertexContainerMixin, EdgeContainerMixin, \
             WireContainerMixin, FaceContainerMixin, BottomUpFaceIterator, \
             BottomUpEdgeIterator, SurfacePropertiesMixin, VolumePropertiesMixin, \
-            BoundingBoxMixin, TriangulatorMixin
+            BoundingBoxMixin, TriangulatorMixin, ShellContainerMixin
 
 from occwl.geometry import geom_utils
 from occwl.shape import Shape
@@ -18,7 +18,7 @@ from deprecate import deprecated
 import logging
 
 
-class Solid(Shape, VertexContainerMixin, EdgeContainerMixin, \
+class Solid(Shape, VertexContainerMixin, EdgeContainerMixin, ShellContainerMixin, \
             WireContainerMixin, FaceContainerMixin, BottomUpFaceIterator, \
             BottomUpEdgeIterator, SurfacePropertiesMixin, VolumePropertiesMixin, \
             BoundingBoxMixin, TriangulatorMixin):
