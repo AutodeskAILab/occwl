@@ -7,6 +7,7 @@ from OCC.Core.gp import gp_XOY, gp_Pnt
 from OCC.Core.GC import GC_MakeSegment
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 from OCC.Core.Geom import Geom_Circle
+from OCC.Core.GeomAbs import GeomAbs_Circle
 from occwl.edge import Edge
 
 # Test
@@ -89,8 +90,10 @@ class EdgeTester(TestBase):
         circle = BRepBuilderAPI_MakeEdge(Geom_Circle(gp_XOY(), 1)).Edge()
         circle = Edge(circle)
         curve_type = circle.curve_type()
+        curve_type_enum = circle.curve_type_enum()
         self.assertTrue(isinstance(curve_type, str))
         self.assertTrue(curve_type == "circle")
+        self.assertTrue(curve_type_enum == GeomAbs_Circle)
 
     def _test_specific_curve(self, edge):
         if edge.has_curve():
