@@ -261,7 +261,7 @@ class FaceContainerMixin:
 
 class ShellContainerMixin:
     """
-    A mixin class that adds the ability to perform operations on the solids
+    A mixin class that adds the ability to perform operations on the shells
     in the shape
     """
     def num_shells(self):
@@ -271,7 +271,7 @@ class ShellContainerMixin:
         Returns:
             int: Number of shells
         """
-        return self._top_exp.number_of_solids()
+        return self._top_exp.number_of_shells()
 
     def shells(self):
         """
