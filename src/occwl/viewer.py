@@ -31,6 +31,7 @@ from OCC.Core.TopoDS import (
     TopoDS_Shell,
     TopoDS_Solid,
     TopoDS_Vertex,
+    TopoDS_Compound,
 )
 from OCC.Display.SimpleGui import init_display
 from OCC.Display.OCCViewer import get_color_from_name
@@ -42,6 +43,7 @@ from occwl.geometry import geom_utils
 from occwl.solid import Solid
 from occwl.vertex import Vertex
 from occwl.compound import Compound
+from occwl.shell import Shell
 
 
 class Viewer:
@@ -92,7 +94,7 @@ class Viewer:
                                            'CYAN', 'BLACK', or 'ORANGE'. Defaults to None.
             transparency (float, optional): How transparent the shape is. Defaults to 0.0.
         """
-        if isinstance(shape, (Compound, Solid, Face, Edge, Wire, Vertex)):
+        if isinstance(shape, (Compound, Solid, Shell, Face, Edge, Wire, Vertex)):
             shape = shape.topods_shape()
         if color and not isinstance(color, (str, tuple)):
             color = "BLACK"
@@ -252,8 +254,12 @@ class Viewer:
                 shapes[i] = Edge(shapes[i])
             elif type(shapes[i]) == TopoDS_Face:
                 shapes[i] = Face(shapes[i])
+            elif type(shapes[i]) == TopoDS_Shell:
+                shapes[i] = Shell(shapes[i])
             elif type(shapes[i]) == TopoDS_Solid:
                 shapes[i] = Solid(shapes[i])
+            elif type(shapes[i]) == TopoDS_Compound:
+                shapes[i] = Compound(shapes[i])
         return shapes
 
     def selected_shapes(self):
