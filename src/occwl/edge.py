@@ -390,6 +390,15 @@ class Edge(Shape):
             return "other"
         return "unknown"
 
+    def curve_type_enum(self):
+        """
+        Get the type of the curve geometry as an OCC.Core.GeomAbs enum
+
+        Returns:
+            OCC.Core.GeomAbs: Type of the curve geometry
+        """
+        return BRepAdaptor_Curve(self.topods_shape()).GetType()
+
     def tolerance(self):
         """
         Get tolerance of this edge.  The 3d curve of the edge should not

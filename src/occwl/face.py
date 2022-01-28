@@ -483,6 +483,15 @@ class Face(Shape):
         if surf_type == GeomAbs_OtherSurface:
             return "other"
         return "unknown"
+    
+    def surface_type_enum(self):
+        """
+        Get the type of the surface geometry as an OCC.Core.GeomAbs enum
+
+        Returns:
+            OCC.Core.GeomAbs: Type of the surface geometry
+        """
+        return BRepAdaptor_Surface(self.topods_shape()).GetType()
 
     def closed_u(self):
         """
