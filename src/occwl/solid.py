@@ -9,7 +9,7 @@ from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
 import math
 from occwl.base import VertexContainerMixin, EdgeContainerMixin, \
             WireContainerMixin, FaceContainerMixin, BottomUpFaceIterator, \
-            SurfacePropertiesMixin, VolumePropertiesMixin, \
+            BottomUpEdgeIterator, SurfacePropertiesMixin, VolumePropertiesMixin, \
             BoundingBoxMixin, TriangulatorMixin
 
 from occwl.geometry import geom_utils
@@ -20,7 +20,7 @@ import logging
 
 class Solid(Shape, VertexContainerMixin, EdgeContainerMixin, \
             WireContainerMixin, FaceContainerMixin, BottomUpFaceIterator, \
-            SurfacePropertiesMixin, VolumePropertiesMixin, \
+            BottomUpEdgeIterator, SurfacePropertiesMixin, VolumePropertiesMixin, \
             BoundingBoxMixin, TriangulatorMixin):
     """
     A solid model

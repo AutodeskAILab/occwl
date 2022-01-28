@@ -1,12 +1,12 @@
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Extend.DataExchange import read_step_file, list_of_shapes_to_compound
-from occwl.base import BottomUpFaceIterator, BoundingBoxMixin, \
+from occwl.base import BottomUpFaceIterator, BottomUpEdgeIterator, BoundingBoxMixin, \
     EdgeContainerMixin, FaceContainerMixin, SolidContainerMixin, SurfacePropertiesMixin, \
         TriangulatorMixin, VertexContainerMixin, VolumePropertiesMixin, WireContainerMixin
 from occwl.shape import Shape
 
 
-class Compound(Shape, BottomUpFaceIterator, BoundingBoxMixin,
+class Compound(Shape, BottomUpFaceIterator, BoundingBoxMixin, BottomUpEdgeIterator,
     EdgeContainerMixin, FaceContainerMixin, SolidContainerMixin, SurfacePropertiesMixin,
     TriangulatorMixin, VertexContainerMixin, VolumePropertiesMixin, WireContainerMixin):
     """
