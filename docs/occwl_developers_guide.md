@@ -22,7 +22,7 @@ or you can add the full path to the `src/occwl` folder to the `PYTHONPATH` envir
 ```
 - Windows:
 ```
-set PYTHONPATH=%PYTHONPATH%;path\to\occwl\src\occwl
+set PYTHONPATH=%PYTHONPATH%;path\to\occwl\src
 ```
 
 To check everything is working run 
