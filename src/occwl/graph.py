@@ -3,6 +3,7 @@ from occwl.compound import Compound
 from occwl.solid import Solid
 from occwl.face import Face
 from occwl.wire import Wire
+from occwl.shell import Shell
 from occwl.entity_mapper import EntityMapper
 
 
@@ -11,7 +12,7 @@ def face_adjacency(shape, self_loops=False):
     Creates a face adjacency graph from the given shape (Solid or Compound)
 
     Args:
-        solid (Solid, or Compound): Shape
+        shape (Shell, Solid, or Compound): Shape
         self_loops (bool, optional): Whether to add self loops in the graph. Defaults to False.
         
     Returns:
@@ -23,8 +24,7 @@ def face_adjacency(shape, self_loops=False):
                     - "edge_idx": index of the (ordered) edge in the solid
         None: if the shape is non-manifold or open
     """
-    # TODO(pradeep): also allow Shell in future
-    assert isinstance(shape, (Solid, Compound))
+    assert isinstance(shape, (Shell, Solid, Compound))
     mapper = EntityMapper(shape)
     graph = nx.DiGraph()
     for face in shape.faces():
@@ -62,7 +62,7 @@ def vertex_adjacency(shape, self_loops=False):
     Creates a vertex adjacency graph from the given shape (Wire, Solid or Compound)
 
     Args:
-        shape (Wire, Face, Solid, or Compound): Shape
+        shape (Wire, Face, Shell, Solid, or Compound): Shape
         self_loops (bool, optional): Whether to add self loops in the graph. Defaults to False.
     
     Returns:
@@ -73,8 +73,7 @@ def vertex_adjacency(shape, self_loops=False):
                     - "edge": contains the B-rep (ordered) edge
                     - "edge_idx": index of the (ordered) edge in the solid
     """
-    # TODO(pradeep): also allow Shell in future
-    assert isinstance(shape, (Wire, Face, Solid, Compound))
+    assert isinstance(shape, (Wire, Face, Shell, Solid, Compound))
     mapper = EntityMapper(shape)
     graph = nx.DiGraph()
     for vert in shape.vertices():

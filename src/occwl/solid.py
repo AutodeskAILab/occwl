@@ -9,8 +9,8 @@ from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
 import math
 from occwl.base import VertexContainerMixin, EdgeContainerMixin, \
             WireContainerMixin, FaceContainerMixin, BottomUpFaceIterator, \
-            SurfacePropertiesMixin, VolumePropertiesMixin, \
-            BoundingBoxMixin, TriangulatorMixin
+            BottomUpEdgeIterator, SurfacePropertiesMixin, VolumePropertiesMixin, \
+            BoundingBoxMixin, TriangulatorMixin, ShellContainerMixin
 
 from occwl.geometry import geom_utils
 from occwl.shape import Shape
@@ -18,9 +18,9 @@ from deprecate import deprecated
 import logging
 
 
-class Solid(Shape, VertexContainerMixin, EdgeContainerMixin, \
+class Solid(Shape, VertexContainerMixin, EdgeContainerMixin, ShellContainerMixin, \
             WireContainerMixin, FaceContainerMixin, BottomUpFaceIterator, \
-            SurfacePropertiesMixin, VolumePropertiesMixin, \
+            BottomUpEdgeIterator, SurfacePropertiesMixin, VolumePropertiesMixin, \
             BoundingBoxMixin, TriangulatorMixin):
     """
     A solid model
