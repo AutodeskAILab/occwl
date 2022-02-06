@@ -24,6 +24,9 @@ for vi, vj in g.edges:
     pt1 = points[vi]
     pt2 = points[vj]
     up_dir = pt2 - pt1
+    if np.linalg.norm(up_dir) < 1e-6:
+        # This must be a loop with one Vertex
+        continue
     v.display(
         Solid.make_cylinder(
             radius=0.2, height=np.linalg.norm(up_dir), base_point=pt1, up_dir=up_dir

@@ -26,14 +26,15 @@ from OCC.Core.ShapeAnalysis import ShapeAnalysis_Edge
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 
 import occwl.geometry.geom_utils as geom_utils
-from occwl.vertex import Vertex
+import occwl.vertex
 from occwl.geometry.interval import Interval
 from occwl.shape import Shape
+from occwl.base import VertexContainerMixin, BoundingBoxMixin
 from deprecate import deprecated
 import logging
 
 
-class Edge(Shape):
+class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
     """
     A topological edge in a solid model
     Represents a 3D curve bounded by vertices
@@ -148,7 +149,7 @@ class Edge(Shape):
         Returns:
             occwl.vertex.Vertex: Start vertex
         """
-        return Vertex(ShapeAnalysis_Edge().FirstVertex(self.topods_shape()))
+        return occwl.vertex.Vertex(ShapeAnalysis_Edge().FirstVertex(self.topods_shape()))
     
     def end_vertex(self):
         """
@@ -157,7 +158,7 @@ class Edge(Shape):
         Returns:
             occwl.vertex.Vertex: End vertex
         """
-        return Vertex(ShapeAnalysis_Edge().LastVertex(self.topods_shape()))
+        return occwl.vertex.Vertex(ShapeAnalysis_Edge().LastVertex(self.topods_shape()))
 
     def tangent(self, u):
         """
@@ -451,13 +452,3 @@ class Edge(Shape):
             right_face = face1
 
         return left_face, right_face
-
-    def vertices(self):
-        """
-        Get an iterator to go over all vertices on this edge
-
-        Returns:
-            Iterator[occwl.vertex.Vertex]: Vertex iterator
-        """
-        top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), ignore_orientation=True)
-        return map(Vertex, top_exp.vertices())

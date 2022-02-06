@@ -22,7 +22,7 @@ for face_idx in g.nodes():
     parbox = face.uv_bounds()
     umin, vmin = parbox.min_point()
     umax, vmax = parbox.max_point()
-    center_uv = (0.5 * (umax - umin), vmin + 0.5 * (vmax - vmin))
+    center_uv = (umin + 0.5 * (umax - umin), vmin + 0.5 * (vmax - vmin))
     center = face.point(center_uv)
     v.display(Solid.make_sphere(center=center, radius=0.25))
     face_centers[face_idx] = center
