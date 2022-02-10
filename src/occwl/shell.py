@@ -31,7 +31,7 @@ class Shell(BottomUpFaceIterator, BottomUpEdgeIterator,
         sew = BRepBuilderAPI_Sewing()
         for f in faces:
             assert isinstance(f, Face)
-            sew.Add(f.topods_face())
+            sew.Add(f.topods_shape())
         sew.Perform()
         sewed_shape = sew.SewedShape()
         if isinstance(sewed_shape, TopoDS_Shell):
