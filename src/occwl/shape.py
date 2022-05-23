@@ -2,10 +2,11 @@
 Base class for faces, edges and vertices
 """
 import numpy as np
+from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeVertex
 from OCC.Core.BRepExtrema import BRepExtrema_DistShapeShape
 from OCC.Core.Extrema import Extrema_ExtFlag_MIN
-from OCC.Core.gp import gp_Ax1
+from OCC.Core.gp import gp_Ax1, gp_Trsf
 from OCC.Core.TopAbs import TopAbs_REVERSED
 from OCC.Core.TopoDS import (
     TopoDS_Edge,
@@ -23,7 +24,7 @@ from OCC.Extend.ShapeFactory import (
     scale_shape,
     translate_shp,
 )
-from OCC.Core.BRepCheck import BRepCheck_Analyzer 
+from OCC.Core.BRepCheck import BRepCheck_Analyzer
 from OCC.Extend import TopologyUtils
 import occwl.geometry.geom_utils as geom_utils
 
@@ -215,3 +216,38 @@ class Shape:
         if return_analyzer:
             return analyzer.IsValid(), analyzer
         return analyzer.IsValid()
+
+    def transform(self, a, copy=True):
+        """
+        Apply the given 4x4 transform matrix to the solid
+
+        Args: a (nd.array) - Homogeneous transform matrix
+                             The transform that will be applied is
+                                        
+                             x' =  a[0,0]*x + a[0,1]*y + a[0,2]*z + a[0, 3]
+                             y' =  a[1,0]*x + a[1,1]*y + a[1,2]*z + a[1, 3]
+                             z' =  a[2,0]*x + a[2,1]*y + a[2,2]*z + a[2, 3]
+
+             copy (bool)    True - Copy entities and apply the transform to
+                                   the underlying geometry
+                            False - Apply the transform to the topods Locator
+                                    if possible 
+        """
+        a = a.astype(np.float64)
+        trsf = gp_Trsf()
+        trsf.SetValues(
+            a[0,0], a[0,1], a[0,2], a[0, 3],
+            a[1,0], a[1,1], a[1,2], a[1, 3],
+            a[2,0], a[2,1], a[2,2], a[2, 3]
+        )
+        return self._apply_transform(trsf, copy=copy)
+
+    def _apply_transform(self, trsf_to_apply, copy=True):
+        """
+        Apply the given transform to this Shape
+        """
+        apply_transform = BRepBuilderAPI_Transform(trsf_to_apply)
+        apply_transform.Perform(self.topods_shape(), copy)
+        transformed_shape = apply_transform.ModifiedShape(self.topods_shape())
+
+        return type(self)(transformed_shape)
