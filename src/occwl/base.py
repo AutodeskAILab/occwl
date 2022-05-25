@@ -591,10 +591,17 @@ class BoundingBoxMixin:
         brepbndlib_AddOptimal(self.topods_shape(), b, use_triangulation, use_shapetolerance)
         return geom_utils.box_to_geometry(b)
 
-    def scale_to_box(self, box_side):
+    def scale_to_box(self, box_side, copy=True):
         """
         Translate and scale the Shape so it fits exactly 
         into the [-box_side, box_side]^3 box
+
+        Args:
+            box_side (float) The side length of the box
+            copy (bool)      True - Copy entities and apply the transform to
+                                    the underlying geometry
+                             False - Apply the transform to the topods Locator
+                                     if possible 
 
         Returns:
             occwl.*.*: The scaled version of this Shape
@@ -615,21 +622,25 @@ class BoundingBoxMixin:
         scale_trsf.SetScale(orig, (2.0 * box_side) / longest_length)
         trsf_to_apply = scale_trsf.Multiplied(move_to_center)
         
-        apply_transform = BRepBuilderAPI_Transform(trsf_to_apply)
-        apply_transform.Perform(self.topods_shape())
-        transformed_shape = apply_transform.ModifiedShape(self.topods_shape())
+        return self._apply_transform(trsf_to_apply, copy=copy)
 
-        return type(self)(transformed_shape)
 
-    def scale_to_unit_box(self):
+    def scale_to_unit_box(self, copy=True):
         """
         Translate and scale the Shape so it fits exactly 
         into the [-1, 1]^3 box
 
+        Args:
+            copy (bool)      True - Copy entities and apply the transform to
+                                        the underlying geometry
+                                False - Apply the transform to the topods Locator
+                                        if possible 
         Returns:
             The scaled version of this shape
         """
-        return self.scale_to_box(1.0)
+        return self.scale_to_box(1.0, copy=copy)
+
+
 
 
 def _find_closest_shape_in_list(shapes, datum):
