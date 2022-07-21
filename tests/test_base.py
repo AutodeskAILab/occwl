@@ -22,8 +22,8 @@ class TestBase(unittest.TestCase):
         return solids[0]
 
     def run_test_on_all_files_in_folder(self, folder):
-        step_files = [f for f in folder.glob("**/*.step")]
-        stp_files = [f for f in folder.glob("**/*.stp")]
+        step_files = [f for f in folder.glob("*.step")]
+        stp_files = [f for f in folder.glob("*.stp")]
         step_files.extend(stp_files)
 
         if len(step_files) == 0:

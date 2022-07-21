@@ -32,7 +32,7 @@ class LoadWithNameTester(TestBase):
             self.check_for_example(pathname, expected_solid_names)
 
     def check_for_example(self, pathname, expected_solid_names):
-        comp, shape_att = load_step_with_attributes(pathname)
+        comp, shape_att = Compound.load_step_with_attributes(pathname)
         for s in comp.solids():
             self.assertTrue(s in shape_att)
             name = shape_att[s]["name"]

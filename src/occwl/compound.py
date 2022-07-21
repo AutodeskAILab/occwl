@@ -79,7 +79,7 @@ class Compound(Shape, BottomUpFaceIterator, BoundingBoxMixin, BottomUpEdgeIterat
                     continue
                 item = StepRepr_RepresentationItem.DownCast(item)
                 name = item.Name().ToCString()
-                occwl_shape = convert_to_occwl_shape(s)
+                occwl_shape = Shape.occwl_shape(s)
                 occwl_shape_to_attributes[occwl_shape] = {
                     "name": name
                 }

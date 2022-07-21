@@ -111,20 +111,20 @@ class Shape:
         from occwl.wire import Wire
         from occwl.shell import Shell
 
-        if isinstance(shape, TopoDS_Vertex):
-            return Vertex(shape)
-        if isinstance(shape, TopoDS_Edge):
-            return Edge(shape)
-        if isinstance(shape, TopoDS_Face):
-            return Face(shape)
-        if isinstance(shape, TopoDS_Wire):
-            return Wire(shape)
-        if isinstance(shape, TopoDS_Shell):
-            return Shell(shape)
-        if isinstance(shape, TopoDS_Solid):
-            return Solid(shape)
-        if isinstance(shape, (TopoDS_Compound, TopoDS_CompSolid)):
-            return Compound(shape)
+        if isinstance(topods_shape, TopoDS_Vertex):
+            return Vertex(topods_shape)
+        if isinstance(topods_shape, TopoDS_Edge):
+            return Edge(topods_shape)
+        if isinstance(topods_shape, TopoDS_Face):
+            return Face(topods_shape)
+        if isinstance(topods_shape, TopoDS_Wire):
+            return Wire(topods_shape)
+        if isinstance(topods_shape, TopoDS_Shell):
+            return Shell(topods_shape)
+        if isinstance(topods_shape, TopoDS_Solid):
+            return Solid(topods_shape)
+        if isinstance(topods_shape, (TopoDS_Compound, TopoDS_CompSolid)):
+            return Compound(topods_shape)
         raise Exception(
             "Shape must be one of TopoDS_Vertex, TopoDS_Edge, TopoDS_Face, TopoDS_Shell, TopoDS_Solid, TopoDS_Compound, TopoDS_CompSolid"
         )
