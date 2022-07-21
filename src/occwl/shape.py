@@ -28,7 +28,6 @@ from OCC.Core.BRepCheck import BRepCheck_Analyzer
 from OCC.Extend import TopologyUtils
 import occwl.geometry.geom_utils as geom_utils
 
-
 class ClosestPointData:
     """
     A class to record information about the closest point on a shape
@@ -83,6 +82,52 @@ class Shape:
             OCC.Core.TopoDS.TopoDS_Vertex/Edge/Face/Wire/Shell/Solid: OCC TopoDS_*
         """
         return self._shape
+
+    @staticmethod
+    def occwl_shape(topods_shape):
+        """
+        Static method to create an occwl shape of the appropriate 
+        class from the given topods_shape
+        Args:
+            topods_shape (OCC.Core.TopoDS.TopoDS_Vertex/Edge/Face/Wire/Shell/Solid): TopoDS shape
+
+        Returns:
+            One of
+                occwl.compound.Compound
+                occwl.solid.Solid
+                occwl.face.Face
+                occwl.edge.Edge
+                occwl.vertex.Vertex
+                occwl.wire.Wire
+                occwl.shell.Shell
+        Raises:
+            Exception: [description]
+        """
+        from occwl.compound import Compound
+        from occwl.solid import Solid
+        from occwl.face import Face
+        from occwl.edge import Edge
+        from occwl.vertex import Vertex
+        from occwl.wire import Wire
+        from occwl.shell import Shell
+
+        if isinstance(shape, TopoDS_Vertex):
+            return Vertex(shape)
+        if isinstance(shape, TopoDS_Edge):
+            return Edge(shape)
+        if isinstance(shape, TopoDS_Face):
+            return Face(shape)
+        if isinstance(shape, TopoDS_Wire):
+            return Wire(shape)
+        if isinstance(shape, TopoDS_Shell):
+            return Shell(shape)
+        if isinstance(shape, TopoDS_Solid):
+            return Solid(shape)
+        if isinstance(shape, (TopoDS_Compound, TopoDS_CompSolid)):
+            return Compound(shape)
+        raise Exception(
+            "Shape must be one of TopoDS_Vertex, TopoDS_Edge, TopoDS_Face, TopoDS_Shell, TopoDS_Solid, TopoDS_Compound, TopoDS_CompSolid"
+        )
 
     def __hash__(self):
         """

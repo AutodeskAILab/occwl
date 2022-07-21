@@ -1,5 +1,17 @@
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Extend.DataExchange import read_step_file, list_of_shapes_to_compound
+from OCC.Core.STEPControl import STEPControl_Reader
+from OCC.Core.TopAbs import (
+    TopAbs_FACE, 
+    TopAbs_EDGE, 
+    TopAbs_SHELL, 
+    TopAbs_SOLID, 
+    TopAbs_COMPOUND, 
+    TopAbs_COMPSOLID
+)
+from OCC.Core.TopExp import TopExp_Explorer
+from OCC.Core.StepRepr import StepRepr_RepresentationItem
+
 from occwl.base import BottomUpFaceIterator, BottomUpEdgeIterator, BoundingBoxMixin, \
     EdgeContainerMixin, FaceContainerMixin, SolidContainerMixin, SurfacePropertiesMixin, \
         TriangulatorMixin, VertexContainerMixin, VolumePropertiesMixin, WireContainerMixin, \
@@ -35,3 +47,50 @@ class Compound(Shape, BottomUpFaceIterator, BoundingBoxMixin, BottomUpEdgeIterat
             shp, success = list_of_shapes_to_compound([shp])
             assert success
         return Compound(shp)
+
+
+    @staticmethod
+    def load_step_with_attributes(step_filename):
+        """Load shapes from a step file with the
+        name information.   Other attributes could be
+        retro-fitted
+
+        Args:
+            step_filename (str): Path to STEP file
+
+        Returns:
+            occwl.Compound, dict occwl.Shape to attributes 
+        """        
+        # Read the file and get the shape
+        reader = STEPControl_Reader()
+        tr = reader.WS().TransferReader()
+        reader.ReadFile(str(step_filename))
+        reader.TransferRoots()
+        shape = reader.OneShape()
+            
+        occwl_shape_to_attributes = {}
+        def check_shape_type(shape_type):
+            exp = TopExp_Explorer(shape, shape_type)
+            while exp.More():
+                s = exp.Current()
+                exp.Next()
+                item = tr.EntityFromShapeResult(s, 1)
+                if item is None:
+                    continue
+                item = StepRepr_RepresentationItem.DownCast(item)
+                name = item.Name().ToCString()
+                occwl_shape = convert_to_occwl_shape(s)
+                occwl_shape_to_attributes[occwl_shape] = {
+                    "name": name
+                }
+
+        check_shape_type(TopAbs_FACE)
+        check_shape_type(TopAbs_EDGE)
+        check_shape_type(TopAbs_SHELL)
+        check_shape_type(TopAbs_SOLID)
+        check_shape_type(TopAbs_COMPOUND)
+        check_shape_type(TopAbs_COMPSOLID)
+
+        shp, success = list_of_shapes_to_compound([shape])
+        assert success, "Failed to convert to a single compound"
+        return Compound(shp), occwl_shape_to_attributes
