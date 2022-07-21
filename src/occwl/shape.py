@@ -8,6 +8,7 @@ from OCC.Core.BRepExtrema import BRepExtrema_DistShapeShape
 from OCC.Core.Extrema import Extrema_ExtFlag_MIN
 from OCC.Core.gp import gp_Ax1, gp_Trsf
 from OCC.Core.TopAbs import TopAbs_REVERSED
+from OCC.Core.TopLoc import TopLoc_Location
 from OCC.Core.TopoDS import (
     TopoDS_Edge,
     TopoDS_Face,
@@ -261,6 +262,33 @@ class Shape:
         if return_analyzer:
             return analyzer.IsValid(), analyzer
         return analyzer.IsValid()
+
+
+
+    def set_transform_to_identity(self):
+        """
+        When an assembly is loaded from a STEP file
+        the solids will be transformed relative to
+        their local coordinate system.   i.e. they
+        are placed in the assembly root components 
+        coordinate system.
+
+        When working with individual bodies you often
+        want them to be axis aligned, in which case 
+        you want to remove the assembly transform.
+        This function removes it for you.
+
+        If however you want to bake the transform
+        into the bodies and suppress the asserts 
+        from parts of occwl which don't cope with
+        transforms then use the transform() function
+        below with copy=True
+        """
+        identity = TopLoc_Location()
+        self.topods_shape().Location(identity)
+        self._top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), True)
+
+        
 
     def transform(self, a, copy=True):
         """
