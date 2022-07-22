@@ -199,11 +199,11 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             OCC.Geom.Handle_Geom_*: Specific geometry type for the surface geometry
         """
-        loc = TopLoc_Location()
-        srf = BRepAdaptor_Surface(self.topods_shape(), loc)
-        assert loc.IsIdentity(), "Requesting surface for transformed face. \
+        assert self.topods_shape().Location().IsIdentity(), \
+            "Requesting surface for transformed face. \
             Call solid.set_transform_to_identity() to remove the transform \
             or compound.Transform(np.eye(4)) to bake in the assembly transform"
+        srf = BRepAdaptor_Surface(self.topods_shape())
         surf_type = self.surface_type()
         if surf_type == "plane":
             return srf.Plane()
