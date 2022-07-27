@@ -52,7 +52,7 @@ def save_step(list_of_solids, filename):
     step_writer = STEPControl_Writer()
     Interface_Static_SetCVal("write.step.schema", "AP203")
     for solid in list_of_solids:
-        assert isinstance(solid, Solid)
+        assert isinstance(solid, (Solid, Compound))
         step_writer.Transfer(solid.topods_shape(), STEPControl_AsIs)
     status = step_writer.Write(str(filename))
     return status == IFSelect_RetDone
