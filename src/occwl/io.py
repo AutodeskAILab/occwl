@@ -5,6 +5,9 @@ from occwl.edge import Edge
 from OCC.Extend.DataExchange import export_shape_to_svg
 from OCC.Core.gp import gp_Pnt, gp_Dir
 from deprecate import deprecated
+from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
+from OCC.Core.Interface import Interface_Static_SetCVal
+from OCC.Core.IFSelect import IFSelect_RetDone
 
 
 @deprecated(target=None, deprecated_in="0.0.3", remove_in="0.0.5")
@@ -49,7 +52,7 @@ def save_step(list_of_solids, filename):
     step_writer = STEPControl_Writer()
     Interface_Static_SetCVal("write.step.schema", "AP203")
     for solid in list_of_solids:
-        assert isinstance(solid, Solid)
+        assert isinstance(solid, (Solid, Compound))
         step_writer.Transfer(solid.topods_shape(), STEPControl_AsIs)
     status = step_writer.Write(str(filename))
     return status == IFSelect_RetDone

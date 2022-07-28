@@ -25,6 +25,7 @@ class GridTester(TestBase):
         num_v = 10
         pts = uvgrid(face, num_u, num_v, method="point")
         nor = uvgrid(face, num_u, num_v, method="normal")
+        length_eps = 1e-3
         if pts is not None and nor is not None:
             g = np.concatenate((pts, nor), axis=2)
             self.reverse_u_test(g)
@@ -36,6 +37,9 @@ class GridTester(TestBase):
                     du = pt10 - pt00
                     dv = pt01 - pt00
                     approx_normal = np.cross(du, dv)
+                    if np.linalg.norm(approx_normal) < length_eps:
+                        # We can't do this test for very small vectors
+                        continue
                     normal = np.array(g[i, j, 3:6])
                     angle = self.angle_between_vectors(approx_normal, normal)
 

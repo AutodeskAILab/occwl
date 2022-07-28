@@ -176,7 +176,12 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             OCC.Geom.Handle_Geom_Surface: Interface to all surface geometry
         """
-        return BRep_Tool_Surface(self.topods_shape())
+        loc = TopLoc_Location()
+        surf = BRep_Tool_Surface(self.topods_shape(), loc)
+        assert loc.IsIdentity(), "Requesting surface for transformed face. \
+            Call solid.set_transform_to_identity() to remove the transform \
+            or compound.Transform(np.eye(4)) to bake in the assembly transform"
+        return surf
 
     def reversed_face(self):
         """
@@ -194,6 +199,10 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             OCC.Geom.Handle_Geom_*: Specific geometry type for the surface geometry
         """
+        assert self.topods_shape().Location().IsIdentity(), \
+            "Requesting surface for transformed face. \
+            Call solid.set_transform_to_identity() to remove the transform \
+            or compound.Transform(np.eye(4)) to bake in the assembly transform"
         srf = BRepAdaptor_Surface(self.topods_shape())
         surf_type = self.surface_type()
         if surf_type == "plane":
@@ -223,7 +232,10 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             np.ndarray: 3D Point
         """
-        pt = self.surface().Value(uv[0], uv[1])
+        loc = TopLoc_Location()
+        surf = BRep_Tool_Surface(self.topods_shape(), loc)
+        pt = surf.Value(uv[0], uv[1])
+        pt = pt.Transformed(loc.Transformation())
         return geom_utils.gp_to_numpy(pt)
 
     def tangent(self, uv):
@@ -236,10 +248,14 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             Pair of np.ndarray or None: 3D unit vectors
         """
+        loc = TopLoc_Location()
+        surf = BRep_Tool_Surface(self.topods_shape(), loc)
         dU, dV = gp_Dir(), gp_Dir()
-        res = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 1, 1e-9)
+        res = GeomLProp_SLProps(surf, uv[0], uv[1], 1, 1e-9)
         if res.IsTangentUDefined() and res.IsTangentVDefined():
             res.TangentU(dU), res.TangentV(dV)
+            dU.Transformed(loc.Transformation())
+            dV.Transformed(loc.Transformation())
             return (geom_utils.gp_to_numpy(dU)), (geom_utils.gp_to_numpy(dV))
         return None, None
 
@@ -253,10 +269,14 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             np.ndarray: 3D unit normal vector
         """
-        res = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 1, 1e-9)
+        loc = TopLoc_Location()
+        surf = BRep_Tool_Surface(self.topods_shape(), loc)
+        res = GeomLProp_SLProps(surf, uv[0], uv[1], 1, 1e-9)
         if not res.IsNormalDefined():
             return (0, 0, 0)
-        normal = geom_utils.gp_to_numpy(res.Normal())
+        gp_normal = res.Normal()
+        gp_normal.Transformed(loc.Transformation())
+        normal = geom_utils.gp_to_numpy(gp_normal)
         if self.reversed():
             normal = -normal
         return normal
@@ -402,8 +422,13 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             np.ndarray: UV-coordinate
         """
-        uv = ShapeAnalysis_Surface(self.surface()).ValueOfUV(
-            gp_Pnt(pt[0], pt[1], pt[2]), 1e-9
+        loc = TopLoc_Location()
+        surf = BRep_Tool_Surface(self.topods_shape(), loc)
+        gp_pt = gp_Pnt(pt[0], pt[1], pt[2])
+        inv = loc.Transformation().Inverted()
+        gp_pt.Transformed(inv)
+        uv = ShapeAnalysis_Surface(surf).ValueOfUV(
+            gp_pt, 1e-9
         )
         return np.array(uv.Coord())
 
