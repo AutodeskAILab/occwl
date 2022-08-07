@@ -10,3 +10,5 @@ dependencies:
   - networkx
   - wxPython
   - pydeprecate
+  - trimesh
+  - scipy
