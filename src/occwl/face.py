@@ -1,7 +1,6 @@
 import logging
 
 import numpy as np
-import trimesh
 from deprecate import deprecated
 from OCC.Core.BRep import BRep_Tool, BRep_Tool_Surface
 from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
@@ -535,12 +534,18 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         if facing == None:
             return [], []
 
-        tab = facing.Nodes()
+        vert_nodes = facing.Nodes()
         tri = facing.Triangles()
+        uv_nodes = facing.UVNodes()
         verts = []
+        normals = []
         for i in range(1, facing.NbNodes() + 1):
-            p = tab.Value(i).Transformed(location.Transformation())
-            verts.append(np.array(list(p.Coord())))
+            vert = vert_nodes.Value(i).Transformed(location.Transformation())
+            verts.append(np.array(list(vert.Coord())))
+            if return_normals:
+                uv = uv_nodes.Value(i).Coord()
+                normal = self.normal(uv)
+                normals.append(normal)
 
         tris = []
         reversed = self.reversed()
@@ -558,11 +563,7 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         np_tris = np.asarray(tris, dtype=np.int32)
 
         if return_normals:
-            mesh = trimesh.Trimesh(
-                vertices=np_verts,
-                faces=np_tris,
-                validate=False
-            )
-            return np_verts, np_tris, mesh.vertex_normals
+            np_normals = np.asarray(normals, dtype=np.float32)
+            return np_verts, np_tris, np_normals
         else:
             return np_verts, np_tris
