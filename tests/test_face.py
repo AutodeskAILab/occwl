@@ -32,6 +32,7 @@ class FaceTester(TestBase):
                 verts, tris, normals = face.get_triangles(return_normals=True)
                 self.assertIsInstance(normals, np.ndarray)
                 self.assertEqual(normals.shape[1], 3)
+                self.assertEqual(verts.shape[0], normals.shape[0])
                 # Check the normals are close to 1.0 length
                 lengths = np.linalg.norm(normals, axis=1)
                 self.assertTrue(np.allclose(lengths, np.ones(lengths.shape)))
