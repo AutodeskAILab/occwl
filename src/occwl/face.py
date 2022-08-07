@@ -1,6 +1,7 @@
 import logging
 
 import numpy as np
+import trimesh
 from deprecate import deprecated
 from OCC.Core.BRep import BRep_Tool, BRep_Tool_Surface
 from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
@@ -513,16 +514,20 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         adaptor = BRepAdaptor_Surface(self.topods_shape())
         return adaptor.IsVPeriodic()
 
-    def get_triangles(self):
+    def get_triangles(self, return_normals=False):
         """
         Get the tessellation of this face as a triangle mesh
         NOTE: First you must call shape.triangulate_all_faces()
         Then call this method to get the triangles for the
         face.
 
+        Args:
+            return_normals (bool): Return vertex normals
+
         Returns:
             2D np.ndarray: Vertices
             2D np.ndarray: Faces
+            2D np.ndarray: Vertex Normals (when return_normals is True)
         """
         location = TopLoc_Location()
         bt = BRep_Tool()
@@ -549,4 +554,15 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
 
             tris.append([index1 - 1, index2 - 1, index3 - 1])
 
-        return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int32)
+        np_verts = np.asarray(verts, dtype=np.float32)
+        np_tris = np.asarray(tris, dtype=np.int32)
+
+        if return_normals:
+            mesh = trimesh.Trimesh(
+                vertices=np_verts,
+                faces=np_tris,
+                validate=False
+            )
+            return np_verts, np_tris, mesh.vertex_normals
+        else:
+            return np_verts, np_tris
