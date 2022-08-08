@@ -9,6 +9,8 @@ from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 from OCC.Core.Geom import Geom_Circle
 from OCC.Core.GeomAbs import GeomAbs_Circle
 from occwl.edge import Edge
+from occwl.solid import Solid
+from occwl.compound import Compound
 
 # Test
 from tests.test_base import TestBase
@@ -99,6 +101,40 @@ class EdgeTester(TestBase):
         if edge.has_curve():
             crv = edge.specific_curve()
             self.assertTrue(crv is not None)
+
+    def test_get_polyline(self):
+        """ Test getting a polyline from an edge """
+        block_solid = self.load_single_solid_from_test_data("block.step")
+        fillet1_solid = self.load_single_solid_from_test_data("block_fillet1.step")
+        fg_solid = self.load_single_solid_from_test_data("119129_8f04623b_0.stp")
+        solids = [block_solid, fillet1_solid, fg_solid]       
+        for solid in solids:
+            # Get the bounding box of the solid
+            bbox = solid.box()
+            edges = solid.edges()
+            for edge in edges:
+                pts = edge.get_polyline()
+                self.assertIsInstance(pts, np.ndarray)
+                self.assertEqual(pts.shape[1], 3)
+                self.assertGreater(pts.shape[0], 0)
+                # Check that the polyline points are within the bounding box
+                for pt in pts:
+                    # May need an epsilon here on some rare cases
+                    self.assertTrue(bbox.contains_point(pt))
+
+    def test_get_polyline_fail(self):
+        """ Test get_polyline handles edges without curves """
+        solid = Solid.make_cone(1.0, 0.0, 1.0)
+        edges = solid.edges()
+        for edge in edges:
+            pts = edge.get_polyline()
+            self.assertIsInstance(pts, np.ndarray)
+            if not edge.has_curve():
+                self.assertEqual(pts.shape, (0,0))
+            else:
+                self.assertEqual(pts.shape[1], 3)
+                self.assertGreater(pts.shape[0], 0)
+
 
     def run_test(self, solid):
         edges = solid.edges()
