@@ -458,7 +458,7 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
 
         return left_face, right_face
 
-    def get_polyline(self, deflection=0.2, algorithm="QuasiUniformDeflection"):
+    def get_polyline(self, deflection=0.0005, algorithm="QuasiUniformDeflection"):
         """
         Get a polyline, represented as a sequence of points, from this edge
 

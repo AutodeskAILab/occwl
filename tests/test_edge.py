@@ -1,4 +1,5 @@
 # System
+import unittest
 import numpy as np
 
 # Geometry
@@ -10,7 +11,7 @@ from OCC.Core.Geom import Geom_Circle
 from OCC.Core.GeomAbs import GeomAbs_Circle
 from occwl.edge import Edge
 from occwl.solid import Solid
-from occwl.compound import Compound
+from occwl.viewer import Viewer
 
 # Test
 from tests.test_base import TestBase
@@ -135,6 +136,21 @@ class EdgeTester(TestBase):
                 self.assertEqual(pts.shape[1], 3)
                 self.assertGreater(pts.shape[0], 0)
 
+    @unittest.skip("Skipping visualization")
+    def test_view_get_polyline(self):
+        """ View the output from get_polyline """
+        # NOTE: On mac this needs to be run using 'pythonw' rather than 'python'
+        solid = Solid.make_cone(1.0, 0.0, 1.0)
+        v = Viewer(backend="wx")
+        v.display(solid, transparency=0.8)
+
+        edges = solid.edges()
+        for edge in edges:
+            pts = edge.get_polyline()
+            for pt in pts:
+                v.display(Solid.make_sphere(center=pt, radius=0.01))
+        v.fit()
+        v.show()
 
     def run_test(self, solid):
         edges = solid.edges()
