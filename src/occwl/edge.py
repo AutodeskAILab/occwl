@@ -24,6 +24,11 @@ from OCC.Core.GCPnts import GCPnts_AbscissaPoint
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Edge
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
+from OCC.Core.GCPnts import (
+    GCPnts_UniformAbscissa,
+    GCPnts_QuasiUniformDeflection,
+    GCPnts_UniformDeflection,
+)
 
 import occwl.geometry.geom_utils as geom_utils
 import occwl.vertex
@@ -452,3 +457,46 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
             right_face = face1
 
         return left_face, right_face
+
+    def get_polyline(self, deflection=0.2, algorithm="QuasiUniformDeflection"):
+        """
+        Get a polyline, represented as a sequence of points, from this edge
+
+        Args:
+            deflection (float): Lower deflection results in more precision
+                                and therefore more points
+            algorithm (string): Algorithm to use, can be one of:
+                                QuasiUniformDeflection, UniformAbscissa,
+                                or UniformDeflection
+        
+        Returns:
+            2D np.ndarray: Points
+        """
+        # If we don't have a valid curve, return an empty array
+        if not self.has_curve():
+            return np.empty(shape=(0,0), dtype=np.float32)
+        
+        curve_adaptor = BRepAdaptor_Curve(self.topods_shape())
+        first_param = curve_adaptor.FirstParameter()
+        last_param = curve_adaptor.LastParameter()
+
+        if algorithm == "QuasiUniformDeflection":
+            discretizer = GCPnts_QuasiUniformDeflection()
+        elif algorithm == "UniformAbscissa":
+            discretizer = GCPnts_UniformAbscissa()
+        elif algorithm == "UniformDeflection":
+            discretizer = GCPnts_UniformDeflection()
+        else:
+            raise Exception("Unknown algorithm")
+        discretizer.Initialize(curve_adaptor, deflection, first_param, last_param)
+
+        if not discretizer.IsDone():
+            raise Exception("Discretizer not done.")
+        if not discretizer.NbPoints() > 0:
+            raise Exception("Discretizer nb points not > 0.")
+
+        points = []
+        for i in range(1, discretizer.NbPoints() + 1):
+            p = curve_adaptor.Value(discretizer.Parameter(i))
+            points.append(np.array(list(p.Coord())))
+        return np.asarray(points, dtype=np.float32)
