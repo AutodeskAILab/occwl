@@ -131,7 +131,7 @@ class EdgeTester(TestBase):
             pts = edge.get_polyline()
             self.assertIsInstance(pts, np.ndarray)
             if not edge.has_curve():
-                self.assertEqual(pts.shape, (0,0))
+                self.assertEqual(pts.shape, (0,3))
             else:
                 self.assertEqual(pts.shape[1], 3)
                 self.assertGreater(pts.shape[0], 0)

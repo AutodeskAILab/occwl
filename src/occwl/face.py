@@ -532,7 +532,17 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         bt = BRep_Tool()
         facing = bt.Triangulation(self.topods_shape(), location)
         if facing == None:
-            return [], []
+            if return_normals:
+                return (
+                    np.empty(shape=(0,3), dtype=np.float32),
+                    np.empty(shape=(0,3), dtype=np.int32),
+                    np.empty(shape=(0,3), dtype=np.float32)
+                )
+            else:
+                return (
+                    np.empty(shape=(0,3), dtype=np.float32),
+                    np.empty(shape=(0,3), dtype=np.int32)
+                )
 
         vert_nodes = facing.Nodes()
         tri = facing.Triangles()
