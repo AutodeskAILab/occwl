@@ -513,16 +513,20 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         adaptor = BRepAdaptor_Surface(self.topods_shape())
         return adaptor.IsVPeriodic()
 
-    def get_triangles(self):
+    def get_triangles(self, return_normals=False):
         """
         Get the tessellation of this face as a triangle mesh
         NOTE: First you must call shape.triangulate_all_faces()
         Then call this method to get the triangles for the
         face.
 
+        Args:
+            return_normals (bool): Return vertex normals
+
         Returns:
             2D np.ndarray: Vertices
             2D np.ndarray: Faces
+            2D np.ndarray: Vertex Normals (when return_normals is True)
         """
         location = TopLoc_Location()
         bt = BRep_Tool()
@@ -530,12 +534,18 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         if facing == None:
             return [], []
 
-        tab = facing.Nodes()
+        vert_nodes = facing.Nodes()
         tri = facing.Triangles()
+        uv_nodes = facing.UVNodes()
         verts = []
+        normals = []
         for i in range(1, facing.NbNodes() + 1):
-            p = tab.Value(i).Transformed(location.Transformation())
-            verts.append(np.array(list(p.Coord())))
+            vert = vert_nodes.Value(i).Transformed(location.Transformation())
+            verts.append(np.array(list(vert.Coord())))
+            if return_normals:
+                uv = uv_nodes.Value(i).Coord()
+                normal = self.normal(uv)
+                normals.append(normal)
 
         tris = []
         reversed = self.reversed()
@@ -549,4 +559,11 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
 
             tris.append([index1 - 1, index2 - 1, index3 - 1])
 
-        return np.asarray(verts, dtype=np.float32), np.asarray(tris, dtype=np.int32)
+        np_verts = np.asarray(verts, dtype=np.float32)
+        np_tris = np.asarray(tris, dtype=np.int32)
+
+        if return_normals:
+            np_normals = np.asarray(normals, dtype=np.float32)
+            return np_verts, np_tris, np_normals
+        else:
+            return np_verts, np_tris
