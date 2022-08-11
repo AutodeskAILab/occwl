@@ -474,7 +474,7 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
         """
         # If we don't have a valid curve, return an empty array
         if not self.has_curve():
-            return np.empty(shape=(0,0), dtype=np.float32)
+            return np.empty(shape=(0,3), dtype=np.float32)
         
         curve_adaptor = BRepAdaptor_Curve(self.topods_shape())
         first_param = curve_adaptor.FirstParameter()
