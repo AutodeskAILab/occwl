@@ -78,6 +78,8 @@ class Compound(Shape, BottomUpFaceIterator, BoundingBoxMixin, BottomUpEdgeIterat
                 if item is None:
                     continue
                 item = StepRepr_RepresentationItem.DownCast(item)
+                if item is None:
+                    continue
                 name = item.Name().ToCString()
                 occwl_shape = Shape.occwl_shape(s)
                 occwl_shape_to_attributes[occwl_shape] = {
