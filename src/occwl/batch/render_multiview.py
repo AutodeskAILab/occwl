@@ -16,11 +16,7 @@ def render(shape, filename, width=1024, height=768, euler_angles_radians=(0, 0, 
     viewer = OffscreenRenderer(background_top_color=[255, 255, 255], background_bottom_color=[255, 255, 255],
                                axes=False, size=(width, height))
     # Add a directional light so that the shading isn't too flat. The default light seems to be pointing backwards
-    dir_light = V3d_DirectionalLight(gp_Dir(0, 0.5, -1), Quantity_Color(Quantity_NOC_WHITE))
-    dir_light.SetEnabled(True)
-    dir_light.SetIntensity(500.0)
-    viewer._display.Viewer.AddLight(dir_light)
-    viewer._display.Viewer.SetLightOn()
+    viewer.add_directional_light((0, 0.5, -1), color=(255, 255, 255))
     if euler_angles_radians != (0, 0, 0):
         shape.rotate_euler_angles(euler_angles_radians)
     viewer.display(shape)

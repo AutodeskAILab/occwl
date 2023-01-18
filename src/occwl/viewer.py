@@ -19,7 +19,7 @@ from OCC.Core.Graphic3d import (
     Graphic3d_TOSM_FACET,
     Graphic3d_TOSM_FRAGMENT
 )
-from OCC.Core.gp import gp_Ax1
+from OCC.Core.gp import gp_Ax1, gp_Dir
 from OCC.Core.Geom import Geom_CartesianPoint, Geom_Line
 from OCC.Core.Prs3d import Prs3d_LineAspect, Prs3d_PointAspect
 from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
@@ -38,6 +38,7 @@ from OCC.Core.TopoDS import (
     TopoDS_Vertex,
     TopoDS_Compound,
 )
+from OCC.Core.V3d import V3d_DirectionalLight
 from OCC.Display.SimpleGui import init_display
 from OCC.Display.OCCViewer import get_color_from_name
 from OCC.Display.OCCViewer import Viewer3d
@@ -50,6 +51,23 @@ from occwl.solid import Solid
 from occwl.vertex import Vertex
 from occwl.compound import Compound
 from occwl.shell import Shell
+
+
+def _get_quantity_color(color):
+    assert isinstance(color, (list, tuple))
+    assert len(color) == 3
+    r, g, b = color
+    assert type(r) == type(g) == type(b)
+    assert type(r) in (float, int)
+    if type(r) == int:
+        assert 0 <= r <= 255
+        assert 0 <= g <= 255
+        assert 0 <= b <= 255
+        return Quantity_Color(r / 255.0, g / 255.0, b / 255.0, Quantity_TOC_RGB)
+    assert 0.0 <= r <= 1.0
+    assert 0.0 <= g <= 1.0
+    assert 0.0 <= b <= 1.0
+    return Quantity_Color(r, g, b, Quantity_TOC_RGB)
 
 
 class _BaseViewer:
@@ -69,8 +87,8 @@ class _BaseViewer:
             shape = shape.topods_shape()
         if color and not isinstance(color, (str, tuple)):
             color = "BLACK"
-        if isinstance(color, tuple):
-            assert len(color) == 3, "Expected a 3-tuple when color is specified as RGB"
+        if isinstance(color, (tuple, list)):
+            assert len(color) == 3, "Expected a 3-tuple/list when color is specified as RGB"
             color = Quantity_Color(
                 float(color[0]), float(color[1]), float(color[2]), Quantity_TOC_RGB
             )
@@ -369,6 +387,16 @@ class _BaseViewer:
         Compute colors per fragment
         """
         self._display.View.SetShadingModel(Graphic3d_TOSM_FRAGMENT)
+
+    def add_directional_light(self, direction, color, intensity=500.0):
+        assert len(direction) == 3
+        assert len(color) == 3
+        color = _get_quantity_color(color)
+        dir_light = V3d_DirectionalLight(gp_Dir(*direction), color)
+        dir_light.SetEnabled(True)
+        dir_light.SetIntensity(intensity)
+        self._display.Viewer.AddLight(dir_light)
+        self._display.Viewer.SetLightOn()
 
 
 class Viewer(_BaseViewer):
