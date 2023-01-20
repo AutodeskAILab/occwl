@@ -1,5 +1,5 @@
 import numpy as np
-from OCC.Core.gp import gp_Pnt, gp_Pnt2d, gp_Vec, gp_Dir, gp_Ax1
+from OCC.Core.gp import gp_Pnt, gp_Pnt2d, gp_Vec, gp_Dir, gp_Ax1, gp_Trsf
 
 from occwl.geometry.box import Box
 
@@ -53,6 +53,13 @@ def to_numpy(any_2d_or_3d_type, dtype=np.float32):
             )
         elif len(any_2d_or_3d_type) == 2:
             return np.array([any_2d_or_3d_type[0], any_2d_or_3d_type[1]], dtype=dtype)
+    elif isinstance(any_2d_or_3d_type, gp_Trsf):
+        # Convert the transform into a 4x4 homogeneous transform matrix
+        mat = np.eye(4)
+        for i in range(3):
+            for j in range(4):
+                mat[i,j] = any_2d_or_3d_type.Value(i+1,j+1)
+        return mat
     raise ValueError(f"Unexpected type: {type(any_2d_or_3d_type)}")
 
 
