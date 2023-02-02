@@ -92,3 +92,8 @@ def to_gp_axis(point_3d, dir_3d):
     assert len(point_3d) == 3
     assert len(dir_3d) == 3
     return gp_Ax1(to_gp_pnt(point_3d), to_gp_dir(dir_3d))
+
+def is_geometric_identity(transform):
+    assert isinstance(transform, gp_Trsf), "Must be a gp_Trsf"
+    np_tsf = to_numpy(transform)
+    return np.allclose(np_tsf, np.eye(4))

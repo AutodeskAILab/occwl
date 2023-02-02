@@ -287,7 +287,36 @@ class Shape:
         identity = TopLoc_Location()
         self.topods_shape().Location(identity)
         self._top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), True)
+        self.convert_geometric_identity_transforms_to_identity()
+        
 
+    def convert_geometric_identity_transforms_to_identity(self):
+        """
+        Open Cascade models sometimes contain transforms which
+        are "geometrically" identify transforms, but the identity
+        flag is not set.
+
+        This function checks each transform and sets the flag if 
+        the appropriate.
+        """
+        identity = TopLoc_Location()
+        if geom_utils.is_geometric_identity(
+            self.topods_shape().Location().Transformation()
+        ):
+            self.topods_shape().Location(identity)
+            self._top_exp = TopologyUtils.TopologyExplorer(self.topods_shape(), True)
+
+        for face in self._top_exp.faces():
+            if geom_utils.is_geometric_identity(face.Location().Transformation()):
+                face.Location(identity)
+
+        for edge in self._top_exp.edges():
+            if geom_utils.is_geometric_identity(edge.Location().Transformation()):
+                edge.Location(identity)
+
+        for vertex in self._top_exp.vertices():
+            if geom_utils.is_geometric_identity(vertex.Location().Transformation()):
+                vertex.Location(identity)
         
 
     def transform(self, a, copy=True):
