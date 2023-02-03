@@ -10,6 +10,13 @@ source activate myoccwlenv
 conda install -c lambouj -c conda-forge occwl
 ```
 
+We have noticed `conda` runnin very slow recently.  See issue #26.  If `conda` is too slow, we recommend using `mamba`.
+```
+conda install -n base mamba -c conda-forge
+...
+mamba install occwl -c lambouj -c conda-forge
+```
+
 
 ## Hello world
 
