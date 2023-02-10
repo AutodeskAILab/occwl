@@ -178,9 +178,13 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         """
         loc = TopLoc_Location()
         surf = BRep_Tool_Surface(self.topods_shape(), loc)
-        assert loc.IsIdentity(), "Requesting surface for transformed face. \
-            Call solid.set_transform_to_identity() to remove the transform \
-            or compound.Transform(np.eye(4)) to bake in the assembly transform"
+        if not loc.IsIdentity():
+            tsf = loc.Transformation()
+            np_tsf = geom_utils.to_numpy(tsf)
+            assert np.allclose(np_tsf, np.eye(4)), \
+                "Requesting surface for transformed face. /n\
+                Call solid.set_transform_to_identity() to remove the transform \
+                or compound.Transform(np.eye(4)) to bake in the assembly transform"
         return surf
 
     def reversed_face(self):
@@ -199,10 +203,13 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             OCC.Geom.Handle_Geom_*: Specific geometry type for the surface geometry
         """
-        assert self.topods_shape().Location().IsIdentity(), \
-            "Requesting surface for transformed face. \
-            Call solid.set_transform_to_identity() to remove the transform \
-            or compound.Transform(np.eye(4)) to bake in the assembly transform"
+        if not self.topods_shape().Location().IsIdentity():
+            tsf = self.topods_shape().Location().Transformation()
+            np_tsf = geom_utils.to_numpy(tsf)
+            assert np.allclose(np_tsf, np.eye(4)), \
+                "Requesting surface for transformed face. /n\
+                Call solid.set_transform_to_identity() to remove the transform /n\
+                or compound.transform(np.eye(4)) to bake in the assembly transform"
         srf = BRepAdaptor_Surface(self.topods_shape())
         surf_type = self.surface_type()
         if surf_type == "plane":
