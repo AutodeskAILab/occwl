@@ -5,7 +5,9 @@ import numpy as np
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeVertex
 from OCC.Core.BRepExtrema import BRepExtrema_DistShapeShape
+from OCC.Core.BRepTools import BRepTools_ShapeSet
 from OCC.Core.Extrema import Extrema_ExtFlag_MIN
+from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.gp import gp_Ax1, gp_Trsf
 from OCC.Core.TopAbs import TopAbs_REVERSED
 from OCC.Core.TopLoc import TopLoc_Location
@@ -153,6 +155,80 @@ class Shape:
         edge1.reversed() == edge2.reversed()
         """
         return self.topods_shape().__hash__() == other.topods_shape().__hash__()
+
+    def save_to_occ_native(
+            self, 
+            filename, 
+            verbosity=False,
+            with_triangles=False,
+            with_normals=False,
+            format_version=None
+        ):
+        """
+        Save this shape into a native OCC binary .brep file.
+
+        Note:  Saving to and loading from the native file format 
+               is between one and two orders of magnitude faster 
+               than loading from STEP, so it is recommended for 
+               large scale data processing
+
+        Args:
+            filename (str or pathlib.Path): .brep filename
+            with_triangles (bool): Whether to save triangle data cached in the shape.
+            with_normals (bool): Whether to save vertex normals cached in the shape
+            format_version (int):  Use None to save to the latest version
+                1 - first revision
+                2 - added storing of CurveOnSurface UV Points
+                3 - [OCCT 7.6] added storing of per-vertex normal information
+                               and dropped storing of CurveOnSurface UV Points
+        """
+        self.save_shapes_to_occ_native(
+            filename, 
+            [ self ],
+            with_triangles=with_triangles,
+            with_normals=with_normals,
+            format_version=format_version
+        )
+    
+    @staticmethod
+    def save_shapes_to_occ_native(
+            filename, 
+            shapes,
+            with_triangles=False,
+            with_normals=False,
+            format_version=None
+        ):
+        """
+        Save this shape into a native OCC binary .brep file.
+
+        Note:  Saving to and loading from the native file format 
+                is between one and two orders of magnitude faster 
+                than loading from STEP, so it is recommended for 
+                large scale data processing
+
+        Args:
+            filename (str or pathlib.Path): .brep filename
+
+            with_triangles (bool): Whether to save triangle data cached in the shape.
+            with_normals (bool): Whether to save vertex normals cached in the shape
+            format_version (int):  Use None to save to the latest version
+                1 - first revision
+                2 - added storing of CurveOnSurface UV Points
+                3 - [OCCT 7.6] added storing of per-vertex normal information
+                               and dropped storing of CurveOnSurface UV Points
+        """
+        new_api = False
+        shapes_set = BRepTools_ShapeSet()
+        for shp in shapes:
+            shapes_set.Add(shp.topods_shape())
+        if format_version is not None:
+            shapes_set.SetFormatNb(format_version)
+
+
+        with open(filename, "w") as fp:
+            s = shapes_set.WriteToString()
+            fp.write(s)
+
 
 
     def reversed(self):

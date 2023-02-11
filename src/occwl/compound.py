@@ -1,5 +1,6 @@
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Extend.DataExchange import read_step_file, list_of_shapes_to_compound
+from OCC.Core.BRepTools import BRepTools_ShapeSet
 from OCC.Core.STEPControl import STEPControl_Reader
 from OCC.Core.TopAbs import (
     TopAbs_FACE, 
@@ -48,7 +49,6 @@ class Compound(Shape, BottomUpFaceIterator, BoundingBoxMixin, BottomUpEdgeIterat
             assert success
         return Compound(shp)
 
-
     @staticmethod
     def load_step_with_attributes(step_filename):
         """Load shapes from a step file with the
@@ -96,3 +96,32 @@ class Compound(Shape, BottomUpFaceIterator, BoundingBoxMixin, BottomUpEdgeIterat
         shp, success = list_of_shapes_to_compound([shape])
         assert success, "Failed to convert to a single compound"
         return Compound(shp), occwl_shape_to_attributes
+
+
+    @staticmethod
+    def load_from_occ_native(filename, verbosity=False):
+        """
+        Load everything from the OCC native .brep file 
+        format into a single occwl.compound.Compound.
+
+        Note:  Saving to and loading from the native file format 
+               is between one and two orders of magnitude faster 
+               than loading from STEP, so it is recommended for 
+               large scale data processing
+
+        Args:
+            filename (str or pathlib.Path): .brep filename
+            verbosity (bool): Whether to print detailed information while loading
+
+        Returns:
+            occwl.compound.Compound: Compound shape
+        """
+        shape_set = BRepTools_ShapeSet()
+        with open(filename, "r") as fp:
+            shape_set.ReadFromString(fp.read())
+        shapes = []
+        for i in range(shape_set.NbShapes()):
+            shapes.append(shape_set.Shape(i+1))
+        shp, success = list_of_shapes_to_compound(shapes)
+        assert success
+        return Compound(shp)

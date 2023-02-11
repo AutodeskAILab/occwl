@@ -11,7 +11,7 @@ from tests.test_base import TestBase
 class LoadWithNameTester(TestBase):
 
     def test_example(self):
-        data_path = self.test_folder() / "test_data"
+        data_path = self.test_folder() / "test_data/import_tests"
         examples = [
             (
                 "import_example_1.step", 
@@ -31,7 +31,10 @@ class LoadWithNameTester(TestBase):
             expected_solid_names = example[1]
             self.check_for_example(pathname, expected_solid_names)
 
+        print("Completed LoadWithNameTester")
+
     def check_for_example(self, pathname, expected_solid_names):
+        self.assertTrue(pathname.exists())
         comp, shape_att = Compound.load_step_with_attributes(pathname)
         for s in comp.solids():
             self.assertTrue(s in shape_att)
