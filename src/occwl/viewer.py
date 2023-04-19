@@ -140,20 +140,20 @@ class _BaseViewer:
         point_entities = []
         for idx in range(pts.shape[0]):
             if isinstance(color, tuple):
-                color = Quantity_Color(color[0], color[1], color[2], Quantity_TOC_RGB)
+                quantity_color = Quantity_Color(color[0], color[1], color[2], Quantity_TOC_RGB)
             elif isinstance(color, np.ndarray):
                 assert (
                     pts.shape[0] == color.shape[0]
                 ), "pts and color must match in size (#points x 3)"
-                color = Quantity_Color(
+                quantity_color = Quantity_Color(
                     color[idx, 0], color[idx, 1], color[idx, 2], Quantity_TOC_RGB
                 )
             elif isinstance(color, str):
-                color = get_color_from_name(color)
+                quantity_color = get_color_from_name(color)
             p = Geom_CartesianPoint(geom_utils.to_gp_pnt(pts[idx, :]))
             ais_point = AIS_Point(p)
             attr = ais_point.Attributes()
-            asp = Prs3d_PointAspect(marker_type, color, float(scale))
+            asp = Prs3d_PointAspect(marker_type, quantity_color, float(scale))
             attr.SetPointAspect(asp)
             ais_point.SetAttributes(attr)
             self._display.Context.Display(ais_point, False)
@@ -196,16 +196,16 @@ class _BaseViewer:
         line_entities = []
         for idx in range(origins.shape[0]):
             if isinstance(color, tuple):
-                color = Quantity_Color(color[0], color[1], color[2], Quantity_TOC_RGB)
+                quantity_color = Quantity_Color(color[0], color[1], color[2], Quantity_TOC_RGB)
             elif isinstance(color, np.ndarray):
                 assert (
                     origins.shape[0] == color.shape[0]
                 ), "pts and color must match in size (#points x 3)"
-                color = Quantity_Color(
+                quantity_color = Quantity_Color(
                     color[idx, 0], color[idx, 1], color[idx, 2], Quantity_TOC_RGB
                 )
             elif isinstance(color, str):
-                color = get_color_from_name(color)
+                quantity_color = get_color_from_name(color)
 
             line = Geom_Line(
                 geom_utils.to_gp_pnt(origins[idx, :]),
@@ -213,7 +213,7 @@ class _BaseViewer:
             )
             ais_line = AIS_Line(line)
             attr = ais_line.Attributes()
-            asp = Prs3d_LineAspect(color, type_of_line, thickness)
+            asp = Prs3d_LineAspect(quantity_color, type_of_line, thickness)
             attr.SetLineAspect(asp)
             ais_line.SetAttributes(attr)
             self._display.Context.Display(ais_line, False)
