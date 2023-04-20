@@ -218,7 +218,9 @@ class Shape:
                                and dropped storing of CurveOnSurface UV Points
         """
         new_api = False
-        shapes_set = BRepTools_ShapeSet()
+        shapes_set = BRepTools_ShapeSet(with_triangles)
+        # shapes_set.SetWithNormals(with_normals) # Not in OCC 7.5.0
+
         for shp in shapes:
             shapes_set.Add(shp.topods_shape())
         if format_version is not None:
