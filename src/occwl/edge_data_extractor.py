@@ -13,7 +13,7 @@ from OCC.Core.gp import gp_Pnt2d, gp_Identity
 # occwl
 from occwl.geometry.interval import Interval
 from occwl.geometry.arc_length_param_finder import ArcLengthParamFinder
-
+import occwl.geometry.geom_utils as geom_utils 
 
 class EdgeConvexity(Enum):
     CONCAVE = 1
@@ -38,14 +38,17 @@ class EdgeDataExtractor:
         If a problem was detected during the calculation then 
         EdgeDataExtractor.good == false
         """
-        assert num_samples > 0
+        assert num_samples > 0, "num_samples must be bigger than 0"
         assert edge is not None
-        assert len(faces) > 0
-        assert edge.topods_shape().Location().Transformation().Form() == gp_Identity
+        assert len(faces) > 0, "Expect 1 or 2 faces adjacent to an edge"
 
         self.num_samples = num_samples
         self.good = True
         self.left_face, self.right_face = edge.find_left_and_right_faces(faces)
+        if self.left_face is None or self.right_face is None:
+            # Cope with case where the left and right face cannot be found
+            self.good = False
+            return
 
         self.edge = edge
         self.curve3d = edge.curve()
