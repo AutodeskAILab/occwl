@@ -436,6 +436,8 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
 
         Returns:
             occwl.face.Face, occwl.face.Face: The left and then right face
+            or 
+            None, None if the left and right faces cannot be found
         """
         assert len(faces) > 0
         face1 = faces[0]
@@ -448,11 +450,13 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
             # In some cases (like a cylinder) the left and right faces
             # of the edge are the same face
             if face1 != face2:
-                assert not face2.is_left_of(self)
+                if not face2.is_left_of(self):
+                    return None, None
             left_face = face1
             right_face = face2
         else:
-            assert face2.is_left_of(self)
+            if not face2.is_left_of(self):
+                return None, None
             left_face = face2
             right_face = face1
 
