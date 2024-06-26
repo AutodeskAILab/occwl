@@ -450,7 +450,7 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
             # In some cases (like a cylinder) the left and right faces
             # of the edge are the same face
             if face1 != face2:
-                if not face2.is_left_of(self):
+                if face2.is_left_of(self):
                     return None, None
             left_face = face1
             right_face = face2
