@@ -248,6 +248,15 @@ class EdgeDataExtractorTester(TestBase):
         ]
         self.check_edges("two_concave_closed_edge.step", edge_checks_list)
 
+    def test_edge_with_transform(self):
+        edge_checks_list = [
+            {
+                "datum": [70, 50, 40],
+                "expected_convexity": EdgeConvexity.CONVEX,
+            }
+        ]
+        self.check_edges("MovedBlock.step", edge_checks_list)
+
     def check_extract_data_for_all_edges(self, solid):
         for edge in solid.edges():
             faces = list(solid.faces_from_edge(edge))
