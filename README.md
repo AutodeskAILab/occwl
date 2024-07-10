@@ -5,7 +5,7 @@ OCCWL is a simple, lightweight Pythonic wrapper around pythonocc (python binding
 ## Installing our conda package
 
 ```
-conda create --name=myoccwlenv python=3.7
+conda create --name=myoccwlenv python=3.9
 source activate myoccwlenv
 conda install -c lambouj -c conda-forge occwl
 ```
