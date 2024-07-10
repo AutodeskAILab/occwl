@@ -5,8 +5,6 @@ Test the transform() function
 # System
 import numpy as np
 
-from occwl.solid import Solid
-
 # Test
 from tests.test_base import TestBase
 
