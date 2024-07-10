@@ -1,7 +1,4 @@
-import logging
-
 import numpy as np
-from deprecate import deprecated
 from OCC.Core.BRep import BRep_Tool
 from OCC.Core.BRepAdaptor import BRepAdaptor_Surface
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeFace
@@ -17,9 +14,9 @@ from OCC.Core.GeomAbs import (GeomAbs_BezierSurface, GeomAbs_BSplineSurface,
                               GeomAbs_Sphere, GeomAbs_SurfaceOfExtrusion,
                               GeomAbs_SurfaceOfRevolution, GeomAbs_Torus)
 from OCC.Core.GeomLProp import GeomLProp_SLProps
-from OCC.Core.gp import gp_Dir, gp_Pnt, gp_Pnt2d, gp_TrsfForm
+from OCC.Core.gp import gp_Dir, gp_Pnt, gp_Pnt2d
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Surface
-from OCC.Core.TopAbs import TopAbs_IN, TopAbs_REVERSED
+from OCC.Core.TopAbs import TopAbs_IN
 from OCC.Core.TopLoc import TopLoc_Location
 from OCC.Core.TopoDS import TopoDS_Face
 

@@ -1,16 +1,13 @@
 import numpy as np
 
-from OCC.Core.gp import gp
 from OCC.Core.Bnd import Bnd_Box
 from OCC.Core.BRepBndLib import brepbndlib
-from OCC.Extend import TopologyUtils
 from OCC.Core.BRepGProp import brepgprop
 from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
 from OCC.Core.GProp import GProp_GProps
-from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1, gp_Vec, gp_Trsf
+from OCC.Core.gp import gp_Pnt, gp_Ax1, gp_Vec, gp_Trsf
 from OCC.Core.ShapeUpgrade import ShapeUpgrade_ShapeDivideClosed
 from OCC.Core.ShapeUpgrade import ShapeUpgrade_ShapeDivideClosedEdges
-from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
 
 
 class VertexContainerMixin:

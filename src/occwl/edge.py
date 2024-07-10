@@ -1,6 +1,6 @@
 import numpy as np
 
-from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d, gp_Ax2, gp_Circ
+from OCC.Core.gp import gp_Pnt, gp_Vec, gp_Ax2, gp_Circ
 from OCC.Core.BRep import BRep_Tool
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.BRepGProp import brepgprop
@@ -17,11 +17,7 @@ from OCC.Core.GeomAbs import (
     GeomAbs_OffsetCurve,
     GeomAbs_OtherCurve,
 )
-from OCC.Core.TopAbs import TopAbs_REVERSED
-from OCC.Extend import TopologyUtils
 from OCC.Core.TopoDS import TopoDS_Edge
-from OCC.Core.GCPnts import GCPnts_AbscissaPoint
-from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
 from OCC.Core.ShapeAnalysis import ShapeAnalysis_Edge
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 from OCC.Core.GCPnts import (
@@ -35,8 +31,6 @@ import occwl.vertex
 from occwl.geometry.interval import Interval
 from occwl.shape import Shape
 from occwl.base import VertexContainerMixin, BoundingBoxMixin
-from deprecate import deprecated
-import logging
 
 
 class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):

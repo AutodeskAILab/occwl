@@ -6,11 +6,9 @@ the triangles
 # System
 from pathlib import Path
 import tempfile
-import numpy as np
 
 # OCC
 from occwl.compound import Compound
-from OCC.Core import PYTHONOCC_VERSION_MAJOR, PYTHONOCC_VERSION_MINOR
 
 # Test
 from tests.test_base import TestBase
