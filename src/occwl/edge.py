@@ -1,9 +1,9 @@
 import numpy as np
 
 from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Vec, gp_Pnt2d, gp_Ax2, gp_Circ
-from OCC.Core.BRep import BRep_Tool, BRep_Tool_Curve, BRep_Tool_Continuity
+from OCC.Core.BRep import BRep_Tool
 from OCC.Core.BRepAdaptor import BRepAdaptor_Curve
-from OCC.Core.BRepGProp import brepgprop_LinearProperties
+from OCC.Core.BRepGProp import brepgprop
 from OCC.Core.GC import GC_MakeArcOfCircle
 from OCC.Core.GProp import GProp_GProps
 from OCC.Core.GeomAbs import (
@@ -217,7 +217,7 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
         if not self.has_curve():
             return 0.0
         geometry_properties = GProp_GProps()
-        brepgprop_LinearProperties(self.topods_shape(), geometry_properties)
+        brepgprop.LinearProperties(self.topods_shape(), geometry_properties)
         return geometry_properties.Mass()
 
     def curve(self):
@@ -227,7 +227,7 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
         Returns:
             OCC.Geom.Handle_Geom_Curve: Interface to all curve geometry
         """
-        return BRep_Tool_Curve(self.topods_shape())[0]
+        return BRep_Tool.Curve(self.topods_shape())[0]
 
     def specific_curve(self):
         """
@@ -278,7 +278,7 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
         if not self.has_curve():
             # Return an empty interval
             return Interval()
-        _, umin, umax = BRep_Tool_Curve(self.topods_shape())
+        _, umin, umax = BRep_Tool.Curve(self.topods_shape())
         return Interval(umin, umax)
 
     def reversed_edge(self):
@@ -363,7 +363,7 @@ class Edge(Shape, VertexContainerMixin, BoundingBoxMixin):
         Returns:
             GeomAbs_Shape: enum describing the continuity order
         """
-        return BRep_Tool_Continuity(
+        return BRep_Tool.Continuity(
             self.topods_shape(), face1.topods_shape(), face2.topods_shape()
         )
 
