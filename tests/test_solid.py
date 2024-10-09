@@ -51,3 +51,25 @@ class SplitClosedEdgeSolidTester(TestBase):
         self.assertTrue(split_solid is not None)
         num_edges_after_splitting = split_solid.num_edges()
         self.assertLessEqual(num_original_edges, num_edges_after_splitting)
+
+class TransformTester(TestBase):
+    def test_smoke(self):
+        box = Solid.make_box(1, 1, 1)
+        with self.subTest("identity"):
+            box.transform(
+                np.array([
+                    [1, 0, 0, 0],
+                    [0, 1, 0, 0],
+                    [0, 0, 1, 0],
+                ]),
+                copy=True,
+            )
+        with self.subTest("nonidentity"):
+            box.transform(
+                np.array([
+                    [0, 1, 0, 1.],
+                    [0, 0, 1, 2.],
+                    [1, 0, 0, 3.],
+                ]),
+                copy=True,
+            )
