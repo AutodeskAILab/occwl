@@ -5,15 +5,9 @@ import sys
 # OCC
 from OCC.Core.Quantity import (
     Quantity_Color,
-    Quantity_TOC_RGB,
-    Quantity_NOC_WHITE,
-    Quantity_NOC_BLACK,
     Quantity_NOC_BLUE1,
-    Quantity_NOC_CYAN1,
     Quantity_NOC_RED,
     Quantity_NOC_GREEN,
-    Quantity_NOC_ORANGE,
-    Quantity_NOC_YELLOW,
 )
 
 

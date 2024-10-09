@@ -9,7 +9,6 @@ from OCC.Extend.ShapeFactory import point_list_to_TColgp_Array1OfPnt
 
 # occwl
 from occwl.geometry.interval import Interval
-from occwl.edge_data_extractor import EdgeDataExtractor, EdgeConvexity
 from occwl.edge import Edge
 from occwl.geometry.arc_length_param_finder import ArcLengthParamFinder
 

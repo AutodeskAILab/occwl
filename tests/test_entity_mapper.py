@@ -3,7 +3,6 @@ from OCC.Extend.TopologyUtils import TopologyExplorer, WireExplorer
 
 # occwl
 from occwl.entity_mapper import EntityMapper
-from occwl.solid import Solid
 from occwl.face import Face
 from occwl.edge import Edge
 from occwl.wire import Wire
