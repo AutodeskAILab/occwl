@@ -422,7 +422,7 @@ class Shape:
         # we don't want to set the values as this
         # would give us a geometric identity without
         # the identity flag set
-        if not np.allclose(a, np.eye(4)):
+        if not np.allclose(a, np.eye(3, 4)):
             trsf.SetValues(
                 a[0,0], a[0,1], a[0,2], a[0, 3],
                 a[1,0], a[1,1], a[1,2], a[1, 3],
