@@ -397,9 +397,9 @@ class Shape:
                 vertex.Location(identity)
         
 
-    def transform(self, a, copy=True):
+    def transform(self, a: np.ndarray, copy=True):
         """
-        Apply the given 4x4 transform matrix to the solid
+        Apply the given 3x4 transform matrix to the solid.
 
         Args: a (nd.array) - Homogeneous transform matrix
                              The transform that will be applied is
@@ -413,6 +413,7 @@ class Shape:
                             False - Apply the transform to the topods Locator
                                     if possible 
         """
+        assert (a.shape == (3, 4)), "Transform matrix must be 3x4"
         a = a.astype(np.float64)
 
         # Create an identity transform
