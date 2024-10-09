@@ -1,5 +1,5 @@
 {% set name = "occwl" %}
-{% set version = "2.1.0" %}
+{% set version = "3.0.0" %}
 
 package:
   name: "{{ name|lower }}"
