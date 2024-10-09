@@ -55,12 +55,21 @@ class SplitClosedEdgeSolidTester(TestBase):
 class TransformTester(TestBase):
     def test_smoke(self):
         box = Solid.make_box(1, 1, 1)
-        print("running")
-        transformed_box = box.transform(
-            np.array([
-                [1, 0, 0, 0],
-                [0, 1, 0, 0],
-                [0, 0, 1, 0],
-            ]),
-            copy=True,
-        )
+        with self.subTest("identity"):
+            box.transform(
+                np.array([
+                    [1, 0, 0, 0],
+                    [0, 1, 0, 0],
+                    [0, 0, 1, 0],
+                ]),
+                copy=True,
+            )
+        with self.subTest("nonidentity"):
+            box.transform(
+                np.array([
+                    [0, 1, 0, 1.],
+                    [0, 0, 1, 2.],
+                    [1, 0, 0, 3.],
+                ]),
+                copy=True,
+            )
