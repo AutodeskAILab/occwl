@@ -1,6 +1,10 @@
 site_name: OCC Wrapper Library (occwl)
 theme:
   name: material
+  features:
+    - navigation.instant
+    - navigation.sections
+    - toc.integrate
 
 plugins:
   - search
