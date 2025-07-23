@@ -6,9 +6,6 @@ from itertools import repeat
 from multiprocessing import Pool
 from occwl.compound import Compound
 from occwl.viewer import OffscreenRenderer
-from OCC.Core.gp import gp_Dir, gp_Vec
-from OCC.Core.V3d import V3d_DirectionalLight
-from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB, Quantity_NOC_WHITE
 from tqdm import tqdm
 
 

@@ -1,11 +1,9 @@
-import numpy as np
-
 from OCC.Core.TopoDS import (
     TopoDS_Solid,
     TopoDS_Compound,
     TopoDS_CompSolid,
 )
-from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
+from OCC.Core.gp import gp_Ax2
 import math
 from occwl.base import VertexContainerMixin, EdgeContainerMixin, \
             WireContainerMixin, FaceContainerMixin, BottomUpFaceIterator, \
@@ -14,8 +12,6 @@ from occwl.base import VertexContainerMixin, EdgeContainerMixin, \
 
 from occwl.geometry import geom_utils
 from occwl.shape import Shape
-from deprecate import deprecated
-import logging
 
 
 class Solid(Shape, VertexContainerMixin, EdgeContainerMixin, ShellContainerMixin, \

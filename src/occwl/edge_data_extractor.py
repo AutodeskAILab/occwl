@@ -7,13 +7,11 @@ from enum import Enum
 import numpy as np
 
 # OCC
-from OCC.Core.BRepAdaptor import BRepAdaptor_Curve2d, BRepAdaptor_Surface
-from OCC.Core.gp import gp_Pnt2d, gp_Identity
+from OCC.Core.BRepAdaptor import BRepAdaptor_Curve2d
+from OCC.Core.gp import gp_Pnt2d
 
 # occwl
-from occwl.geometry.interval import Interval
 from occwl.geometry.arc_length_param_finder import ArcLengthParamFinder
-import occwl.geometry.geom_utils as geom_utils 
 
 class EdgeConvexity(Enum):
     CONCAVE = 1

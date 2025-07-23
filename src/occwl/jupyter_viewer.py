@@ -1,10 +1,9 @@
 import numpy as np
-import math
 import sys
 import uuid
 
-from typing import Any, Callable, List, Optional, Tuple
-from OCC.Core.TopoDS import TopoDS_Vertex, TopoDS_Edge, TopoDS_Face, TopoDS_Shell, TopoDS_Solid
+from typing import Optional, Tuple
+from OCC.Core.TopoDS import TopoDS_Edge, TopoDS_Face
 
 from OCC.Display.WebGl.jupyter_renderer import JupyterRenderer
 
@@ -12,12 +11,9 @@ from matplotlib.cm import get_cmap
 from matplotlib.colors import Normalize
 from matplotlib.colors import rgb2hex
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from occwl.vertex import Vertex
 from occwl.edge import Edge
 from occwl.face import Face
-from occwl.solid import Solid
 
 # pythreejs
 try:

@@ -1,12 +1,9 @@
-from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d
 from OCC.Core.TopoDS import TopoDS_Vertex
 from OCC.Core.BRep import BRep_Tool
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeVertex
-import logging
 
 from occwl.geometry import geom_utils
 from occwl.shape import Shape
-from deprecate import deprecated
 
 
 class Vertex(Shape):

@@ -1,8 +1,4 @@
 import numpy as np
-from OCC.Core.gp import gp_Identity
-
-from occwl.face import Face
-from occwl.edge import Edge
 
 
 def _uvgrid_reverse_u(grid):
