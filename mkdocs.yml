@@ -12,8 +12,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          setup_commands:
-            - import sys; sys.path.insert(0, "src")
+          paths: [src]
 
 nav:
   - Home: index.md
