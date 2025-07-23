@@ -1,5 +1,7 @@
 # OCC Wrapper Library
 
+[![Docs](https://img.shields.io/badge/docs-online-orange)](https://AutodeskAILab.github.io/occwl)
+
 OCCWL is a simple, lightweight Pythonic wrapper around pythonocc (python bindings for OpenCascade).
 
 ## Installing our conda package
