@@ -10,9 +10,10 @@ plugins:
   - search
   - mkdocstrings:
       default_handler: python
-
-setup_commands:
-  - import sys; sys.path.insert(0, "src")
+      handlers:
+        python:
+          setup_commands:
+            - import sys; sys.path.insert(0, "src")
 
 nav:
   - Home: index.md
