@@ -7,7 +7,6 @@ from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeVertex
 from OCC.Core.BRepExtrema import BRepExtrema_DistShapeShape
 from OCC.Core.BRepTools import BRepTools_ShapeSet
 from OCC.Core.Extrema import Extrema_ExtFlag_MIN
-from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.gp import gp_Ax1, gp_Trsf
 from OCC.Core.TopAbs import TopAbs_REVERSED
 from OCC.Core.TopLoc import TopLoc_Location

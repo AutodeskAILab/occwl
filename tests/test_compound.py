@@ -1,5 +1,4 @@
 from occwl.compound import Compound
-from occwl.io import load_single_compound_from_step
 
 # Test
 from tests.test_base import TestBase

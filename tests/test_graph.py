@@ -1,12 +1,4 @@
-# System
-import numpy as np
-
 # Geometry
-from occwl.geometry.interval import Interval
-from OCC.Core.gp import gp_XOY, gp_Pnt
-from OCC.Core.GC import GC_MakeSegment
-from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
-from OCC.Core.Geom import Geom_Circle
 from occwl.graph import vertex_adjacency, face_adjacency
 
 # Test

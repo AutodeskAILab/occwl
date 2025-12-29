@@ -1,6 +1,3 @@
-# System
-from pathlib import Path
-
 # OCC
 from occwl.compound import Compound
 

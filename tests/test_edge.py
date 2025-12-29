@@ -4,7 +4,7 @@ import numpy as np
 
 # Geometry
 from occwl.geometry.interval import Interval
-from OCC.Core.gp import gp_XOY, gp_Pnt
+from OCC.Core.gp import gp, gp_Pnt
 from OCC.Core.GC import GC_MakeSegment
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeEdge
 from OCC.Core.Geom import Geom_Circle
@@ -71,7 +71,7 @@ class EdgeTester(TestBase):
 
     def _test_closed_periodic(self):
         # Circle
-        circle = BRepBuilderAPI_MakeEdge(Geom_Circle(gp_XOY(), 1)).Edge()
+        circle = BRepBuilderAPI_MakeEdge(Geom_Circle(gp.XOY(), 1)).Edge()
         circle = Edge(circle)
         is_closed = circle.closed_curve()
         is_periodic = circle.periodic()
@@ -90,7 +90,7 @@ class EdgeTester(TestBase):
         self.assertTrue(not is_periodic)
 
     def _test_curve_type(self):
-        circle = BRepBuilderAPI_MakeEdge(Geom_Circle(gp_XOY(), 1)).Edge()
+        circle = BRepBuilderAPI_MakeEdge(Geom_Circle(gp.XOY(), 1)).Edge()
         circle = Edge(circle)
         curve_type = circle.curve_type()
         curve_type_enum = circle.curve_type_enum()
