@@ -1,0 +1,20 @@
+site_name: OCC Wrapper Library (occwl)
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.sections
+    - toc.integrate
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+
+nav:
+  - Home: index.md
+  - API Documentation: api.md
+  - Developers Guide: occwl_developers_guide.md
