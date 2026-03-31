@@ -1,5 +1,6 @@
 from OCC.Core.TopoDS import TopoDS_Compound
-from OCC.Extend.DataExchange import read_step_file, list_of_shapes_to_compound
+from OCC.Extend.DataExchange import read_step_file
+from OCC.Extend.TopologyUtils import list_of_shapes_to_compound
 from OCC.Core.BRepTools import BRepTools_ShapeSet
 from OCC.Core.STEPControl import STEPControl_Reader
 from OCC.Core.TopAbs import (
