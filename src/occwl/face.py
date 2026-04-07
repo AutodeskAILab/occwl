@@ -332,9 +332,10 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             float: Gaussian curvature
         """
-        return GeomLProp_SLProps(
-            self.surface(), uv[0], uv[1], 2, 1e-9
-        ).GaussianCurvature()
+        props = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9)
+        if props.IsCurvatureDefined():
+            return props.GaussianCurvature()
+        return 0.0
 
     def min_curvature(self, uv):
         """
@@ -346,12 +347,14 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             float: Min. curvature
         """
-        min_curv = GeomLProp_SLProps(
-            self.surface(), uv[0], uv[1], 2, 1e-9
-        ).MinCurvature()
-        if self.reversed():
-            min_curv *= -1
-        return min_curv
+        props = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9)
+        if props.IsCurvatureDefined():
+            min_curv = props.MinCurvature()
+            if self.reversed():
+                min_curv *= -1
+            return min_curv
+        else:
+            return 0.0
 
     def mean_curvature(self, uv):
         """
@@ -363,12 +366,14 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             float: Mean curvature
         """
-        mean_curv = GeomLProp_SLProps(
-            self.surface(), uv[0], uv[1], 2, 1e-9
-        ).MeanCurvature()
-        if self.reversed():
-            mean_curv *= -1
-        return mean_curv
+        props = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9)
+        if props.IsCurvatureDefined():
+            mean_curv = props.MeanCurvature()
+            if self.reversed():
+                mean_curv *= -1
+            return mean_curv
+        else:
+            return 0.0
 
     def max_curvature(self, uv):
         """
@@ -380,12 +385,14 @@ class Face(Shape, BoundingBoxMixin, TriangulatorMixin, WireContainerMixin, \
         Returns:
             float: Max. curvature
         """
-        max_curv = GeomLProp_SLProps(
-            self.surface(), uv[0], uv[1], 2, 1e-9
-        ).MaxCurvature()
-        if self.reversed():
-            max_curv *= -1
-        return max_curv
+        props = GeomLProp_SLProps(self.surface(), uv[0], uv[1], 2, 1e-9)
+        if props.IsCurvatureDefined():
+            max_curv = props.MaxCurvature()
+            if self.reversed():
+                max_curv *= -1
+            return max_curv
+        else:
+            return 0.0
 
     def pcurve(self, edge):
         """
