@@ -21,7 +21,6 @@ class TransformSolidTester(TestBase):
             [1, 0, 0, 1],
             [0, 1, 0, 0],
             [0, 0, 1, 0],
-            [0, 0, 0, 1]
         ])
         transformed = solid.transform(mat)
         transformed_box = transformed.exact_box()

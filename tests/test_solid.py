@@ -1,6 +1,9 @@
 # System
 import numpy as np
 
+# OCC
+from occwl.solid import Solid
+
 # Test
 from tests.test_base import TestBase
 
