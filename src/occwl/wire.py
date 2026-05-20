@@ -5,8 +5,6 @@ from occwl.edge import Edge
 from occwl.vertex import Vertex
 
 from occwl.shape import Shape
-from deprecate import deprecated
-import logging
 
 
 class Wire(Shape):

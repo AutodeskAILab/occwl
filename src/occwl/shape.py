@@ -5,9 +5,9 @@ import numpy as np
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_MakeVertex
 from OCC.Core.BRepExtrema import BRepExtrema_DistShapeShape
-from OCC.Core.BRepTools import BRepTools_ShapeSet
+from OCC.Core.BRepTools import breptools
+from OCC.Extend.TopologyUtils import list_of_shapes_to_compound
 from OCC.Core.Extrema import Extrema_ExtFlag_MIN
-from OCC.Core.Message import Message_ProgressRange
 from OCC.Core.gp import gp_Ax1, gp_Trsf
 from OCC.Core.TopAbs import TopAbs_REVERSED
 from OCC.Core.TopLoc import TopLoc_Location
@@ -217,19 +217,12 @@ class Shape:
                 3 - [OCCT 7.6] added storing of per-vertex normal information
                                and dropped storing of CurveOnSurface UV Points
         """
-        new_api = False
-        shapes_set = BRepTools_ShapeSet(with_triangles)
-        # shapes_set.SetWithNormals(with_normals) # Not in OCC 7.5.0
+        shapes_list = [shp.topods_shape() for shp in shapes]
+        compound, success = list_of_shapes_to_compound(shapes_list)
+        assert success
 
-        for shp in shapes:
-            shapes_set.Add(shp.topods_shape())
-        if format_version is not None:
-            shapes_set.SetFormatNb(format_version)
-
-
-        with open(filename, "w") as fp:
-            s = shapes_set.WriteToString()
-            fp.write(s)
+        version = format_version if format_version is not None else 1
+        breptools.Write(compound, str(filename), with_triangles, with_normals, version)
 
 
 

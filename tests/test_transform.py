@@ -5,8 +5,6 @@ Test the transform() function
 # System
 import numpy as np
 
-from occwl.solid import Solid
-
 # Test
 from tests.test_base import TestBase
 
@@ -23,7 +21,6 @@ class TransformSolidTester(TestBase):
             [1, 0, 0, 1],
             [0, 1, 0, 0],
             [0, 0, 1, 0],
-            [0, 0, 0, 1]
         ])
         transformed = solid.transform(mat)
         transformed_box = transformed.exact_box()

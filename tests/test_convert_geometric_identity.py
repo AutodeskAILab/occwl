@@ -2,9 +2,6 @@
 Test for convert_geometric_identity_transforms_to_identity()
 """
 # System
-import numpy as np
-from pathlib import Path
-
 from occwl.compound import Compound
 
 # Test

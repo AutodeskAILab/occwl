@@ -1,20 +1,13 @@
 import numpy as np
 
-from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Pnt2d, gp_Ax2
 from OCC.Core.Bnd import Bnd_Box
-from OCC.Core.BRepBndLib import brepbndlib_Add, brepbndlib_AddOptimal
-from OCC.Extend import TopologyUtils
-from OCC.Core.BRepGProp import (
-    brepgprop_LinearProperties,
-    brepgprop_SurfaceProperties,
-    brepgprop_VolumeProperties,
-)
+from OCC.Core.BRepBndLib import brepbndlib
+from OCC.Core.BRepGProp import brepgprop
 from OCC.Core.BRepMesh import BRepMesh_IncrementalMesh
 from OCC.Core.GProp import GProp_GProps
-from OCC.Core.gp import gp_Pnt, gp_Dir, gp_Ax1, gp_Vec, gp_Trsf
+from OCC.Core.gp import gp_Pnt, gp_Ax1, gp_Vec, gp_Trsf
 from OCC.Core.ShapeUpgrade import ShapeUpgrade_ShapeDivideClosed
 from OCC.Core.ShapeUpgrade import ShapeUpgrade_ShapeDivideClosedEdges
-from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
 
 
 class VertexContainerMixin:
@@ -498,7 +491,7 @@ class SurfacePropertiesMixin:
             float: Area
         """
         geometry_properties = GProp_GProps()
-        brepgprop_SurfaceProperties(self.topods_shape(), geometry_properties)
+        brepgprop.SurfaceProperties(self.topods_shape(), geometry_properties)
         return geometry_properties.Mass()
 
 
@@ -517,7 +510,7 @@ class VolumePropertiesMixin:
             float: Volume
         """
         props = GProp_GProps()
-        brepgprop_VolumeProperties(self.topods_shape(), props, tolerance)
+        brepgprop.VolumeProperties(self.topods_shape(), props, tolerance)
         return props.Mass()
 
     def center_of_mass(self, tolerance=1e-9):
@@ -532,7 +525,7 @@ class VolumePropertiesMixin:
         """
         from occwl.geometry import geom_utils
         props = GProp_GProps()
-        brepgprop_VolumeProperties(self.topods_shape(), props, tolerance)
+        brepgprop.VolumeProperties(self.topods_shape(), props, tolerance)
         com = props.CentreOfMass()
         return geom_utils.gp_to_numpy(com)
 
@@ -550,7 +543,7 @@ class VolumePropertiesMixin:
         """
         from occwl.geometry import geom_utils
         props = GProp_GProps()
-        brepgprop_VolumeProperties(self.topods_shape(), props, tolerance)
+        brepgprop.VolumeProperties(self.topods_shape(), props, tolerance)
         axis = gp_Ax1(
             geom_utils.numpy_to_gp(point), geom_utils.numpy_to_gp_dir(direction)
         )
@@ -571,7 +564,7 @@ class BoundingBoxMixin:
         """
         from occwl.geometry import geom_utils
         b = Bnd_Box()
-        brepbndlib_Add(self.topods_shape(), b)
+        brepbndlib.Add(self.topods_shape(), b)
         return geom_utils.box_to_geometry(b)
 
     def exact_box(self, use_shapetolerance=False):
@@ -588,7 +581,7 @@ class BoundingBoxMixin:
         from occwl.geometry import geom_utils
         b = Bnd_Box()
         use_triangulation = True
-        brepbndlib_AddOptimal(self.topods_shape(), b, use_triangulation, use_shapetolerance)
+        brepbndlib.AddOptimal(self.topods_shape(), b, use_triangulation, use_shapetolerance)
         return geom_utils.box_to_geometry(b)
 
     def scale_to_box(self, box_side, copy=True):

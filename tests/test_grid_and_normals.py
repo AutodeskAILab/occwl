@@ -1,9 +1,7 @@
 # System
-from pathlib import Path
 import numpy as np
 
 # OCC
-from occwl.solid import Solid
 from occwl.uvgrid import uvgrid, ugrid, _uvgrid_reverse_u
 
 # Test

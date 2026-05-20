@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import Any, Callable, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
-from OCC.Core.AIS import AIS_Line, AIS_Point, AIS_Shaded, AIS_WireFrame, AIS_Axis
+from OCC.Core.AIS import AIS_Line, AIS_Point, AIS_Shaded, AIS_WireFrame
 from OCC.Core.Aspect import (
     Aspect_TOL_DASH,
     Aspect_TOL_DOT,
@@ -19,7 +19,7 @@ from OCC.Core.Graphic3d import (
     Graphic3d_TOSM_FACET,
     Graphic3d_TOSM_FRAGMENT
 )
-from OCC.Core.gp import gp_Ax1, gp_Dir
+from OCC.Core.gp import gp_Dir
 from OCC.Core.Geom import Geom_CartesianPoint, Geom_Line
 from OCC.Core.Prs3d import Prs3d_LineAspect, Prs3d_PointAspect
 from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
