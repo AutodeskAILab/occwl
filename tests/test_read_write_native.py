@@ -44,7 +44,6 @@ class ReadWriteNativeTester(TestBase):
             [1, 0, 0, 1],
             [0, 1, 0, 0],
             [0, 0, 1, 0],
-            [0, 0, 0, 1]
         ])
         copy = solid.transform(mat, copy=True)
         solids = [ solid, copy]

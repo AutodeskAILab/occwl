@@ -1,7 +1,7 @@
+from OCC.Core.BRepTools import breptools
 from OCC.Core.TopoDS import TopoDS_Compound
 from OCC.Extend.DataExchange import read_step_file
 from OCC.Extend.TopologyUtils import list_of_shapes_to_compound
-from OCC.Core.BRepTools import BRepTools_ShapeSet
 from OCC.Core.STEPControl import STEPControl_Reader
 from OCC.Core.TopAbs import (
     TopAbs_FACE, 
@@ -117,12 +117,11 @@ class Compound(Shape, BottomUpFaceIterator, BoundingBoxMixin, BottomUpEdgeIterat
         Returns:
             occwl.compound.Compound: Compound shape
         """
-        shape_set = BRepTools_ShapeSet()
         with open(filename, "r") as fp:
-            shape_set.ReadFromString(fp.read())
-        shapes = []
-        for i in range(shape_set.NbShapes()):
-            shapes.append(shape_set.Shape(i+1))
-        shp, success = list_of_shapes_to_compound(shapes)
-        assert success
-        return Compound(shp)
+            content = fp.read()
+        shape = breptools.ReadFromString(content)
+        if not isinstance(shape, TopoDS_Compound):
+            shp, success = list_of_shapes_to_compound([shape])
+            assert success
+            return Compound(shp)
+        return Compound(shape)
