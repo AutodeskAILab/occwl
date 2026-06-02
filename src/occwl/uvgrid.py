@@ -35,8 +35,8 @@ def uvgrid(face, num_u=10, num_v=10, uvs=False, method="point", reverse_order_wi
     uvgrid = []
     uv_values = np.zeros((num_u, num_v, 2), dtype=np.float32)
 
-    if type(face.surface()) is float:
-        # Can't get an curve for this face.
+    if face.surface() is None:
+        # Can't get a surface for this face.
         if uvs:
             return None, uv_values
         return None
@@ -77,8 +77,8 @@ def ugrid(edge, num_u: int = 10, us=False, method="point", reverse_order_with_ed
     ugrid = []
     u_values = np.zeros((num_u), dtype=np.float32)
 
-    if type(edge.curve()) is float:
-        # Can't get an curve for this edge.
+    if not edge.has_curve():
+        # Can't get a curve for this edge.
         if us:
             return None, u_values
         return None

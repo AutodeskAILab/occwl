@@ -24,7 +24,9 @@ class EdgeTester(TestBase):
 
     def perform_tests_on_edge(self, edge):
         curve = edge.curve()
-        self.assertTrue(curve is not None)
+        # Some edges (e.g. at the pole of a sphere) legitimately have no curve
+        if edge.has_curve():
+            self.assertTrue(curve is not None)
 
         # Can't do this test as we have some unsupported curve types
         # specific_curve = edge.specific_curve()
